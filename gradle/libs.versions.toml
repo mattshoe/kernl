@@ -1,0 +1,8 @@
+[versions]
+ksp = "2.0.0-1.0.21"
+
+[libraries]
+
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
