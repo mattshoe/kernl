@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-//    ksp(project(":AutoRepo.Processor"))
+    ksp(project(":AutoRepo.Processor"))
     compileOnly(project(":AutoRepo.Annotations"))
 
     testImplementation(kotlin("test"))

@@ -18,11 +18,13 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":AutoRepo.Annotations"))
     implementation(kotlin("stdlib"))
+    implementation(project(":AutoRepo.Annotations"))
+
     implementation("com.squareup:kotlinpoet:1.17.0")
     implementation("com.squareup:kotlinpoet-ksp:1.17.0")
     implementation("com.google.devtools.ksp:symbol-processing-api:2.0.0-1.0.21")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.3")
