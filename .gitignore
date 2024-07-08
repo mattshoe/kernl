@@ -43,3 +43,6 @@ bin/
 
 ### Kotlin 2.0 Junk ###
 /.kotlin
+
+### Intellij Junk ###
+/.idea
