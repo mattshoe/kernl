@@ -17,6 +17,7 @@ repositories {
 dependencies {
     ksp(project(":AutoRepo.Processor"))
     compileOnly(project(":AutoRepo.Annotations"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 
     testImplementation(kotlin("test"))
 }

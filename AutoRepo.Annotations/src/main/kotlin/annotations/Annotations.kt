@@ -1,32 +1,26 @@
 package io.github.mattshoe.shoebox.annotations
 
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class AutoRepo(
-    val name: String = ""
+    val name: String
 ) {
-    @Target(AnnotationTarget.CLASS)
+    @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.SOURCE)
-    annotation class SingleCacheInMemory(
-        val name: String = ""
+    annotation class SingleMemoryCache(
+        val name: String
     )
 
-    @Target(AnnotationTarget.CLASS)
+    @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.SOURCE)
-    annotation class MultiCacheInMemory(
-        val name: String = ""
+    annotation class MultiMemoryCache(
+        val name: String
     )
 
-    @Target(AnnotationTarget.CLASS)
+    @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.SOURCE)
-    annotation class SingleCacheDisk(
-        val name: String = ""
-    )
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.SOURCE)
-    annotation class MultiCacheDisk(
-        val name: String = ""
+    annotation class Persistent(
+        val name: String
     )
 }
 

@@ -1,71 +1,53 @@
 package io.github.mattshoe.shoebox.processor
 
-import com.google.devtools.ksp.getDeclaredFunctions
-import com.google.devtools.ksp.processing.*
+import com.google.devtools.ksp.processing.CodeGenerator
+import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import io.github.mattshoe.shoebox.annotations.AutoRepo
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import io.github.mattshoe.shoebox.processor.generators.RepositoryGenerator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class AutoRepoProcessor(
     private val codeGenerator: CodeGenerator,
-    private val logger: KSPLogger
+    private val generators: Set<Pair<String, RepositoryGenerator>>
 ) : SymbolProcessor {
 
-    override fun process(resolver: Resolver): List<KSAnnotated> {
-        val symbols = resolver.getSymbolsWithAnnotation(AutoRepo.SingleCacheInMemory::class.qualifiedName!!)
-            .filterIsInstance<KSClassDeclaration>()
-
-        symbols.forEach { classDeclaration ->
-            generateRepositoryClass(classDeclaration)
+    override fun process(resolver: Resolver): List<KSAnnotated> = runBlocking {
+        generators.forEach { (annotationName, generator) ->
+            launch {
+                resolver
+                    .getSymbolsWithAnnotation(annotationName)
+                    .filterIsInstance<KSFunctionDeclaration>()
+                    .toList().forEach { classDeclaration ->
+                        launch {
+                            generateFiles(classDeclaration, generator)
+                        }
+                    }
+            }
         }
 
-        return emptyList()
+        emptyList()
     }
 
-    private fun generateRepositoryClass(classDeclaration: KSClassDeclaration) {
-        val packageName = classDeclaration.packageName.asString()
-        val serviceName = classDeclaration.simpleName.asString()
-        val repositoryInterfaceName = serviceName.removeSuffix("Service") + "Repository"
-
-        // Get the return type of the service method
-        val function = classDeclaration.getDeclaredFunctions().firstOrNull { it.simpleName.asString().startsWith("get") }
-        val returnType = function?.returnType?.resolve()?.declaration?.qualifiedName?.asString()
-
-        if (returnType != null) {
-            val fileSpec = FileSpec.builder(packageName, repositoryInterfaceName)
-                .addType(
-                    TypeSpec.interfaceBuilder(repositoryInterfaceName)
-                        .addProperty(
-                            PropertySpec.builder("data", ClassName("kotlinx.coroutines.flow", "Flow").parameterizedBy(ClassName("", "DataResult").parameterizedBy(ClassName.bestGuess(returnType))))
-                                .build()
-                        )
-                        .addFunction(
-                            FunSpec.builder("init")
-                                .addModifiers(KModifier.SUSPEND, KModifier.ABSTRACT)
-                                .addParameter("data", ClassName.bestGuess(returnType))
-                                .addParameter("forceRefresh", BOOLEAN)
-                                .build()
-                        )
-                        .addFunction(
-                            FunSpec.builder("refresh")
-                                .addModifiers(KModifier.SUSPEND, KModifier.ABSTRACT)
-                                .build()
-                        )
-                        .build()
-                )
-                .build()
-
-            codeGenerator.createNewFile(
-                Dependencies(false, classDeclaration.containingFile!!),
-                packageName,
-                repositoryInterfaceName
-            ).bufferedWriter().use {
-                fileSpec.writeTo(it)
+    private suspend fun generateFiles(classDeclaration: KSFunctionDeclaration, generator: RepositoryGenerator) {
+        generator
+            .generate(classDeclaration)
+            .forEach { fileData ->
+                withContext(Dispatchers.IO) {
+                    codeGenerator.createNewFile(
+                        Dependencies(false, classDeclaration.containingFile!!),
+                        fileData.packageName,
+                        fileData.fileName
+                    ).bufferedWriter().use {
+                        fileData.fileSpec.writeTo(it)
+                    }
+                }
             }
-        } else {
-            logger.warn("No suitable method found in $serviceName")
-        }
     }
 }
