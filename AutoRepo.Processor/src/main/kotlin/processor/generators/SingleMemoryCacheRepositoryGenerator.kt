@@ -4,6 +4,7 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.util.argument
 import io.github.mattshoe.shoebox.util.find
@@ -26,7 +27,8 @@ class SingleMemoryCacheRepositoryGenerator(
         val serviceReturnType = functionDeclaration.returnType?.resolve()?.declaration?.qualifiedName?.asString()
 
         serviceReturnType?.let { returnType ->
-            generateInterfaceFileData(files, repositoryName, packageName, returnType)
+            val parametersDataClass = generateDataClassForServiceParameters(functionDeclaration)
+            generateInterfaceFileData(files, repositoryName, packageName, returnType, parametersDataClass)
         } ?: run {
             logger.error("Method '${functionDeclaration.simpleName.asString()}' has no return type! It cannot be used as a repository.", functionDeclaration)
         }
@@ -39,7 +41,8 @@ class SingleMemoryCacheRepositoryGenerator(
         files: MutableSet<Deferred<FileGenData?>>,
         serviceName: String,
         packageName: String,
-        returnType: String
+        returnType: String,
+        parametersDataClass: TypeSpec
     ) = files.add(
         async {
             FileGenData(
@@ -48,7 +51,8 @@ class SingleMemoryCacheRepositoryGenerator(
                 buildInterface(
                     packageName,
                     serviceName,
-                    returnType
+                    returnType,
+                    parametersDataClass
                 )
             )
         }
@@ -58,39 +62,41 @@ class SingleMemoryCacheRepositoryGenerator(
     private fun buildInterface(
         packageName: String,
         repositoryInterfaceName: String,
-        returnType: String
+        dataType: String,
+        parametersDataClass: TypeSpec
     ): FileSpec {
         return FileSpec.builder(packageName, repositoryInterfaceName)
             .addType(
                 TypeSpec.interfaceBuilder(repositoryInterfaceName)
+                    .addType(parametersDataClass)
+                    .addProperty(
+                        PropertySpec.builder("value", dataResult(dataType)).build()
+                    )
                     .addProperty(
                         PropertySpec.builder(
-                            "data", ClassName("kotlinx.coroutines.flow", "Flow").parameterizedBy(
-                                ClassName("io.github.mattshoe.shoebox.data", "DataResult").parameterizedBy(
-                                    ClassName.bestGuess(returnType)
-                                )
+                            "data",
+                            ClassName(
+                                "kotlinx.coroutines.flow",
+                                "Flow"
+                            ).parameterizedBy(
+                                dataResult(dataType)
                             )
-                        )
-                            .build()
+                        ).build()
                     )
                     .addFunction(
                         FunSpec.builder("initialize")
                             .addModifiers(KModifier.SUSPEND, KModifier.ABSTRACT)
                             .addParameter(
+                                ParameterSpec.builder(
+                                    "params",
+                                    ClassName("", parametersDataClass.name!!)
+                                ).build()
+                            )
+                            .addParameter(
                                 ParameterSpec.builder("forceRefresh", BOOLEAN)
                                     .defaultValue("false")
                                     .build()
-                            )
-                            .addParameter(
-                                ParameterSpec.builder(
-                                    "data",
-                                    LambdaTypeName.get(
-                                        parameters = listOf(ParameterSpec.unnamed(STRING)),
-                                        returnType = ClassName.bestGuess(returnType)
-                                    ).copy(suspending = true)
-                                ).build()
-                            )
-                            .build()
+                            ).build()
                     )
                     .addFunction(
                         FunSpec.builder("refresh")
@@ -100,5 +106,24 @@ class SingleMemoryCacheRepositoryGenerator(
                     .build()
             )
             .build()
+    }
+
+    private fun generateDataClassForServiceParameters(function: KSFunctionDeclaration): TypeSpec {
+        val classBuilder = TypeSpec
+            .classBuilder("Params")
+            .addModifiers(KModifier.DATA)
+
+        val constructorBuilder = FunSpec.constructorBuilder()
+
+        function.parameters.forEach { parameter ->
+            val name = parameter.name?.asString() ?: return@forEach
+            val type = parameter.type.resolve().toTypeName()
+            val propertySpec = PropertySpec.builder(name, type).initializer(name).build()
+            classBuilder.addProperty(propertySpec)
+            constructorBuilder.addParameter(name, type)
+        }
+
+        classBuilder.primaryConstructor(constructorBuilder.build())
+        return classBuilder.build()
     }
 }
