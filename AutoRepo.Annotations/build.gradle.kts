@@ -20,6 +20,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 
     testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation("com.google.truth:truth:1.4.3")
+    testImplementation("junit:junit:4.13.2")
+}
+
+tasks.test {
+    useJUnit()
 }
 
 publishing {
@@ -77,10 +85,6 @@ publishing {
             }
         }
     }
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 tasks.register<Zip>("generateZip") {

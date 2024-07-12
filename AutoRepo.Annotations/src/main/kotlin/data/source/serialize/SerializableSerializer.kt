@@ -13,6 +13,7 @@ class SerializableSerializer<T : Serializable> : Serializer<T> {
         return byteArrayOutputStream.toByteArray()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun deserialize(data: ByteArray): T {
         val byteArrayInputStream = ByteArrayInputStream(data)
         return ObjectInputStream(byteArrayInputStream).use { it.readObject() as T }

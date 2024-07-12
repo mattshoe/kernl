@@ -27,13 +27,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.3")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.6.0")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
+    testImplementation("com.google.truth:truth:1.4.3")
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnit()
 }
 
 kotlin {

@@ -102,6 +102,7 @@ class SingleMemoryCacheRepositoryGenerator(
                 )
             )
             .addType(parametersDataClass)
+            .overrideFetchIfNoParams(packageName, repositoryName, parametersDataClass)
             .addType(
                 TypeSpec.companionObjectBuilder()
                     .addFunction(
@@ -184,5 +185,27 @@ class SingleMemoryCacheRepositoryGenerator(
         requireNotNull(repositoryName)
 
         return repositoryName
+    }
+
+    private fun TypeSpec.Builder.overrideFetchIfNoParams(
+        packageName: String,
+        repositoryName: String,
+        parametersDataClass: TypeSpec
+    ): TypeSpec.Builder {
+//        if (parametersDataClass.propertySpecs.isEmpty()) {
+//            addFunction(
+//                FunSpec.Builder()
+//                    .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
+//                    .addParameter(
+//                        "params",
+//                        ClassName(
+//                            packageName,
+//                            "$repositoryName.${parametersDataClass.name!!}"
+//                        )
+//                    )
+//            )
+//        }
+
+        return this
     }
 }
