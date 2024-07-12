@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-abstract class BaseSingleSourceLiveRepository<TParams: Any, TData: Any>: SingleSourceLiveRepository<TParams, TData> {
+abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCacheLiveRepository<TParams, TData> {
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val dataSource by lazy {
         DataSource.Builder()
@@ -23,7 +23,7 @@ abstract class BaseSingleSourceLiveRepository<TParams: Any, TData: Any>: SingleS
 
     protected abstract suspend fun fetchData(params: TParams): TData
 
-    override suspend fun fetch(data: TParams) {
+    override suspend fun fetch(data: TParams, forceRefresh: Boolean) {
         coroutineScope.launch {
             dataSource.initialize {
                 fetchData(data)
@@ -37,11 +37,7 @@ abstract class BaseSingleSourceLiveRepository<TParams: Any, TData: Any>: SingleS
         }.join()
     }
 
-    override suspend fun clear() {
+    override suspend fun invalidate() {
         dataSource.invalidate()
-    }
-
-    override fun close() {
-        coroutineScope.cancel()
     }
 }

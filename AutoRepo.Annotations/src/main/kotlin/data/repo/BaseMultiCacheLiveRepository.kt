@@ -5,23 +5,21 @@ import io.github.mattshoe.shoebox.data.source.DataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.reflect.KClass
 
-abstract class BaseMultiSourceLiveRepository<TParams: Any, TData: Any>(
+abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>(
     dispatcher: CoroutineDispatcher
-): MultiSourceLiveRepository<TParams, TData> {
+): MultiCacheLiveRepository<TParams, TData> {
 
     private data class CacheEntry<TData: Any>(
         val dataSource: DataSource<TData>

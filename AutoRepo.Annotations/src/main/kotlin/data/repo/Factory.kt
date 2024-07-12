@@ -11,11 +11,11 @@ fun <TParams: Any, TData: Any> transientRepository(
     }
 }
 
-fun <TParams: Any, TData: Any> singleSourceLiveRepository(
+fun <TParams: Any, TData: Any> singleCacheLiveRepository(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
-): SingleSourceLiveRepository<TParams, TData> {
-    return object : BaseSingleSourceLiveRepository<TParams, TData>() {
+): SingleCacheLiveRepository<TParams, TData> {
+    return object : BaseSingleCacheLiveRepository<TParams, TData>() {
         override val dataType = clazz
         override suspend fun fetchData(params: TParams): TData = fetchData(params)
     }
@@ -24,8 +24,8 @@ fun <TParams: Any, TData: Any> singleSourceLiveRepository(
 fun <TParams: Any, TData: Any> multiSourceLiveRepository(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
-): MultiSourceLiveRepository<TParams, TData> {
-    return object : BaseMultiSourceLiveRepository<TParams, TData>(Dispatchers.IO) {
+): MultiCacheLiveRepository<TParams, TData> {
+    return object : BaseMultiCacheLiveRepository<TParams, TData>(Dispatchers.IO) {
         override val dataType = clazz
         override suspend fun fetchData(params: TParams): TData = fetchData(params)
     }
