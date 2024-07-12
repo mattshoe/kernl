@@ -10,18 +10,18 @@ data class MyResponseData(
 
 interface MyService {
     @AutoRepo.SingleMemoryCache("MyRepository")
-    suspend fun getMyResponse(): MyResponseData
+    suspend fun getMyResponse(id: String): MyResponseData
 }
 
 fun main() = runBlocking {
-//    val service: MyService = object : MyService {
-//        override suspend fun getMyResponse(id: String, someParam: Int, otherParam: Boolean): MyResponseData {
-//            TODO("Not yet implemented")
-//        }
-//    }
-//    val repo = MyRepository.Factory { id, someParam, otherParam ->
-//        service.getMyResponse(id, someParam, otherParam)
-//    }
+    val service: MyService = object : MyService {
+        override suspend fun getMyResponse(id: String): MyResponseData {
+            TODO("Not yet implemented")
+        }
+    }
+    val repo = MyRepository.Factory { id ->
+        service.getMyResponse(id)
+    }
 
     println("Hello World!")
 }

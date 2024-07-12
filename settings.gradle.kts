@@ -5,3 +5,4 @@ rootProject.name = "AutoRepo"
 include("AutoRepo.Annotations")
 include("AutoRepo.Processor")
 include("AutoRepo.Test")
+include("AutoRepo.Runtime")

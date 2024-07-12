@@ -25,7 +25,7 @@ fun <TParams: Any, TData: Any> multiSourceLiveRepository(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
 ): MultiCacheLiveRepository<TParams, TData> {
-    return object : BaseMultiCacheLiveRepository<TParams, TData>() {
+    return object : io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository<TParams, TData>() {
         override val dataType = clazz
         override suspend fun fetchData(params: TParams): TData = fetchData(params)
     }

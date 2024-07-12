@@ -9,17 +9,17 @@ sealed interface DataResult<T: Any> {
     /**
      * Encapsulates the data of a successful data retrieval operation.
      */
-    data class Success<T: Any>(val data: T): DataResult<T>
+    data class Success<T: Any>(val data: T): io.github.mattshoe.shoebox.data.DataResult<T>
 
     /**
      * Encapsulates an error encountered by a data retrieval operation.
      */
     data class Error<T: Any>(val error: Throwable):
-        DataResult<T>
+        io.github.mattshoe.shoebox.data.DataResult<T>
 
     /**
      * Representation of an invalidated cache. Meaning any previous data
      * is invalid.
      */
-    data class Invalidated<T: Any>(private val data: Unit = Unit): DataResult<T>
+    data class Invalidated<T: Any>(private val data: Unit = Unit): io.github.mattshoe.shoebox.data.DataResult<T>
 }
