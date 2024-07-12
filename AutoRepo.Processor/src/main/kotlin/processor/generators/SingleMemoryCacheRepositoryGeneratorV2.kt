@@ -2,14 +2,14 @@ package io.github.mattshoe.shoebox.processor.generators
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.data.repo.BaseSingleCacheLiveRepository
 import io.github.mattshoe.shoebox.data.repo.SingleCacheLiveRepository
-import io.github.mattshoe.shoebox.util.argument
-import io.github.mattshoe.shoebox.util.find
+import io.github.mattshoe.shoebox.util.*
 import kotlinx.coroutines.*
 import kotlin.reflect.KClass
 
@@ -27,7 +27,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
         val files = mutableSetOf<Deferred<FileGenData?>>()
 
         // Get the return type of the service method
-        val serviceReturnType = functionDeclaration.returnType?.resolve()?.declaration?.qualifiedName?.asString()
+        val serviceReturnType = functionDeclaration.returnType?.resolve()
 
         serviceReturnType?.let { returnType ->
             val parametersDataClass = generateDataClassForServiceParameters(functionDeclaration)
@@ -44,7 +44,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
         files: MutableSet<Deferred<FileGenData?>>,
         serviceName: String,
         packageName: String,
-        returnType: String,
+        returnType: KSType,
         parametersDataClass: TypeSpec
     ) = files.add(
         async {
@@ -65,7 +65,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
     private fun buildInterface(
         packageName: String,
         repositoryInterfaceName: String,
-        dataType: String,
+        dataType: KSType,
         parametersDataClass: TypeSpec
     ): FileSpec {
         return FileSpec.builder(packageName, repositoryInterfaceName)
@@ -77,7 +77,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
                             SingleCacheLiveRepository::class.simpleName!!
                         ).parameterizedBy(
                             ClassName(packageName,"${repositoryInterfaceName}.${parametersDataClass.name!!}"),
-                            ClassName.bestGuess(dataType)
+                            dataType.className
                         )
                     )
                     .addType(parametersDataClass)
@@ -87,7 +87,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
                                 FunSpec.builder("Factory")
                                     .addParameter("call", LambdaTypeName.get(
                                         parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
-                                        returnType = ClassName.bestGuess(dataType)
+                                        returnType = dataType.className
                                     ).copy(suspending = true))
                                     .returns(ClassName(packageName, repositoryInterfaceName))
                                     .addCode("""
@@ -106,7 +106,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
                         FunSpec.constructorBuilder()
                             .addParameter("call", LambdaTypeName.get(
                                 parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
-                                returnType = ClassName.bestGuess(dataType)
+                                returnType = dataType.className
                             ).copy(suspending = true))
                             .build()
                     )
@@ -117,21 +117,21 @@ class SingleMemoryCacheRepositoryGeneratorV2(
                             BaseSingleCacheLiveRepository::class.simpleName!!
                         ).parameterizedBy(
                             ClassName(packageName,"${repositoryInterfaceName}.${parametersDataClass.name!!}"),
-                            ClassName.bestGuess(dataType)
+                            dataType.className
                         )
                     )
                     .addProperty(
                         PropertySpec.builder("call", LambdaTypeName.get(
                             parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
-                            returnType = ClassName.bestGuess(dataType)
+                            returnType = dataType.className
                         ).copy(suspending = true))
                             .initializer("call")
                             .addModifiers(KModifier.PRIVATE)
                             .build()
                     )
                     .addProperty(
-                        PropertySpec.builder("dataType", KClass::class.asTypeName().parameterizedBy(ClassName.bestGuess(dataType)))
-                            .initializer("${dataType}::class")
+                        PropertySpec.builder("dataType", KClass::class.asTypeName().parameterizedBy(dataType.className))
+                            .initializer("${dataType.simpleName}::class")
                             .addModifiers(KModifier.OVERRIDE)
                             .build()
                     )
@@ -139,7 +139,7 @@ class SingleMemoryCacheRepositoryGeneratorV2(
                         FunSpec.builder("fetchData")
                             .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
                             .addParameter("params", ClassName(packageName, "$repositoryInterfaceName.${parametersDataClass.name!!}"))
-                            .returns(ClassName.bestGuess(dataType))
+                            .returns(dataType.className)
                             .addCode(
                                   "return·call(${parametersDataClass.propertySpecs.joinToString { "params.${it.name}" }})".replace(" ", "·")
                             )

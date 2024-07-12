@@ -4,11 +4,10 @@ import io.github.mattshoe.shoebox.data.DataResult
 import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
 
-interface MultiCacheLiveRepository<TParams: Any, TData: Any>: Closeable {
+interface MultiCacheLiveRepository<TParams: Any, TData: Any> {
     fun stream(params: TParams, forceFetch: Boolean = false): Flow<DataResult<TData>>
     fun latestValue(params: TParams): DataResult<TData>?
-    fun refresh(params: TParams)
-    fun invalidate(params: TParams)
-    fun invalidateAll()
-    override fun close()
+    suspend fun refresh(params: TParams)
+    suspend fun invalidate(params: TParams)
+    suspend fun invalidateAll()
 }

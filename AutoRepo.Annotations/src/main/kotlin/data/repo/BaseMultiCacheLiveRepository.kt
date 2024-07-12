@@ -2,35 +2,20 @@ package io.github.mattshoe.shoebox.data.repo
 
 import io.github.mattshoe.shoebox.data.DataResult
 import io.github.mattshoe.shoebox.data.source.DataSource
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.reflect.KClass
 
-abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>(
-    dispatcher: CoroutineDispatcher
-): MultiCacheLiveRepository<TParams, TData> {
+abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>: MultiCacheLiveRepository<TParams, TData> {
 
     private data class CacheEntry<TData: Any>(
         val dataSource: DataSource<TData>
-    )
-
-    protected val coroutineScope = CoroutineScope(
-        SupervisorJob()
-                + dispatcher
-                + CoroutineName(
-            "${javaClass.canonicalName}:RepoScope"
-        )
     )
     private val dataCacheMutex = Mutex()
     private val dataCache = mutableMapOf<TParams, CacheEntry<TData>>()
@@ -56,8 +41,8 @@ abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>(
         }
     }
 
-    override fun refresh(params: TParams) {
-        coroutineScope.launch {
+    override suspend fun refresh(params: TParams) {
+        withContext(Dispatchers.IO) {
             with (findDataCacheEntry(params)) {
                 updateDataCache(this, params) {
                     doFetchData(
@@ -70,34 +55,27 @@ abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>(
         }
     }
 
-    override fun invalidate(params: TParams) {
-        coroutineScope.launch {
+    override suspend fun invalidate(params: TParams) {
+        withContext(Dispatchers.IO) {
             dataCache[params]?.dataSource?.invalidate()
         }
     }
 
-    override fun invalidateAll() {
-        coroutineScope.launch {
+    override suspend fun invalidateAll() {
+        withContext(Dispatchers.IO) {
             invalidateAllDataSources()
-        }
-    }
-
-    override fun close() {
-        coroutineScope.launch {
-            invalidateAllDataSources()
-            dataCache.clear()
-        }.invokeOnCompletion {
-            coroutineScope.cancel()
         }
     }
 
     private fun initializeNewStream(params: TParams, forceFetch: Boolean): Flow<DataResult<TData>> {
         return channelFlow {
-            loadDataIntoCache(params, forceFetch)
-            getDataFromDataCache(params)
-                .collectLatest {
-                    send(it)
-                }
+            withContext(Dispatchers.IO) {
+                loadDataIntoCache(params, forceFetch)
+                getDataFromDataCache(params)
+                    .collectLatest {
+                        send(it)
+                    }
+            }
         }
     }
 

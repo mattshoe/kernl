@@ -2,16 +2,11 @@ package io.github.mattshoe.shoebox.data.repo
 
 import io.github.mattshoe.shoebox.data.DataResult
 import io.github.mattshoe.shoebox.data.source.DataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCacheLiveRepository<TParams, TData> {
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val dataSource by lazy {
         DataSource.Builder()
             .memoryCache(dataType)
@@ -24,20 +19,22 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCa
     protected abstract suspend fun fetchData(params: TParams): TData
 
     override suspend fun fetch(data: TParams, forceRefresh: Boolean) {
-        coroutineScope.launch {
+        withContext(Dispatchers.IO) {
             dataSource.initialize {
                 fetchData(data)
             }
-        }.join()
+        }
     }
 
     override suspend fun refresh() {
-        coroutineScope.launch {
+        withContext(Dispatchers.IO) {
             dataSource.refresh()
-        }.join()
+        }
     }
 
     override suspend fun invalidate() {
-        dataSource.invalidate()
+        withContext(Dispatchers.IO) {
+            dataSource.invalidate()
+        }
     }
 }
