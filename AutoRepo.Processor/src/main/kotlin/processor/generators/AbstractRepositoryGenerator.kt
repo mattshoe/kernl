@@ -6,7 +6,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 
 abstract class AbstractRepositoryGenerator: RepositoryGenerator {
-    protected fun packageDestination(functionDeclaration: KSFunctionDeclaration) = "${functionDeclaration.packageName.asString()}.autorepo"
+    protected fun getPackageDestination(functionDeclaration: KSFunctionDeclaration) = "${functionDeclaration.packageName.asString()}.autorepo"
     protected fun dataResult(type: String): TypeName {
         return ClassName(
             "io.github.mattshoe.shoebox.data",
