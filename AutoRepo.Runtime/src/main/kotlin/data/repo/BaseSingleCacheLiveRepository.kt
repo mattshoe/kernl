@@ -12,9 +12,11 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCa
             .memoryCache(dataType)
             .build()
     }
+    
     protected abstract val dataType: KClass<TData>
 
-    override val data: Flow<DataResult<TData>> = dataSource.data
+    override val data: Flow<DataResult<TData>>
+        get() = dataSource.data
 
     protected abstract suspend fun fetchData(params: TParams): TData
 
