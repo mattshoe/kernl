@@ -1,10 +1,10 @@
-package io.github.mattshoe.shoebox
+package io.github.mattshoe.shoebox.singlememorycache
 
 import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.models.ServiceRequest
 import io.github.mattshoe.shoebox.models.ServiceResponse
 
-interface SingleMemoryCache {
+interface SingleMemoryCacheScenarios {
 
     // Single primitive parameter, primitive return
     @AutoRepo.SingleMemoryCache("SingleParamPrimitiveReturn")

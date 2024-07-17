@@ -12,5 +12,11 @@ dependencies {
     implementation(project(":AutoRepo.Runtime"))
     implementation(libs.kotlinx.coroutines)
 
+    kspTest(project(":AutoRepo.Processor"))
     testImplementation(kotlin("test"))
+    testImplementation(libs.junit)
+    testImplementation(libs.truth)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

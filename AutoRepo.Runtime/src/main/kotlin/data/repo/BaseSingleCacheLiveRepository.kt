@@ -4,6 +4,7 @@ import io.github.mattshoe.shoebox.data.DataResult
 import io.github.mattshoe.shoebox.data.source.DataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCacheLiveRepository<TParams, TData> {
@@ -12,17 +13,20 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCa
             .memoryCache(dataType)
             .build()
     }
-    
+
     protected abstract val dataType: KClass<TData>
 
     override val data: Flow<DataResult<TData>>
         get() = dataSource.data
+            .onEach {
+                println(it)
+            }
 
     protected abstract suspend fun fetchData(params: TParams): TData
 
     override suspend fun fetch(data: TParams, forceRefresh: Boolean) {
         withContext(Dispatchers.IO) {
-            dataSource.initialize {
+            dataSource.initialize(forceFetch = forceRefresh) {
                 fetchData(data)
             }
         }
