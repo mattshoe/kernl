@@ -12,7 +12,8 @@ class AutoRepoProcessorProvider : SymbolProcessorProvider {
             environment.codeGenerator,
             setOf(
                 AutoRepo.SingleMemoryCache::class.qualifiedName!! to SingleMemoryCacheRepositoryGenerator(environment.logger)
-            )
+            ),
+            environment.logger
         )
     }
 }

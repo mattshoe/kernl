@@ -10,7 +10,7 @@ dependencies {
     ksp(project(":AutoRepo.Processor"))
     compileOnly(project(":AutoRepo.Annotations"))
     implementation(project(":AutoRepo.Runtime"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
+    implementation(libs.kotlinx.coroutines)
 
     testImplementation(kotlin("test"))
 }
