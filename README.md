@@ -50,6 +50,9 @@ val repo = MyRepository.Factory { id, someParam, otherParam ->
 }
 ```
 
+<details>
+    <summary><b>Examples with Dependency Injections</b></summary>
+
 #### Dagger Sample
 ```kotlin
 @Module
@@ -101,6 +104,8 @@ class MyServiceConfiguration {
     }
 }
 ```
+</details>
+
 
 ### 3. Use your repository!
 
