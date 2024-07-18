@@ -1,6 +1,5 @@
 package io.github.mattshoe.shoebox.data.repo
 
-import kotlinx.coroutines.Dispatchers
 import kotlin.reflect.KClass
 
 fun <TParams: Any, TData: Any> transientRepository(
@@ -24,8 +23,8 @@ fun <TParams: Any, TData: Any> singleCacheLiveRepository(
 fun <TParams: Any, TData: Any> multiSourceLiveRepository(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
-): MultiCacheLiveRepository<TParams, TData> {
-    return object : io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository<TParams, TData>() {
+): AssociativeCacheLiveRepository<TParams, TData> {
+    return object : BaseAssociativeCacheLiveRepository<TParams, TData>() {
         override val dataType = clazz
         override suspend fun fetchData(params: TParams): TData = fetchData(params)
     }

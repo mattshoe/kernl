@@ -31,7 +31,7 @@ internal open class MemoryCachedDataSource<T: Any>(
     }
 
     override suspend fun refresh() = withContext(dispatcher) {
-        require(this@MemoryCachedDataSource::dataRetrievalAction.isInitialized) {
+        check(this@MemoryCachedDataSource::dataRetrievalAction.isInitialized) {
             "Refresh was invoked before the data source was initialized."
         }
         fetchData(forceFetch = true, null)

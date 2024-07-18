@@ -12,14 +12,14 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.reflect.KClass
 
-abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>:
-    io.github.mattshoe.shoebox.data.repo.MultiCacheLiveRepository<TParams, TData> {
+abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
+    AssociativeCacheLiveRepository<TParams, TData> {
 
     private data class CacheEntry<TData: Any>(
         val dataSource: DataSource<TData>
     )
     private val dataCacheMutex = Mutex()
-    private val dataCache = mutableMapOf<TParams, io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository.CacheEntry<TData>>()
+    private val dataCache = mutableMapOf<TParams, CacheEntry<TData>>()
     abstract val dataType: KClass<TData>
 
     abstract suspend fun fetchData(params: TParams): TData
@@ -103,9 +103,9 @@ abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>:
             )
     }
 
-    private fun findDataCacheEntry(params: TParams): io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository.CacheEntry<TData> {
+    private fun findDataCacheEntry(params: TParams): CacheEntry<TData> {
         return dataCache[params]
-            ?: io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository.CacheEntry(
+            ?: CacheEntry(
                 DataSource.Builder()
                     .memoryCache(dataType)
                     .build()
@@ -113,7 +113,7 @@ abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>:
     }
 
     private suspend fun updateDataCache(
-        cacheEntry: io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository.CacheEntry<TData>,
+        cacheEntry: CacheEntry<TData>,
         params: TParams,
         onCacheMiss: suspend () -> Unit
     ) {
@@ -125,7 +125,7 @@ abstract class BaseMultiCacheLiveRepository<TParams: Any, TData: Any>:
     }
 
     private suspend fun doFetchData(
-        cacheEntry: io.github.mattshoe.shoebox.data.repo.BaseMultiCacheLiveRepository.CacheEntry<TData>,
+        cacheEntry: CacheEntry<TData>,
         params: TParams,
         forceFetch: Boolean
     ) {

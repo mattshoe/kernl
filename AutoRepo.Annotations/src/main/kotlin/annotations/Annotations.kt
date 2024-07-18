@@ -13,7 +13,7 @@ annotation class AutoRepo(
 
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.SOURCE)
-    annotation class MultiMemoryCache(
+    annotation class AssociativeMemoryCache(
         val name: String
     )
 

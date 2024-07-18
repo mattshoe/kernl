@@ -57,6 +57,8 @@ interface DataSource<T: Any> {
      * given time, preventing the possibility of duplicate/redundant [refresh] operations. Any
      * concurrent invocations of [refresh] will be dropped, NOT queued. Meaning that if this
      * method is invoked while a [refresh] is already in flight, then it will be ignored.
+     *
+     * @throws IllegalStateException if [refresh] is invoked BEFORE `[initialize]
      */
     suspend fun refresh()
 
