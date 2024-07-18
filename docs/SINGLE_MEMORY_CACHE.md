@@ -15,24 +15,86 @@ The generated repository exposes methods to `refresh` and `invalidate` the data 
 This will be the name of the generated repository. This value is not optional.
 
 ## Generated Repository
-Your generated repository will always contain the following fields for you to operate on
-### `val data: Flow<DataResult<TData>>`
-Exposes the stream of values held in memory by this repository. Each time the underlying data changes anywhere in the 
-app, the new value will be emitted to all listeners. This ensures your data stays in sync across your application by holding a 
-single source of truth. Details on the encapsulating `DataResult` [here](DATA_RESULT.md).
+Your generated repository will always be an implementation of the [SingleCacheLiveRepository](SINGLE_CACHE_LIVE_REPOSITORY.md) interface.
 
-### `suspend fun fetch(data: TParams, forceRefresh: Boolean = false)`
-Use this method to initialize the data for this repository. This method has some very important characteristics:
-1. Only the first call to `fetch` will be run. All subsequent invocations will be **_dropped_** unless the `forceRefresh` flag is true.
-2. Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `fetch` will be dropped until the operation completes.
+Let's imagine you have a Retrofit service such as the following:
 
-### `suspend fun refresh()`
-Use this method when you need to repeat the most recent [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) operation.
-- Throws `IllegalStateException` if this method is invoked **_before_** [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false).
-- Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `refresh` will be dropped until the operation completes.
+```kotlin
+interface MyService {
+    @AutoRepo.SingleMemoryCache("MyRepository")
+    @GET("foo/{id}/{someParam}")
+    suspend fun getMyResponse(
+        @Path("id") id: String, 
+        @Path("someParam") someParam: Int,
+        @Query("otherParam") otherParam: Boolean
+    ): MyResponseData
+}
+```
 
-### `suspend fun invalidate()`
-Use this method when you need to enforce that the most recently emitted value of [data](#val-data-flowdataresulttdata)
-should no longer be used in your app.
-- Invoking this method will wipe the most recent value of [data](#val-data-flowdataresulttdata) from the in-memory cache.
-- This will cause a new emission from the [data](#val-data-flowdataresulttdata) flow, and the value will always be an empty [DataResult.Invalidated()](DATA_RESULT.md) object, overwriting the last value of your data.
+### Obtaining an Instance
+AutoRepo provides factories to obtain transient instances of your repositories. They are transient meaning a new instance 
+is created every time you invoke the `Factory` method.
+
+```kotlin
+// Option 1: Pass your Service impl's function pointer to the Factory method
+val myRepo = MyRepository.Factory(service::getMyResponse)
+
+// Option 2: Pass a lambda to the factory
+val myRepo = MyRepository.Factory { id, someParam, otherParam ->
+    service.getMyResponse(id, someParam, otherParam)
+}
+```
+
+### Dependency Injection
+AutoRepo is designed to work well with any arbitrary dependency injection framework. I will demonstrate with Dagger, but 
+the pattern should be similar for any dependency injection framework
+
+```kotlin
+@Module
+interface MyServiceModule {
+    companion object {
+        @Provides
+        fun provideMyRepository(
+            service: MyService
+        ): MyRepository {
+            return MyRepository.Factory(service::getMyResponse)
+        }
+    }
+}
+```
+
+### Use Your Repository
+The example below uses Android ViewModels for demonstration, but you can adapt your use-case to your architectural patterns. 
+The `AutoRepo` library is in no way tied to the Android SDK. 
+
+```kotlin
+class MyViewModel @Inject constructor(
+    private val myRepository: MyRepository
+): ViewModel() {
+    init {
+        myRepository.data
+            .onEach {
+                // process data
+            }.catch {
+                // this should never be hit, as errors are encapsulated in DataResult
+            }.launchIn(viewModelScope)
+        
+        loadData(
+            someId,
+            someParam,
+            otherParam
+        )
+    }
+
+    /**
+     * Fetch whatever data you may need
+     */
+    fun loadData(id: String, someParam: Int, otherParam: Boolean) {
+        viewModelScope.launch {
+            myRepository.fetch(
+                MyRepository.Params(id, someParam, otherParam)
+            )
+        }
+    }
+}
+```
