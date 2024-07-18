@@ -5,7 +5,7 @@ Any updates to the cached value are broadcast immediately to all listeners.
 By default, only the very first call to the [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) method will be honored. All subsequent invocations of `fetch` will
 be ignored unless the [forceRefresh](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) value is passed as `true`.
 
-The generated repository will guarantee that only ONE single service call can be in flight at a given time. 
+The generated repository will guarantee that only one data retrieval operation will be in flight at a given time.
 
 The generated repository exposes methods to `refresh` and `invalidate` the data as needed.
 
