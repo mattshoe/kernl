@@ -24,10 +24,10 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCa
 
     protected abstract suspend fun fetchData(params: TParams): TData
 
-    override suspend fun fetch(data: TParams, forceRefresh: Boolean) {
+    override suspend fun fetch(params: TParams, forceRefresh: Boolean) {
         withContext(Dispatchers.IO) {
             dataSource.initialize(forceFetch = forceRefresh) {
-                fetchData(data)
+                fetchData(params)
             }
         }
     }

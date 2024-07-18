@@ -1,9 +1,9 @@
 package io.github.mattshoe.shoebox.data
 
 /**
- * ***A type that encapsulates the result of a single data retrieval operation.***
+ * ### Encapsulates the result of a single data retrieval operation.
  *
- * Can be either [Success] or [Error].
+ * Can be either [Success], [Error], or [Invalidated].
  */
 sealed interface DataResult<T: Any> {
     /**

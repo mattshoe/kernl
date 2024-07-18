@@ -12,7 +12,7 @@ Exposes the stream of values held in memory by this repository. Each time the un
 app, the new value will be emitted to all listeners. This ensures your data stays in sync across your application by holding a
 single source of truth. Details on the encapsulating `DataResult` [here](DATA_RESULT.md).
 
-### `suspend fun fetch(data: TParams, forceRefresh: Boolean = false)`
+### `suspend fun fetch(params: TParams, forceRefresh: Boolean = false)`
 Use this method to initialize the data for this repository. This method has some very important characteristics:
 1. Only the first call to `fetch` will be run. All subsequent invocations will be **_dropped_** unless the `forceRefresh` flag is true.
 2. Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `fetch` will be dropped until the operation completes.
