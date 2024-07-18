@@ -1,4 +1,4 @@
-package io.github.mattshoe.shoebox.data.repo
+package io.github.mattshoe.shoebox.data.repo.associativecache
 
 import io.github.mattshoe.shoebox.data.DataResult
 import io.github.mattshoe.shoebox.data.source.DataSource

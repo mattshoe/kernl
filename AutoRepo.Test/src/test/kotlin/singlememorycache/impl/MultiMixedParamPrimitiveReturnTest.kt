@@ -1,6 +1,6 @@
 package singlememorycache.impl
 
-import io.github.mattshoe.shoebox.data.repo.SingleCacheLiveRepository
+import io.github.mattshoe.shoebox.data.repo.singlecache.SingleCacheLiveRepository
 import io.github.mattshoe.shoebox.models.ServiceRequest
 import io.github.mattshoe.shoebox.singlememorycache.autorepo.MultiMixedParamPrimitiveReturn
 import singlememorycache.SingleMemoryCacheScenariosTest

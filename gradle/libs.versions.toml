@@ -8,6 +8,7 @@ kotlinPoet = "1.18.1"
 compileTestingKsp = "1.6.0"
 compileTesting = "1.5.0"
 mockkVersion = "1.13.12"
+dokka = "1.9.20"
 
 [libraries]
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
@@ -25,3 +26,4 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion"}
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka"}

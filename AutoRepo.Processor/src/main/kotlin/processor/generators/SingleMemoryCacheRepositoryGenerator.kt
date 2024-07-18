@@ -7,8 +7,8 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.mattshoe.shoebox.annotations.AutoRepo
-import io.github.mattshoe.shoebox.data.repo.BaseSingleCacheLiveRepository
-import io.github.mattshoe.shoebox.data.repo.SingleCacheLiveRepository
+import io.github.mattshoe.shoebox.data.repo.singlecache.BaseSingleCacheLiveRepository
+import io.github.mattshoe.shoebox.data.repo.singlecache.SingleCacheLiveRepository
 import io.github.mattshoe.shoebox.util.*
 import kotlinx.coroutines.*
 import kotlin.reflect.KClass

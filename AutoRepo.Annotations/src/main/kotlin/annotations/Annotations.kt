@@ -7,6 +7,12 @@ annotation class AutoRepo(
 ) {
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.SOURCE)
+    annotation class NoCache(
+        val name: String
+    )
+
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class SingleMemoryCache(
         val name: String
     )

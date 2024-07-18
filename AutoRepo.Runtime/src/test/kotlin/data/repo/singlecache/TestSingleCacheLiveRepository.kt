@@ -1,6 +1,6 @@
-package data.repo
+package data.repo.singlecache
 
-import io.github.mattshoe.shoebox.data.repo.BaseSingleCacheLiveRepository
+import io.github.mattshoe.shoebox.data.repo.singlecache.BaseSingleCacheLiveRepository
 import kotlinx.coroutines.CoroutineDispatcher
 
 class TestSingleCacheLiveRepository(

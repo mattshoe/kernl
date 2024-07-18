@@ -1,4 +1,4 @@
-package data.repo
+package data.repo.singlecache
 
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
@@ -201,7 +201,7 @@ class BaseSingleCacheLiveRepositoryIntegrationTest {
         subject.data.test {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
-            
+
             subject.invalidate()
             Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
         }

@@ -1,10 +1,9 @@
-package io.github.mattshoe.shoebox.data.repo
+package io.github.mattshoe.shoebox.data.repo.singlecache
 
 import io.github.mattshoe.shoebox.data.DataResult
 import io.github.mattshoe.shoebox.data.source.DataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>(

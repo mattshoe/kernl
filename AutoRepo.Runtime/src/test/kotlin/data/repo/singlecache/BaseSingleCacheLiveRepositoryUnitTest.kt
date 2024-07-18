@@ -1,4 +1,4 @@
-package data.repo
+package data.repo.singlecache
 
 import com.google.common.truth.Truth
 import io.github.mattshoe.shoebox.data.source.DataSource
