@@ -7,13 +7,9 @@ import kotlinx.coroutines.flow.Flow
  * ### Repository that holds a single cached value in memory.
  *
  * Any updates to the cached value are broadcast immediately to all listeners.
- *
- * By default, only the very first call to the fetch method will be honored.
- * All subsequent invocations of fetch will be ignored unless the forceRefresh value is passed as true.
- *
+ * 
  * This repository will guarantee that only ONE data retrieval operation can ever be in flight at a given time.
  */
-
 interface SingleCacheLiveRepository<TParams: Any, TData: Any> {
     /**
      * ### Stream producing the most up-to-date value for this repository.
