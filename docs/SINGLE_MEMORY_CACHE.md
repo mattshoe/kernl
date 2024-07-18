@@ -23,13 +23,13 @@ single source of truth. Details on the encapsulating `DataResult` [here](DATA_RE
 
 ### `suspend fun fetch(data: TParams, forceRefresh: Boolean = false)`
 Use this method to initialize the data for this repository. This method has some very important characteristics:
-1. Only the first call to `fetch` will be run. All other invocations will be dropped unless the `forceRefresh` flag is true.
-2. Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then any invocations of `fetch` will be dropped until the operation completes.
+1. Only the first call to `fetch` will be run. All subsequent invocations will be **_dropped_** unless the `forceRefresh` flag is true.
+2. Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `fetch` will be dropped until the operation completes.
 
 ### `suspend fun refresh()`
 Use this method when you need to repeat the most recent [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) operation.
-- If this method is invoked BEFORE [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false), then an `IllegalStateException` will be thrown
-- Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then any invocations of `refresh` will be dropped until the operation completes.
+- Throws `IllegalStateException` if this method is invoked **_before_** [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false).
+- Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `refresh` will be dropped until the operation completes.
 
 ### `suspend fun invalidate()`
 Use this method when you need to enforce that the most recently emitted value of [data](#val-data-flowdataresulttdata)
