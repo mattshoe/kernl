@@ -2,7 +2,6 @@ plugins {
     kotlin("jvm")
     id("maven-publish")
     signing
-    alias(libs.plugins.dokka)
 }
 
 ext {
