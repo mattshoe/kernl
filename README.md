@@ -153,4 +153,5 @@ class MyViewModel(
 # API Documentation 
 
 - [@AutoRepo.SingleMemoryCache](docs/SINGLE_MEMORY_CACHE.md)
+- [SingleCacheLiveRepository](docs/SINGLE_CACHE_LIVE_REPOSITORY.md)
 - [DataResult](docs/DATA_RESULT.md)

@@ -1,4 +1,4 @@
-# Data Result\<T>
+# `DataResult<T>`
 This is a data type that encapsulates the result of a data retrieval operation.
 
 This `sealed interface` hierarchy has 3 distinct values:

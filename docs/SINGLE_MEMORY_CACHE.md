@@ -1,4 +1,4 @@
-# AutoRepo.SingleMemoryCache
+# `@AutoRepo.SingleMemoryCache`
 The `AutoRepo.SingleMemoryCache` annotation generates a repository that holds a single cached value in memory. <br> 
 Any updates to the cached value are broadcast immediately to all listeners.
 
@@ -71,12 +71,22 @@ The `AutoRepo` library is in no way tied to the Android SDK.
 class MyViewModel @Inject constructor(
     private val myRepository: MyRepository
 ): ViewModel() {
+    private val _state = MutableStateFlow<YourState>(YourState.Loading)
+    val state: StateFlow<YourState> = _state
+    
     init {
         myRepository.data
             .onEach {
-                // process data
+                when (it) {
+                    is Success -> _state.update { YourState.Success(it) }
+                    is Error -> _state.update { YourState.Error("Oh no!")}
+                    is Invalidated -> {
+                        _state.update { YourState.Loading }
+                        myRepository.refresh()
+                    } 
+                }
             }.catch {
-                // this should never be hit, as errors are encapsulated in DataResult
+                // Data retrieval errors will be encapsulated in DataResult, but your onEach could throw errors
             }.launchIn(viewModelScope)
         
         loadData(
@@ -85,10 +95,7 @@ class MyViewModel @Inject constructor(
             otherParam
         )
     }
-
-    /**
-     * Fetch whatever data you may need
-     */
+    
     fun loadData(id: String, someParam: Int, otherParam: Boolean) {
         viewModelScope.launch {
             myRepository.fetch(
