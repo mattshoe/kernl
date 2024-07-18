@@ -17,4 +17,5 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.truth)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
 }

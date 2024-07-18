@@ -36,7 +36,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval fails THEN error is emitted`() = runTest {
+    fun `WHEN data retrieval fails THEN error is emitted`() = runTest {
         subject.data.test {
             val expectedValue = RuntimeException("oops")
 
@@ -139,7 +139,7 @@ class MemoryCachedDataSourceTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = IllegalStateException::class)
     fun `WHEN refresh is invoked before initialize THEN exception is thrown`() = runTest {
         subject.refresh()
     }

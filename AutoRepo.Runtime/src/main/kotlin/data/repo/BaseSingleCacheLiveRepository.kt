@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 import kotlin.reflect.KClass
 
-abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCacheLiveRepository<TParams, TData> {
+abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>(
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+): SingleCacheLiveRepository<TParams, TData> {
     private val dataSource by lazy {
         DataSource.Builder()
             .memoryCache(dataType)
@@ -18,14 +20,11 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCa
 
     override val data: Flow<DataResult<TData>>
         get() = dataSource.data
-            .onEach {
-                println(it)
-            }
 
     protected abstract suspend fun fetchData(params: TParams): TData
 
     override suspend fun fetch(params: TParams, forceRefresh: Boolean) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             dataSource.initialize(forceFetch = forceRefresh) {
                 fetchData(params)
             }
@@ -33,13 +32,13 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>: SingleCa
     }
 
     override suspend fun refresh() {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             dataSource.refresh()
         }
     }
 
     override suspend fun invalidate() {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             dataSource.invalidate()
         }
     }
