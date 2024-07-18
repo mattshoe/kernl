@@ -2,7 +2,6 @@
 
 AutoRepo is a Kotlin Symbol Processing (KSP) library designed to automatically generate repository classes for your service interfaces. This library helps reduce boilerplate code and ensures a consistent architecture by generating repository interfaces and implementation classes based on annotated service methods.
 
----
 
 ## Features
 
@@ -24,7 +23,7 @@ AutoRepo integrates smoothly with popular dependency injection frameworks like D
 ### 6. Customizable Fetch Logic
 Define custom data fetch logic with ease, allowing you to tailor the data retrieval process to meet your specific application needs.
 
----
+
 
 ## Quick Start
 
@@ -149,7 +148,7 @@ class MyViewModel(
 }
 ```
 
----
+
 
 # API Documentation 
 

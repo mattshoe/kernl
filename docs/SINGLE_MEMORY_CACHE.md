@@ -9,13 +9,10 @@ The generated repository will guarantee that only ONE single service call can be
 
 The generated repository exposes methods to `refresh` and `invalidate` the data as needed.
 
----
 
 ## Annotation Parameters
 ### `name: String`
 This will be the name of the generated repository. This value is not optional.
-
----
 
 ## Generated Repository
 Your generated repository will always contain the following fields for you to operate on
