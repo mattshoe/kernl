@@ -23,9 +23,20 @@ AutoRepo integrates smoothly with popular dependency injection frameworks like D
 Define custom data fetch logic with ease, allowing you to tailor the data retrieval process to meet your specific application needs.
 
 
-## Getting Started
+## Quick Start
 
-### 1. Define Your Service Interface
+### 1. Add dependencies to your build.gradle.kts
+You'll notice there are 3 distinct libraries. This is to keep your final `jar`/`aar` files as compact as possible by only
+including the minimum runtime dependencies. Things like annotations are only needed at compile time.
+```kotlin
+dependencies {
+    ksp("io.github.mattshoe.shoebox:AutoRepo.Processor:1.0.0")
+    compileOnly("io.github.mattshoe.shoebox:AutoRepo.Annotations:1.0.0")
+    implementation("io.github.mattshoe.shoebox:AutoRepo.Runtime:1.0.0")
+}
+```
+
+### 2. Define Your Service Interface
 
 Annotate your service methods with `@AutoRepo.SingleMemoryCache` to indicate that a repository should be generated for them.
 
@@ -36,9 +47,10 @@ interface MyService {
 }
 ```
 
-### 2. Bind Your Repository
+### 3. Bind Your Repository
 
-AutoRepo was designed with flexibility in mind, so it is trivial to create an instance of the generated repository via its associated Factory.
+AutoRepo was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
+via its associated Factory. This allows you to use `AutoRepo` with any dependency injection framework. Examples included below.
 
 ```kotlin
 // Option 1: Pass function pointer to the factory
@@ -51,7 +63,7 @@ val repo = MyRepository.Factory { id, someParam, otherParam ->
 ```
 
 <details>
-    <summary><b>Examples with Dependency Injections</b></summary>
+    <summary><b>Dependency Injection Examples</b></summary>
 
 #### Dagger Sample
 ```kotlin
@@ -107,7 +119,7 @@ class MyServiceConfiguration {
 </details>
 
 
-### 3. Use your repository!
+### 4. Use Your Repository!
 
 Now you can use your repository anywhere you need it!
 
