@@ -5,14 +5,14 @@ import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSNode
 import io.github.mattshoe.shoebox.autorepo.processors.Processor
-import io.github.mattshoe.shoebox.autorepo.processors.strategy.Strategy
+import io.github.mattshoe.shoebox.autorepo.processors.strategy.ParsingStrategy
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class AutoRepoProcessor(
     private val codeGenerator: CodeGenerator,
-    private val strategies: List<Strategy<KSNode>>,
+    private val strategies: List<ParsingStrategy<KSNode>>,
     private val logger: KSPLogger
 ) : SymbolProcessor {
 

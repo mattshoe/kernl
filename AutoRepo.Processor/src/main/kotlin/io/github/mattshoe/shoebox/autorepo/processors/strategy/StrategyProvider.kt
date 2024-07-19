@@ -2,7 +2,6 @@ package io.github.mattshoe.shoebox.autorepo.processors.strategy
 
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSNode
-import io.github.mattshoe.shoebox.autorepo.model.AnnotationStrategy
 
 /**
  * Provides the processing strategies for this application.
@@ -21,6 +20,6 @@ interface StrategyProvider {
      *
      * @return an ordered list of strategies to apply to the [environment]
      */
-    fun getStrategies(environment: SymbolProcessorEnvironment): List<Strategy<KSNode>>
+    fun getStrategies(environment: SymbolProcessorEnvironment): List<ParsingStrategy<KSNode>>
 }
 
