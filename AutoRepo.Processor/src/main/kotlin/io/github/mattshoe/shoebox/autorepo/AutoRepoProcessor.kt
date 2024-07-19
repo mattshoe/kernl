@@ -10,7 +10,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-
 class AutoRepoProcessor(
     private val codeGenerator: CodeGenerator,
     private val strategies: List<Strategy<KSNode>>,
