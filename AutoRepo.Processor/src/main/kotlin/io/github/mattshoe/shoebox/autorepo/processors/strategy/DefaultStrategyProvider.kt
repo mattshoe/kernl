@@ -6,20 +6,30 @@ import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.autorepo.model.AnnotationParsingStrategy
 import io.github.mattshoe.shoebox.autorepo.processors.impl.SingleMemoryCacheProcessor
 
-class StrategyProviderImpl: StrategyProvider {
+class DefaultStrategyProvider: StrategyProvider {
 
     override fun getStrategies(environment: SymbolProcessorEnvironment): List<ParsingStrategy<KSNode>> {
-        return listOf(
-           singleMemoryCacheStrategy(environment)
+        return buildList {
+            add(noCacheStrategy(environment))
+            add(singleMemoryCacheStrategy(environment))
+        }
+    }
+
+    private fun noCacheStrategy(environment: SymbolProcessorEnvironment): ParsingStrategy<KSNode> {
+        return AnnotationParsingStrategy(
+            annotation = AutoRepo.NoCache::class,
+            processors = buildList {
+                // TODO
+            }
         )
     }
 
     private fun singleMemoryCacheStrategy(environment: SymbolProcessorEnvironment): ParsingStrategy<KSNode> {
         return AnnotationParsingStrategy(
             annotation = AutoRepo.SingleMemoryCache::class,
-            processors = listOf(
-                SingleMemoryCacheProcessor(environment.logger)
-            )
+            processors = buildList {
+                add(SingleMemoryCacheProcessor(environment.logger))
+            }
         )
     }
 }

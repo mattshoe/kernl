@@ -9,7 +9,7 @@ import com.google.devtools.ksp.symbol.KSNode
 interface StrategyProvider {
 
     companion object {
-        private val impl = StrategyProviderImpl()
+        private val impl = DefaultStrategyProvider()
         fun get(): StrategyProvider = impl
     }
 
