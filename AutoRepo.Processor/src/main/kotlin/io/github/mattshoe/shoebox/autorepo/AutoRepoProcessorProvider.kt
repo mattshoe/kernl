@@ -1,18 +1,17 @@
-package io.github.mattshoe.shoebox.processor
+package io.github.mattshoe.shoebox.autorepo
 
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
-import io.github.mattshoe.shoebox.annotations.AutoRepo
-import io.github.mattshoe.shoebox.processor.generators.SingleMemoryCacheRepositoryGenerator
+import io.github.mattshoe.shoebox.autorepo.processors.strategy.StrategyProvider
+import io.github.mattshoe.shoebox.autorepo.processors.strategy.StrategyProviderImpl
 
 class AutoRepoProcessorProvider : SymbolProcessorProvider {
+    private val strategyProvider: StrategyProvider = StrategyProvider.get()
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return AutoRepoProcessor(
             environment.codeGenerator,
-            setOf(
-                AutoRepo.SingleMemoryCache::class.qualifiedName!! to SingleMemoryCacheRepositoryGenerator(environment.logger)
-            ),
+            strategyProvider.getStrategies(environment),
             environment.logger
         )
     }

@@ -1,10 +1,108 @@
 package processor.generators
 
+import com.tschuchort.compiletesting.KotlinCompilation
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Ignore
 import util.RepositoryGeneratorTest
 import org.junit.Test
 
-class SingleMemoryCacheRepositoryGeneratorTest: RepositoryGeneratorTest() {
+@OptIn(ExperimentalCompilerApi::class)
+class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
+
+    @Test
+    fun `WHEN annotated function has no parameters THEN compilation error is thrown`() {
+        assertOutput(
+            "NoParamRepository",
+            sourceContent =  """
+                package io.github.mattshoe.test
+    
+                import io.github.mattshoe.shoebox.annotations.AutoRepo
+    
+                interface SomeInterface {
+                    @AutoRepo.SingleMemoryCache(name = "NoParamRepository")
+                    suspend fun fetchData(): String
+                }
+                
+            """.trimIndent(),
+            exitCode = KotlinCompilation.ExitCode.COMPILATION_ERROR
+        )
+    }
+
+    @Test
+    fun `WHEN annotated function has no return type THEN error is thrown`() {
+        assertOutput(
+            "NoReturnRepository",
+            sourceContent =  """
+                package io.github.mattshoe.test
+    
+                import io.github.mattshoe.shoebox.annotations.AutoRepo
+    
+                interface SomeInterface {
+                    @AutoRepo.SingleMemoryCache(name = "NoReturnRepository")
+                    suspend fun fetchData(string: String)
+                }
+                
+            """.trimIndent(),
+            exitCode = KotlinCompilation.ExitCode.COMPILATION_ERROR
+        )
+    }
+
+    @Test
+    fun `WHEN annotated function has Unit return type THEN error is thrown`() {
+        assertOutput(
+            "UnitReturnRepository",
+            sourceContent =  """
+                package io.github.mattshoe.test
+    
+                import io.github.mattshoe.shoebox.annotations.AutoRepo
+    
+                interface SomeInterface {
+                    @AutoRepo.SingleMemoryCache(name = "UnitReturnRepository")
+                    suspend fun fetchData(string: String): Unit
+                }
+                
+            """.trimIndent(),
+            exitCode = KotlinCompilation.ExitCode.COMPILATION_ERROR
+        )
+    }
+
+    @Test
+    fun `WHEN annotated function has no params and Unit return type THEN error is thrown`() {
+        assertOutput(
+            "NoParamUnitReturnRepository",
+            sourceContent =  """
+                package io.github.mattshoe.test
+    
+                import io.github.mattshoe.shoebox.annotations.AutoRepo
+    
+                interface SomeInterface {
+                    @AutoRepo.SingleMemoryCache(name = "NoParamUnitReturnRepository")
+                    suspend fun fetchData(): Unit
+                }
+                
+            """.trimIndent(),
+            exitCode = KotlinCompilation.ExitCode.COMPILATION_ERROR
+        )
+    }
+
+    @Test
+    fun `WHEN annotated function has no params and no return type THEN error is thrown`() {
+        assertOutput(
+            "NoParamNoReturnRepository",
+            sourceContent =  """
+                package io.github.mattshoe.test
+    
+                import io.github.mattshoe.shoebox.annotations.AutoRepo
+    
+                interface SomeInterface {
+                    @AutoRepo.SingleMemoryCache(name = "NoParamNoReturnRepository")
+                    suspend fun fetchData()
+                }
+                
+            """.trimIndent(),
+            exitCode = KotlinCompilation.ExitCode.COMPILATION_ERROR
+        )
+    }
 
     @Test
     fun `test SingleMemoryCacheRepositoryGenerator generates expected files`() {
@@ -144,49 +242,6 @@ class SingleMemoryCacheRepositoryGeneratorTest: RepositoryGeneratorTest() {
                 
                   override suspend fun fetchData(params: DifferentReturnTypeRepository.Params): Int =
                       call(params.param)
-                }
-            """.trimIndent()
-        )
-    }
-
-    @Ignore("I don't feel like solving this problem right now...")
-    @Test
-    fun `test SingleMemoryCacheRepositoryGenerator with no parameters`() {
-        assertOutput(
-            fileName = "NoParamRepository",
-            sourceContent =  """
-                package io.github.mattshoe.test
-    
-                import io.github.mattshoe.shoebox.annotations.AutoRepo
-    
-                interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "NoParamRepository")
-                    suspend fun fetchData(): String
-                }
-            """.trimIndent(),
-            expectedOutput = """
-                package io.github.mattshoe.test.autorepo
-                
-                import io.github.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import io.github.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
-                import kotlin.String
-                import kotlin.reflect.KClass
-                
-                public interface NoParamRepository : SingleCacheLiveRepository<NoParamRepository.Params, String> {
-                  public data class Params()
-                
-                  public companion object {
-                    public fun Factory(call: suspend () -> String): NoParamRepository = NoParamRepositoryImpl(call)
-                  }
-                }
-                
-                private class NoParamRepositoryImpl(
-                  private val call: suspend () -> String,
-                ) : BaseSingleCacheLiveRepository<NoParamRepository.Params, String>(),
-                    NoParamRepository {
-                  override val dataType: KClass<String> = String::class
-                
-                  override suspend fun fetchData(params: NoParamRepository.Params): String = call()
                 }
             """.trimIndent()
         )

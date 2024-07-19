@@ -10,12 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface DataSource<T: Any> {
 
     companion object {
-        fun Builder() = DataSourceBuilderRequest()
-    }
-
-    enum class Type {
-        IN_MEMORY,
-        BROADCAST
+        val Builder: DataSourceBuilderRequest
+            get() = DataSourceBuilderRequest()
     }
 
     val value: DataResult<T>?

@@ -10,7 +10,7 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): SingleCacheLiveRepository<TParams, TData> {
     private val dataSource by lazy {
-        DataSource.Builder()
+        DataSource.Builder
             .memoryCache(dataType)
             .build()
     }

@@ -17,7 +17,7 @@ import org.junit.Test
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
 class BaseSingleCacheLiveRepositoryUnitTest {
     private val mockDataSource: DataSource<String> = mockk(relaxed = true)
-    private val datasourceBuilder: DataSourceBuilderRequest = mockk(relaxed = true)
+    private val datasourceBuilderRequest: DataSourceBuilderRequest = mockk(relaxed = true)
     private val memoryCachedDataSourceBuilderRequest: MemoryCacheDataSourceBuilder<String> = mockk(relaxed = true)
 
     companion object {
@@ -32,8 +32,8 @@ class BaseSingleCacheLiveRepositoryUnitTest {
     fun setUp() {
         clearAllMocks()
 
-        every { DataSource.Builder() } returns datasourceBuilder
-        every { datasourceBuilder.memoryCache(String::class) } returns memoryCachedDataSourceBuilderRequest
+        every { DataSource.Builder } returns datasourceBuilderRequest
+        every { datasourceBuilderRequest.memoryCache(String::class) } returns memoryCachedDataSourceBuilderRequest
         every { memoryCachedDataSourceBuilderRequest.build() } returns mockDataSource
     }
 

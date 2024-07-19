@@ -106,7 +106,7 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
     private fun findDataCacheEntry(params: TParams): CacheEntry<TData> {
         return dataCache[params]
             ?: CacheEntry(
-                DataSource.Builder()
+                DataSource.Builder
                     .memoryCache(dataType)
                     .build()
             )

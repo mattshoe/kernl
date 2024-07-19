@@ -1,4 +1,4 @@
-package io.github.mattshoe.shoebox.processor.generators
+package io.github.mattshoe.shoebox.autorepo.processors.impl
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
@@ -9,29 +9,33 @@ import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.data.repo.singlecache.BaseSingleCacheLiveRepository
 import io.github.mattshoe.shoebox.data.repo.singlecache.SingleCacheLiveRepository
+import io.github.mattshoe.shoebox.autorepo.processors.AbstractProcessor
+import io.github.mattshoe.shoebox.autorepo.model.GeneratedFileData
 import io.github.mattshoe.shoebox.util.*
 import kotlinx.coroutines.*
 import kotlin.reflect.KClass
 
-class SingleMemoryCacheRepositoryGenerator(
+class SingleMemoryCacheProcessor(
     private val logger: KSPLogger
-): AbstractRepositoryGenerator() {
-    override suspend fun generate(functionDeclaration: KSFunctionDeclaration): List<FileGenData> = withContext(Dispatchers.Default) {
-        val repositoryName = getRepositoryName(functionDeclaration)
-        val packageDestination = getPackageDestination(functionDeclaration)
-        val serviceReturnType = functionDeclaration.returnType?.resolve()
-        val fileAggregator = mutableSetOf<Deferred<FileGenData?>>()
+): AbstractProcessor<KSFunctionDeclaration>() {
+    override val targetClass = KSFunctionDeclaration::class
+
+    override suspend fun process(declaration: KSFunctionDeclaration): Set<GeneratedFileData> = withContext(Dispatchers.Default) {
+        validateFunctionSignature(declaration)
+
+        val repositoryName = getRepositoryName(declaration)
+        val packageDestination = getPackageDestination(declaration)
+        val serviceReturnType = declaration.returnType?.resolve()
+        val fileAggregator = mutableListOf<Deferred<GeneratedFileData?>>()
 
         serviceReturnType?.let { returnType ->
-            fileAggregator.generateInterfaceFileData(functionDeclaration, repositoryName, packageDestination, returnType)
-        } ?: run {
-            logger.error("Method '${functionDeclaration.simpleName.asString()}' has no return type! It cannot be used as a repository.", functionDeclaration)
+            fileAggregator.generateInterfaceFileData(declaration, repositoryName, packageDestination, returnType)
         }
 
-        return@withContext fileAggregator.awaitAll().filterNotNull()
+        return@withContext fileAggregator.awaitAll().filterNotNullTo(mutableSetOf())
     }
 
-    private suspend fun MutableCollection<Deferred<FileGenData?>>.generateInterfaceFileData(
+    private suspend fun MutableCollection<Deferred<GeneratedFileData?>>.generateInterfaceFileData(
         function: KSFunctionDeclaration,
         repositoryName: String,
         packageDestination: String,
@@ -39,7 +43,7 @@ class SingleMemoryCacheRepositoryGenerator(
     ) = withContext(Dispatchers.Default) {
         this@generateInterfaceFileData.add(
             async {
-                FileGenData(
+                GeneratedFileData(
                     repositoryName,
                     packageDestination,
                     generateInterfaceFileSpec(
@@ -102,7 +106,6 @@ class SingleMemoryCacheRepositoryGenerator(
                 )
             )
             .addType(parametersDataClass)
-            .overrideFetchIfNoParams(packageName, repositoryName, parametersDataClass)
             .addType(
                 TypeSpec.companionObjectBuilder()
                     .addFunction(
@@ -187,25 +190,20 @@ class SingleMemoryCacheRepositoryGenerator(
         return repositoryName
     }
 
-    private fun TypeSpec.Builder.overrideFetchIfNoParams(
-        packageName: String,
-        repositoryName: String,
-        parametersDataClass: TypeSpec
-    ): TypeSpec.Builder {
-//        if (parametersDataClass.propertySpecs.isEmpty()) {
-//            addFunction(
-//                FunSpec.Builder()
-//                    .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
-//                    .addParameter(
-//                        "params",
-//                        ClassName(
-//                            packageName,
-//                            "$repositoryName.${parametersDataClass.name!!}"
-//                        )
-//                    )
-//            )
-//        }
+    private fun validateFunctionSignature(function: KSFunctionDeclaration) {
+        if (function.parameters.isEmpty())
+            logger.error("AutoRepo requires that ${function.simpleName} have at least one function parameter.", function)
+        if (function.isVoidFunction()) {
+            logger.error("AutoRepo requires that annotated functions have a non-Unit return type.", function)
+        }
+    }
 
-        return this
+    private fun KSFunctionDeclaration.isVoidFunction(): Boolean {
+        val returnType = returnType?.resolve()
+        return returnType == null || returnType.isUnit()
+    }
+
+    private fun KSType.isUnit(): Boolean {
+        return this.declaration.qualifiedName?.asString() == "kotlin.Unit"
     }
 }

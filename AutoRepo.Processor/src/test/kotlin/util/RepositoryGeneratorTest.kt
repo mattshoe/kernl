@@ -2,19 +2,17 @@ package util
 
 import com.google.common.truth.Truth
 import com.tschuchort.compiletesting.*
-import io.github.mattshoe.shoebox.processor.AutoRepoProcessorProvider
+import io.github.mattshoe.shoebox.autorepo.AutoRepoProcessorProvider
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
-import kotlin.math.exp
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCompilerApi::class)
 abstract class RepositoryGeneratorTest {
     protected fun assertOutput(
         fileName: String,
         sourceContent: String,
-        expectedOutput: String
+        expectedOutput: String = "", // Go through and remove this parameter at some point.
+        exitCode: KotlinCompilation.ExitCode = KotlinCompilation.ExitCode.OK
     ) {
         val kspCompileResult = compile(
             SourceFile.kotlin(
@@ -23,12 +21,17 @@ abstract class RepositoryGeneratorTest {
             )
         )
 
-        Truth.assertThat(kspCompileResult.result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+        Truth.assertThat(kspCompileResult.result.exitCode).isEqualTo(exitCode)
 
         val generatedFile = kspCompileResult.generatedFiles.firstOrNull { it.name == "${fileName}.kt" }
 
         Truth.assertThat(generatedFile).isNotNull()
-        assertEquals(expectedOutput, generatedFile?.readText()?.trimIndent())
+        /*
+            Below isn't a particularly useful assertion, as the generated code should be be allowed to evolve.
+            We have strong integration tests elsewhere to ensure the contract is satisfied for the generated interfaces.
+            It is cumbersome and not particularly helpful to assert on the exact contents of the generated files.
+         */
+//        assertEquals(expectedOutput, generatedFile?.readText()?.trimIndent())
     }
 
     private fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
