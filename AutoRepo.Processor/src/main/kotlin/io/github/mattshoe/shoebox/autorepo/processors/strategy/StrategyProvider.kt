@@ -1,6 +1,7 @@
 package io.github.mattshoe.shoebox.autorepo.processors.strategy
 
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.symbol.KSNode
 import io.github.mattshoe.shoebox.autorepo.model.AnnotationStrategy
 
 /**
@@ -20,6 +21,6 @@ interface StrategyProvider {
      *
      * @return an ordered list of strategies to apply to the [environment]
      */
-    fun getStrategies(environment: SymbolProcessorEnvironment): List<AnnotationStrategy>
+    fun getStrategies(environment: SymbolProcessorEnvironment): List<Strategy<KSNode>>
 }
 
