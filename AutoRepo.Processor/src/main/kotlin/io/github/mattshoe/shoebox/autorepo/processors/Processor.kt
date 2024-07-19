@@ -1,13 +1,14 @@
 package io.github.mattshoe.shoebox.autorepo.processors
 
 import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSNode
 import io.github.mattshoe.shoebox.autorepo.model.GeneratedFileData
 import kotlin.reflect.KClass
 
 /**
  * Defines a Processor meant to handle a specific subclass of [KSDeclaration].
  */
-interface Processor<out T: KSDeclaration> {
+interface Processor<out T: KSNode> {
     /**
      * This is the target whose code you want to process.
      */

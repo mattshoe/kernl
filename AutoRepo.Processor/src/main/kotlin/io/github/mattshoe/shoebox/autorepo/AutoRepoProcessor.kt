@@ -1,8 +1,10 @@
 package io.github.mattshoe.shoebox.autorepo
 
+import com.google.devtools.ksp.containingFile
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSNode
 import io.github.mattshoe.shoebox.autorepo.model.AnnotationStrategy
 import io.github.mattshoe.shoebox.autorepo.processors.Processor
 import kotlinx.coroutines.*
@@ -21,12 +23,12 @@ class AutoRepoProcessor(
                         .getSymbolsWithAnnotation(annotationName)
                         .filterIsInstance(processor.targetClass.java)
                         .toList()
-                        .forEach { declaration ->
+                        .forEach { node ->
                             launch {
                                 try {
-                                    generateFiles(declaration, processor)
+                                    generateFiles(node, processor)
                                 } catch (e: Throwable) {
-                                    logger.error("Error processing ${declaration.simpleName.asString()}:  $e", declaration)
+                                    logger.error("Error processing ${node.location}:  $e", node)
                                 }
                             }
                         }
@@ -37,7 +39,7 @@ class AutoRepoProcessor(
         emptyList() // Only return items if you need additional processing at a later stage. We do not.
     }
 
-    private suspend fun <T: KSDeclaration> generateFiles(
+    private suspend fun <T: KSNode> generateFiles(
         declaration: T,
         generator: Processor<T>
     ) = coroutineScope {
