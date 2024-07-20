@@ -11,11 +11,14 @@ import io.github.mattshoe.shoebox.util.find
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.print.attribute.standard.Destination
+import kotlin.reflect.KClass
 
 abstract class RepositoryFunctionProcessor(
     protected val logger: KSPLogger
 ): AbstractProcessor<KSFunctionDeclaration>() {
     override val targetClass = KSFunctionDeclaration::class
+
+    abstract protected val annotationClass: KClass<out Any>
 
     abstract suspend fun process(
         declaration: KSFunctionDeclaration,
@@ -27,7 +30,7 @@ abstract class RepositoryFunctionProcessor(
     override suspend fun process(declaration: KSFunctionDeclaration): Set<GeneratedFileData> = withContext(Dispatchers.Default) {
         declaration.validateFunctionSignature()
 
-        val repositoryName = getRepositoryName<AutoRepo.SingleMemoryCache>(declaration)
+        val repositoryName = getRepositoryName(annotationClass, declaration)
         val packageDestination = getPackageDestination(declaration)
         val serviceReturnType = declaration.returnType?.resolve()
 
@@ -39,8 +42,11 @@ abstract class RepositoryFunctionProcessor(
         )
     }
 
-    protected inline fun <reified T: Annotation> getRepositoryName(function: KSFunctionDeclaration): String {
-        val annotation = function.annotations.find<T>()
+    protected fun getRepositoryName(
+        annotationClass: KClass<out Any>,
+        function: KSFunctionDeclaration
+    ): String {
+        val annotation = function.annotations.find(annotationClass)
         val repositoryName = annotation.argument<String>("name")?.replaceFirstChar { it.titlecase() }
         if (repositoryName.isNullOrEmpty() || repositoryName.isBlank()) {
             logger.error("You must provide a non-empty name for the Repository!", annotation)

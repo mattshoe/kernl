@@ -4,6 +4,7 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSNode
 import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.autorepo.model.AnnotationParsingStrategy
+import io.github.mattshoe.shoebox.autorepo.processors.impl.NoCacheProcessor
 import io.github.mattshoe.shoebox.autorepo.processors.impl.SingleMemoryCacheProcessor
 
 class DefaultStrategyProvider: StrategyProvider {
@@ -19,7 +20,7 @@ class DefaultStrategyProvider: StrategyProvider {
         return AnnotationParsingStrategy(
             annotation = AutoRepo.NoCache::class,
             processors = buildList {
-                // TODO
+                add(NoCacheProcessor(environment.logger))
             }
         )
     }

@@ -6,6 +6,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
+import io.github.mattshoe.shoebox.annotations.AutoRepo
 import io.github.mattshoe.shoebox.autorepo.model.GeneratedFileData
 import io.github.mattshoe.shoebox.data.repo.singlecache.BaseSingleCacheLiveRepository
 import io.github.mattshoe.shoebox.data.repo.singlecache.SingleCacheLiveRepository
@@ -19,6 +20,8 @@ class SingleMemoryCacheProcessor(
 ): RepositoryFunctionProcessor(
     logger
 ) {
+
+    override val annotationClass = AutoRepo.SingleMemoryCache::class
 
     override suspend fun process(
         declaration: KSFunctionDeclaration,

@@ -1,13 +1,15 @@
-package processor.generators
+package util
 
-import com.tschuchort.compiletesting.KotlinCompilation
+import com.google.common.truth.Truth
+import com.tschuchort.compiletesting.*
+import io.github.mattshoe.shoebox.autorepo.AutoRepoProcessorProvider
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
-import org.junit.Ignore
-import util.RepositoryGeneratorTest
 import org.junit.Test
+import java.io.File
 
 @OptIn(ExperimentalCompilerApi::class)
-class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
+abstract class RepositoryProcessorTestHarness {
+    protected abstract val annotationText: String
 
     @Test
     fun `WHEN annotated function has no parameters THEN compilation error is thrown`() {
@@ -19,7 +21,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "NoParamRepository")
+                    $annotationText(name = "NoParamRepository")
                     suspend fun fetchData(): String
                 }
                 
@@ -38,7 +40,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "NoReturnRepository")
+                    $annotationText(name = "NoReturnRepository")
                     suspend fun fetchData(string: String)
                 }
                 
@@ -57,7 +59,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "UnitReturnRepository")
+                    $annotationText(name = "UnitReturnRepository")
                     suspend fun fetchData(string: String): Unit
                 }
                 
@@ -76,7 +78,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "NoParamUnitReturnRepository")
+                    $annotationText(name = "NoParamUnitReturnRepository")
                     suspend fun fetchData(): Unit
                 }
                 
@@ -95,7 +97,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "NoParamNoReturnRepository")
+                    $annotationText(name = "NoParamNoReturnRepository")
                     suspend fun fetchData()
                 }
                 
@@ -105,7 +107,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
     }
 
     @Test
-    fun `test SingleMemoryCacheRepositoryGenerator generates expected files`() {
+    fun `test processor generates expected files`() {
         assertOutput(
             fileName = "MyTestRepository",
             sourceContent =  """
@@ -114,7 +116,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "MyTestRepository")
+                    $annotationText(name = "MyTestRepository")
                     suspend fun fetchData(param: String): String
                 }
                 
@@ -151,7 +153,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
     }
 
     @Test
-    fun `test SingleMemoryCacheRepositoryGenerator with multiple parameters`() {
+    fun `test processor with multiple parameters`() {
         assertOutput(
             fileName = "MultiParamRepository",
             sourceContent =  """
@@ -160,7 +162,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "MultiParamRepository")
+                    $annotationText(name = "MultiParamRepository")
                     suspend fun fetchData(param1: String, param2: Int): String
                 }
             """.trimIndent(),
@@ -200,7 +202,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
     }
 
     @Test
-    fun `test SingleMemoryCacheRepositoryGenerator with different return type`() {
+    fun `test processor with different return type`() {
         assertOutput(
             fileName = "DifferentReturnTypeRepository",
             sourceContent =  """
@@ -209,7 +211,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 import io.github.mattshoe.shoebox.annotations.AutoRepo
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "DifferentReturnTypeRepository")
+                    $annotationText(name = "DifferentReturnTypeRepository")
                     suspend fun fetchData(param: String): Int
                 }
             """.trimIndent(),
@@ -248,7 +250,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
     }
 
     @Test
-    fun `test SingleMemoryCacheRepositoryGenerator with complex return type`() {
+    fun `test processor with complex return type`() {
         assertOutput(
             fileName = "ComplexReturnTypeRepository",
             sourceContent =  """
@@ -259,7 +261,7 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 data class ComplexType(val data: String, val number: Int)
     
                 interface SomeInterface {
-                    @AutoRepo.SingleMemoryCache(name = "ComplexReturnTypeRepository")
+                    $annotationText(name = "ComplexReturnTypeRepository")
                     suspend fun fetchData(param: String): ComplexType
                 }
             """.trimIndent(),
@@ -295,5 +297,57 @@ class SingleMemoryCacheFunctionProcessorTest: RepositoryGeneratorTest() {
                 }
             """.trimIndent()
         )
+    }
+    
+    protected fun assertOutput(
+        fileName: String,
+        sourceContent: String,
+        expectedOutput: String = "", // Go through and remove this parameter at some point.
+        exitCode: KotlinCompilation.ExitCode = KotlinCompilation.ExitCode.OK
+    ) {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                "Test.kt",
+                sourceContent
+            )
+        )
+
+        Truth.assertThat(kspCompileResult.result.exitCode).isEqualTo(exitCode)
+
+        val generatedFile = kspCompileResult.generatedFiles.firstOrNull { it.name == "${fileName}.kt" }
+
+        Truth.assertThat(generatedFile).isNotNull()
+        /*
+            Below isn't a particularly useful assertion, as the generated code should be be allowed to evolve.
+            We have strong integration tests elsewhere to ensure the contract is satisfied for the generated interfaces.
+            It is cumbersome and not particularly helpful to assert on the exact contents of the generated files.
+         */
+//        assertEquals(expectedOutput, generatedFile?.readText()?.trimIndent())
+    }
+
+    private fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
+        val compilation = prepareCompilation(*sourceFiles)
+        val result = compilation.compile()
+        return KspCompileResult(
+            result,
+            findGeneratedFiles(compilation)
+        )
+    }
+
+    private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation =
+        KotlinCompilation()
+            .apply {
+                inheritClassPath = true
+                symbolProcessorProviders = listOf(AutoRepoProcessorProvider())
+                sources = sourceFiles.asList()
+                verbose = true
+                kspIncremental = false
+            }
+
+    private fun findGeneratedFiles(compilation: KotlinCompilation): List<File> {
+        return compilation.kspSourcesDir
+            .walkTopDown()
+            .filter { it.isFile }
+            .toList()
     }
 }
