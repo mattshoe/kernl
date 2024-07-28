@@ -77,9 +77,9 @@ subprojects {
                             artifactId = subArtifactId
                             version = VERSION
                             pom {
-                                name = "AutoRepo.Processor"
-                                description = "AutoRepo: A Kotlin Symbol Processing (KSP) library for automatic repository generation."
-                                url = "https://github.com/mattshoe/autorepo"
+                                name = "Kernl.Processor"
+                                description = "Kernl: A Kotlin Symbol Processing (KSP) library for automatic repository generation."
+                                url = "https://github.com/mattshoe/kernl"
                                 properties = mapOf(
                                     "myProp" to "value"
                                 )
@@ -99,9 +99,9 @@ subprojects {
                                     }
                                 }
                                 scm {
-                                    connection = "scm:git:git@github.com:mattshoe/autorepo.git"
-                                    developerConnection = "scm:git:git@github.com:mattshoe/autorepo.git"
-                                    url = "https://github.com/mattshoe/autorepo"
+                                    connection = "scm:git:git@github.com:mattshoe/kernl.git"
+                                    developerConnection = "scm:git:git@github.com:mattshoe/kernl.git"
+                                    url = "https://github.com/mattshoe/kernl"
                                 }
                             }
                         }

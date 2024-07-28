@@ -1,5 +1,5 @@
-# `@AutoRepo.SingleMemoryCache`
-The `AutoRepo.SingleMemoryCache` annotation generates a repository that holds a single cached value in memory. <br> 
+# `@Kernl.SingleMemoryCache`
+The `Kernl.SingleMemoryCache` annotation generates a repository that holds a single cached value in memory. <br> 
 Any updates to the cached value are broadcast immediately to all listeners.
 
 By default, only the very first call to the [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) method will be honored. All subsequent invocations of `fetch` will
@@ -21,7 +21,7 @@ Let's imagine you have a Retrofit service such as the following:
 
 ```kotlin
 interface MyService {
-    @AutoRepo.SingleMemoryCache("MyRepository")
+    @Kernl.SingleMemoryCache("MyRepository")
     @GET("foo/{id}/{someParam}")
     suspend fun getMyResponse(
         @Path("id") id: String, 
@@ -32,7 +32,7 @@ interface MyService {
 ```
 
 ### Obtaining an Instance
-AutoRepo provides factories to obtain transient instances of your repositories. They are transient meaning a new instance 
+Kernl provides factories to obtain transient instances of your repositories. They are transient meaning a new instance 
 is created every time you invoke the `Factory` method.
 
 ```kotlin
@@ -46,7 +46,7 @@ val myRepo = MyRepository.Factory { id, someParam, otherParam ->
 ```
 
 ### Dependency Injection
-AutoRepo is designed to work well with any arbitrary dependency injection framework. I will demonstrate with Dagger, but 
+Kernl is designed to work well with any arbitrary dependency injection framework. I will demonstrate with Dagger, but 
 the pattern should be similar for any dependency injection framework
 
 ```kotlin
@@ -65,7 +65,7 @@ interface MyServiceModule {
 
 ### Use Your Repository
 The example below uses Android ViewModels for demonstration, but you can adapt your use-case to your architectural patterns. 
-The `AutoRepo` library is in no way tied to the Android SDK. 
+The `Kernl` library is in no way tied to the Android SDK. 
 
 ```kotlin
 class MyViewModel @Inject constructor(
