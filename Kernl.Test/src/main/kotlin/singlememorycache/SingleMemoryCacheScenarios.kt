@@ -1,6 +1,6 @@
 package io.github.mattshoe.shoebox.singlememorycache
 
-import io.github.mattshoe.shoebox.annotations.Kernl
+import io.github.mattshoe.shoebox.kernl.annotations.Kernl
 import io.github.mattshoe.shoebox.models.ServiceRequest
 import io.github.mattshoe.shoebox.models.ServiceResponse
 

@@ -1,7 +1,7 @@
 package io.github.mattshoe.shoebox.kernl
 
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import io.github.mattshoe.shoebox.annotations.Kernl
+import io.github.mattshoe.shoebox.kernl.annotations.Kernl
 import io.github.mattshoe.shoebox.kernl.processors.impl.NoCacheProcessor
 import io.github.mattshoe.shoebox.kernl.processors.impl.SingleMemoryCacheProcessor
 import io.github.mattshoe.shoebox.stratify.StratifySymbolProcessor

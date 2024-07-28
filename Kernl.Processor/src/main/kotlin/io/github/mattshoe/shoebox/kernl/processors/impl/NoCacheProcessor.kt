@@ -6,7 +6,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
-import io.github.mattshoe.shoebox.annotations.Kernl
+import io.github.mattshoe.shoebox.kernl.annotations.Kernl
 import io.github.mattshoe.shoebox.kernl.data.repo.nocache.BaseNoCacheRepository
 import io.github.mattshoe.shoebox.kernl.data.repo.nocache.NoCacheRepository
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile

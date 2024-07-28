@@ -1,4 +1,4 @@
-package io.github.mattshoe.shoebox.annotations
+package io.github.mattshoe.shoebox.kernl.annotations
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)

@@ -18,7 +18,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoParamRepository")
@@ -37,7 +37,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoReturnRepository")
@@ -56,7 +56,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "UnitReturnRepository")
@@ -75,7 +75,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoParamUnitReturnRepository")
@@ -94,7 +94,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoParamNoReturnRepository")
@@ -113,7 +113,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "MyTestRepository")
@@ -159,7 +159,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "MultiParamRepository")
@@ -208,7 +208,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "DifferentReturnTypeRepository")
@@ -256,7 +256,7 @@ abstract class RepositoryProcessorTestHarness {
             sourceContent =  """
                 package io.github.mattshoe.test
     
-                import io.github.mattshoe.shoebox.annotations.Kernl
+                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
     
                 data class ComplexType(val data: String, val number: Int)
     
