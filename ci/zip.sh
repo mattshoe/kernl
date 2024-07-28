@@ -2,9 +2,9 @@
 
 # Define the array of project names
 projects=(
-  "AutoRepo.Runtime"
-  "AutoRepo.Processor"
-  "AutoRepo.Annotations"
+  "Kernl.Runtime"
+  "Kernl.Processor"
+  "Kernl.Annotations"
 )
 
 OUTPUT_DIR="./build/distributions/"

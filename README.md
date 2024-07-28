@@ -1,12 +1,12 @@
-# AutoRepo
+# Kernl
 
-AutoRepo is a Kotlin Symbol Processing (KSP) library designed to automatically generate repository classes for your service interfaces. This library helps reduce boilerplate code and ensures a consistent architecture by generating repository interfaces and implementation classes based on annotated service methods.
+Kernl is a Kotlin Symbol Processing (KSP) library designed to automatically generate repository classes for your service interfaces. This library helps reduce boilerplate code and ensures a consistent architecture by generating repository interfaces and implementation classes based on annotated service methods.
 
 
 ## Features
 
 ### 1. Automated Repository Generation
-AutoRepo automatically generates repository interfaces and implementation classes from your service interfaces, reducing the need for repetitive boilerplate code.
+Kernl automatically generates repository interfaces and implementation classes from your service interfaces, reducing the need for repetitive boilerplate code.
 
 ### 2. In-Memory Caching
 Out-of-the-box support for in-memory caching ensures that your repositories store and retrieve data efficiently, reducing unnecessary network calls and improving performance.
@@ -18,7 +18,7 @@ Automatically keep all observers updated with the latest data changes, ensuring 
 Built-in support for cache invalidation allows you to easily manage and refresh your data, maintaining the accuracy and relevance of your application's state.
 
 ### 5. Seamless Integration with Dependency Injection
-AutoRepo integrates smoothly with popular dependency injection frameworks like Dagger, Hilt, and Koin, simplifying the setup and management of repositories in your projects.
+Kernl integrates smoothly with popular dependency injection frameworks like Dagger, Hilt, and Koin, simplifying the setup and management of repositories in your projects.
 
 ### 6. Customizable Fetch Logic
 Define custom data fetch logic with ease, allowing you to tailor the data retrieval process to meet your specific application needs.
@@ -32,27 +32,27 @@ You'll notice there are 3 distinct libraries. This is to keep your final `jar`/`
 including the minimum runtime dependencies. Things like annotations are only needed at compile time.
 ```kotlin
 dependencies {
-    ksp("io.github.mattshoe.shoebox:AutoRepo.Processor:1.0.0")
-    compileOnly("io.github.mattshoe.shoebox:AutoRepo.Annotations:1.0.0")
-    implementation("io.github.mattshoe.shoebox:AutoRepo.Runtime:1.0.0")
+    ksp("io.github.mattshoe.shoebox:Kernl.Processor:1.0.0")
+    compileOnly("io.github.mattshoe.shoebox:Kernl.Annotations:1.0.0")
+    implementation("io.github.mattshoe.shoebox:Kernl.Runtime:1.0.0")
 }
 ```
 
 ### 2. Define Your Service Interface
 
-Annotate your service methods with `@AutoRepo.SingleMemoryCache` to indicate that a repository should be generated for them.
+Annotate your service methods with `@Kernl.SingleMemoryCache` to indicate that a repository should be generated for them.
 
 ```kotlin
 interface MyService {
-    @AutoRepo.SingleMemoryCache("MyRepository")
+    @Kernl.SingleMemoryCache("MyRepository")
     suspend fun getMyResponse(id: String, someParam: Int, otherParam: Boolean): MyResponseData
 }
 ```
 
 ### 3. Bind Your Repository
 
-AutoRepo was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
-via its associated Factory. This allows you to use `AutoRepo` with any dependency injection framework. Examples included below.
+Kernl was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
+via its associated Factory. This allows you to use `Kernl` with any dependency injection framework. Examples included below.
 
 ```kotlin
 // Option 1: Pass function pointer to the factory
@@ -152,6 +152,6 @@ class MyViewModel(
 
 # API Documentation 
 
-- [@AutoRepo.SingleMemoryCache](docs/SINGLE_MEMORY_CACHE.md)
+- [@Kernl.SingleMemoryCache](docs/SINGLE_MEMORY_CACHE.md)
 - [SingleCacheLiveRepository](docs/SINGLE_CACHE_LIVE_REPOSITORY.md)
 - [DataResult](docs/DATA_RESULT.md)
