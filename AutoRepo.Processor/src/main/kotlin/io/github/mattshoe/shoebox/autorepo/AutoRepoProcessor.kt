@@ -1,57 +1,37 @@
 package io.github.mattshoe.shoebox.autorepo
 
-import com.google.devtools.ksp.containingFile
-import com.google.devtools.ksp.processing.*
-import com.google.devtools.ksp.symbol.KSAnnotated
-import com.google.devtools.ksp.symbol.KSNode
-import io.github.mattshoe.shoebox.autorepo.processors.Processor
-import io.github.mattshoe.shoebox.autorepo.processors.strategy.ParsingStrategy
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import io.github.mattshoe.shoebox.annotations.AutoRepo
+import io.github.mattshoe.shoebox.autorepo.processors.impl.NoCacheProcessor
+import io.github.mattshoe.shoebox.autorepo.processors.impl.SingleMemoryCacheProcessor
+import io.github.mattshoe.shoebox.stratify.StratifySymbolProcessor
+import io.github.mattshoe.shoebox.stratify.ksp.StratifyResolver
+import io.github.mattshoe.shoebox.stratify.strategy.AnnotationStrategy
 
-class AutoRepoProcessor(
-    private val codeGenerator: CodeGenerator,
-    private val strategies: List<ParsingStrategy<KSNode>>,
-    private val logger: KSPLogger
-) : SymbolProcessor {
+class AutoRepoProcessor: StratifySymbolProcessor() {
 
-    override fun process(resolver: Resolver): List<KSAnnotated> = runBlocking {
-        strategies.forEach { strategy ->
-            strategy.processors.forEach { processor ->
-                launch {
-                    strategy.resolveNodes(resolver, processor)
-                        .forEach { node ->
-                            launch {
-                                try {
-                                    generateFiles(node, processor)
-                                } catch (e: Throwable) {
-                                    logger.error("Error processing ${node.location}:  $e", node)
-                                }
-                            }
-                        }
-                }
+    override suspend fun buildStrategies(resolver: StratifyResolver) = listOf(
+        noCacheStrategy(environment),
+        singleMemoryCacheStrategy(environment)
+    )
+
+
+    private fun noCacheStrategy(environment: SymbolProcessorEnvironment): AnnotationStrategy {
+        return AnnotationStrategy(
+            annotation = AutoRepo.NoCache::class,
+            processors = buildList {
+                add(NoCacheProcessor(environment.logger))
             }
-        }
-
-        emptyList() // Only return items if you need additional processing at a later stage. We do not.
+        )
     }
 
-    private suspend fun <T: KSNode> generateFiles(
-        node: T,
-        processor: Processor<T>
-    ) = coroutineScope {
-        processor.process(node)
-            .forEach { fileData ->
-                launch {
-                    codeGenerator.createNewFile(
-                        Dependencies(false, node.containingFile!!),
-                        fileData.packageName,
-                        fileData.fileName
-                    ).bufferedWriter().use {
-                        fileData.fileSpec.writeTo(it)
-                    }
-                }
+    private fun singleMemoryCacheStrategy(environment: SymbolProcessorEnvironment): AnnotationStrategy {
+        return AnnotationStrategy(
+            annotation = AutoRepo.SingleMemoryCache::class,
+            processors = buildList {
+                add(SingleMemoryCacheProcessor(environment.logger))
             }
+        )
     }
 }

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.Java
+
 plugins {
     kotlin("jvm") version "2.0.0"
     id("maven-publish")
@@ -11,6 +13,7 @@ group = GROUP_ID
 version = VERSION
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -20,6 +23,7 @@ dependencies {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
     }
@@ -44,6 +48,19 @@ allprojects {
 }
 
 subprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+    }
+
+    plugins.withId("java") {
+        java {
+            withJavadocJar()
+            withSourcesJar()
+        }
+    }
+
     afterEvaluate {
         (findProperty("PUBLICATION_NAME") as? String)?.let { publicationName ->
             val subArtifactId = findProperty("ARTIFACT_ID") as String
@@ -116,8 +133,4 @@ subprojects {
             }
         }
     }
-}
-
-kotlin {
-    jvmToolchain(19)
 }

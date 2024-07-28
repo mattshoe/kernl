@@ -7,9 +7,9 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.mattshoe.shoebox.annotations.AutoRepo
-import io.github.mattshoe.shoebox.autorepo.model.GeneratedFileData
 import io.github.mattshoe.shoebox.data.repo.singlecache.BaseSingleCacheLiveRepository
 import io.github.mattshoe.shoebox.data.repo.singlecache.SingleCacheLiveRepository
+import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import io.github.mattshoe.shoebox.util.className
 import io.github.mattshoe.shoebox.util.simpleName
 import kotlinx.coroutines.*
@@ -28,13 +28,13 @@ class SingleMemoryCacheProcessor(
         repositoryName: String,
         packageDestination: String,
         serviceReturnType: KSType
-    ): Set<GeneratedFileData> {
+    ): Set<GeneratedFile> {
         return buildSet {
             generateInterfaceFileData(declaration, repositoryName, packageDestination, serviceReturnType)
         }.awaitAll().filterNotNullTo(mutableSetOf())
     }
 
-    private suspend fun MutableCollection<Deferred<GeneratedFileData?>>.generateInterfaceFileData(
+    private suspend fun MutableCollection<Deferred<GeneratedFile?>>.generateInterfaceFileData(
         function: KSFunctionDeclaration,
         repositoryName: String,
         packageDestination: String,
@@ -42,10 +42,10 @@ class SingleMemoryCacheProcessor(
     ) = withContext(Dispatchers.Default) {
         this@generateInterfaceFileData.add(
             async {
-                GeneratedFileData(
-                    repositoryName,
-                    packageDestination,
-                    generateInterfaceFileSpec(
+                GeneratedFile(
+                    fileName = repositoryName,
+                    packageName = packageDestination,
+                    output = generateInterfaceFile(
                         packageDestination,
                         repositoryName,
                         dataType,
@@ -56,12 +56,12 @@ class SingleMemoryCacheProcessor(
         )
     }
 
-    private fun generateInterfaceFileSpec(
+    private fun generateInterfaceFile(
         packageName: String,
         repositoryName: String,
         dataType: KSType,
         parametersDataClass: TypeSpec
-    ): FileSpec {
+    ): String {
         return FileSpec.builder(packageName, repositoryName)
             .addType(
                 buildInterface(packageName, repositoryName, dataType, parametersDataClass)
@@ -70,6 +70,7 @@ class SingleMemoryCacheProcessor(
                 buildImpl(packageName, repositoryName, dataType, parametersDataClass)
             )
             .build()
+            .toString()
     }
 
     private fun buildParamsDataClass(function: KSFunctionDeclaration): TypeSpec {

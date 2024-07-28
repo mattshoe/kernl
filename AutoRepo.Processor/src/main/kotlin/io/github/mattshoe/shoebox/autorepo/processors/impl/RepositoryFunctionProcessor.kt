@@ -3,14 +3,12 @@ package io.github.mattshoe.shoebox.autorepo.processors.impl
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import io.github.mattshoe.shoebox.annotations.AutoRepo
-import io.github.mattshoe.shoebox.autorepo.model.GeneratedFileData
 import io.github.mattshoe.shoebox.autorepo.processors.AbstractProcessor
+import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import io.github.mattshoe.shoebox.util.argument
 import io.github.mattshoe.shoebox.util.find
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.print.attribute.standard.Destination
 import kotlin.reflect.KClass
 
 abstract class RepositoryFunctionProcessor(
@@ -18,24 +16,24 @@ abstract class RepositoryFunctionProcessor(
 ): AbstractProcessor<KSFunctionDeclaration>() {
     override val targetClass = KSFunctionDeclaration::class
 
-    abstract protected val annotationClass: KClass<out Any>
+    protected abstract val annotationClass: KClass<out Any>
 
     abstract suspend fun process(
         declaration: KSFunctionDeclaration,
         repositoryName: String,
         packageDestination: String,
         serviceReturnType: KSType
-    ): Set<GeneratedFileData>
+    ): Set<GeneratedFile>
 
-    override suspend fun process(declaration: KSFunctionDeclaration): Set<GeneratedFileData> = withContext(Dispatchers.Default) {
-        declaration.validateFunctionSignature()
+    override suspend fun process(node: KSFunctionDeclaration): Set<GeneratedFile> = withContext(Dispatchers.Default) {
+        node.validateFunctionSignature()
 
-        val repositoryName = getRepositoryName(annotationClass, declaration)
-        val packageDestination = getPackageDestination(declaration)
-        val serviceReturnType = declaration.returnType?.resolve()
+        val repositoryName = getRepositoryName(annotationClass, node)
+        val packageDestination = getPackageDestination(node)
+        val serviceReturnType = node.returnType?.resolve()
 
         return@withContext process(
-            declaration,
+            node,
             repositoryName,
             packageDestination,
             serviceReturnType!! // This is covered by `validateFunctionSignature()`
