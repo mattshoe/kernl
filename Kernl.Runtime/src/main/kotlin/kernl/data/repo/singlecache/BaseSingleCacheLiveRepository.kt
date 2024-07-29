@@ -17,7 +17,7 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>(
 
     protected abstract val dataType: KClass<TData>
 
-    override val data: Flow<io.github.mattshoe.shoebox.kernl.data.DataResult<TData>>
+    override val data: Flow<DataResult<TData>>
         get() = dataSource.data
 
     protected abstract suspend fun fetchData(params: TParams): TData
