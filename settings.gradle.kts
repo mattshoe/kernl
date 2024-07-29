@@ -4,5 +4,5 @@ plugins {
 rootProject.name = "Kernl"
 include("Kernl.Annotations")
 include("Kernl.Processor")
-include("Kernl.Test")
+include("Kernl.Consumer")
 include("Kernl.Runtime")
