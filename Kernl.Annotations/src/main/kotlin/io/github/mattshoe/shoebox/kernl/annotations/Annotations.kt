@@ -23,14 +23,12 @@ annotation class Kernl(
         val name: String
     )
 
-    @Target(AnnotationTarget.FUNCTION)
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.SOURCE)
     annotation class Persistent(
-        val name: String
+        val name: String,
     )
 }
-
-
 
 
 

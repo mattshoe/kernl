@@ -13,29 +13,29 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.reflect.KClass
 
 abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
-    io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeCacheLiveRepository<TParams, TData> {
+    AssociativeMemoryCacheLiveRepository<TParams, TData> {
 
     private data class CacheEntry<TData: Any>(
         val dataSource: DataSource<TData>
     )
     private val dataCacheMutex = Mutex()
-    private val dataCache = mutableMapOf<TParams, io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository.CacheEntry<TData>>()
+    private val dataCache = mutableMapOf<TParams, CacheEntry<TData>>()
     abstract val dataType: KClass<TData>
 
     abstract suspend fun fetchData(params: TParams): TData
     protected open fun checkCache(params: TParams): TData? = null
 
-    override fun stream(params: TParams, forceFetch: Boolean): Flow<io.github.mattshoe.shoebox.kernl.data.DataResult<TData>> {
+    override fun stream(params: TParams, forceFetch: Boolean): Flow<DataResult<TData>> {
         return initializeNewStream(params, forceFetch)
             .catch {
-                emit(io.github.mattshoe.shoebox.kernl.data.DataResult.Error(it))
+                emit(DataResult.Error(it))
             }
     }
 
-    override fun latestValue(params: TParams): io.github.mattshoe.shoebox.kernl.data.DataResult<TData>? {
+    override fun latestValue(params: TParams): DataResult<TData>? {
         return try {
             checkCache(params)?.let {
-                io.github.mattshoe.shoebox.kernl.data.DataResult.Success(it)
+                DataResult.Success(it)
             } ?: dataCache[params]?.dataSource?.value
         } catch (e: Throwable) {
             null
@@ -68,7 +68,7 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
         }
     }
 
-    private fun initializeNewStream(params: TParams, forceFetch: Boolean): Flow<io.github.mattshoe.shoebox.kernl.data.DataResult<TData>> {
+    private fun initializeNewStream(params: TParams, forceFetch: Boolean): Flow<DataResult<TData>> {
         return channelFlow {
             withContext(Dispatchers.IO) {
                 loadDataIntoCache(params, forceFetch)
@@ -92,20 +92,20 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
         }
     }
 
-    private fun getDataFromDataCache(params: TParams): Flow<io.github.mattshoe.shoebox.kernl.data.DataResult<TData>> {
+    private fun getDataFromDataCache(params: TParams): Flow<DataResult<TData>> {
         return dataCache[params]
             ?.dataSource
             ?.data
             ?: flowOf(
-                io.github.mattshoe.shoebox.kernl.data.DataResult.Error(
+                DataResult.Error(
                     IllegalAccessError("No data found in the network cache!")
                 )
             )
     }
 
-    private fun findDataCacheEntry(params: TParams): io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository.CacheEntry<TData> {
+    private fun findDataCacheEntry(params: TParams): CacheEntry<TData> {
         return dataCache[params]
-            ?: io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository.CacheEntry(
+            ?: CacheEntry(
                 DataSource.Builder
                     .memoryCache(dataType)
                     .build()
@@ -113,7 +113,7 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
     }
 
     private suspend fun updateDataCache(
-        cacheEntry: io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository.CacheEntry<TData>,
+        cacheEntry: CacheEntry<TData>,
         params: TParams,
         onCacheMiss: suspend () -> Unit
     ) {
@@ -125,7 +125,7 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
     }
 
     private suspend fun doFetchData(
-        cacheEntry: io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository.CacheEntry<TData>,
+        cacheEntry: CacheEntry<TData>,
         params: TParams,
         forceFetch: Boolean
     ) {

@@ -1,5 +1,6 @@
 package io.github.mattshoe.shoebox.kernl.data.repo
 
+import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository
 import io.github.mattshoe.shoebox.kernl.data.repo.nocache.BaseNoCacheRepository
 import io.github.mattshoe.shoebox.kernl.data.repo.nocache.NoCacheRepository
 import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.BaseSingleCacheLiveRepository
@@ -27,8 +28,8 @@ fun <TParams: Any, TData: Any> singleCacheLiveRepository(
 fun <TParams: Any, TData: Any> multiSourceLiveRepository(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
-): io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeCacheLiveRepository<TParams, TData> {
-    return object : io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository<TParams, TData>() {
+): io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMemoryCacheLiveRepository<TParams, TData> {
+    return object : BaseAssociativeCacheLiveRepository<TParams, TData>() {
         override val dataType = clazz
         override suspend fun fetchData(params: TParams): TData = fetchData(params)
     }

@@ -1,73 +1,60 @@
 package io.github.mattshoe.shoebox.kernl.processors.impl
 
-import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
-import io.github.mattshoe.shoebox.kernl.annotations.Kernl
-import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.BaseSingleCacheLiveRepository
-import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.SingleCacheLiveRepository
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import io.github.mattshoe.shoebox.util.className
 import io.github.mattshoe.shoebox.util.simpleName
 import kotlinx.coroutines.*
 import kotlin.reflect.KClass
 
-
-class SingleMemoryCacheProcessor(
-    logger: KSPLogger,
-    private val codeGenerator: MemoryCacheCodeGenerator
-): RepositoryFunctionProcessor(
-    logger
-) {
-
-    override val annotationClass = Kernl.SingleMemoryCache::class
-
-    override suspend fun process(
+class MemoryCacheCodeGenerator {
+    suspend fun generate(
+        baseInterface: KClass<*>,
+        baseClass: KClass<*>,
         declaration: KSFunctionDeclaration,
         repositoryName: String,
         packageDestination: String,
         serviceReturnType: KSType
-    ): Set<GeneratedFile> = coroutineScope {
-        listOf(
-            async {
-                codeGenerator.generate(
-                    SingleCacheLiveRepository::class,
-                    BaseSingleCacheLiveRepository::class,
-                    declaration,
-                    repositoryName,
-                    packageDestination,
-                    serviceReturnType
-                )
-            }
-        ).awaitAll().filterNotNullTo(mutableSetOf())
+    ): GeneratedFile {
+        return generateInterfaceFileData(
+                baseInterface,
+                baseClass,
+                declaration,
+                repositoryName,
+                packageDestination,
+                serviceReturnType
+            )
     }
 
-    private suspend fun MutableCollection<Deferred<GeneratedFile?>>.generateInterfaceFileData(
+    private suspend fun generateInterfaceFileData(
+        baseInterface: KClass<*>,
+        baseClass: KClass<*>,
         function: KSFunctionDeclaration,
         repositoryName: String,
         packageDestination: String,
         dataType: KSType,
     ) = withContext(Dispatchers.Default) {
-        this@generateInterfaceFileData.add(
-            async {
-                GeneratedFile(
-                    fileName = repositoryName,
-                    packageName = packageDestination,
-                    output = generateInterfaceFile(
-                        packageDestination,
-                        repositoryName,
-                        dataType,
-                        buildParamsDataClass(function)
-                    )
-                )
-            }
+        GeneratedFile(
+            fileName = repositoryName,
+            packageName = packageDestination,
+            output = generateInterfaceFile(
+                baseInterface,
+                baseClass,
+                packageDestination,
+                repositoryName,
+                dataType,
+                buildParamsDataClass(function)
+            )
         )
     }
 
     private fun generateInterfaceFile(
+        baseInterface: KClass<*>,
+        baseClass: KClass<*>,
         packageName: String,
         repositoryName: String,
         dataType: KSType,
@@ -75,10 +62,10 @@ class SingleMemoryCacheProcessor(
     ): String {
         return FileSpec.builder(packageName, repositoryName)
             .addType(
-                buildInterface(packageName, repositoryName, dataType, parametersDataClass)
+                buildInterface(baseInterface, packageName, repositoryName, dataType, parametersDataClass)
             )
             .addType(
-                buildImpl(packageName, repositoryName, dataType, parametersDataClass)
+                buildImpl(baseClass, packageName, repositoryName, dataType, parametersDataClass)
             )
             .build()
             .toString()
@@ -91,7 +78,7 @@ class SingleMemoryCacheProcessor(
         function.parameters.forEach { parameter ->
             val name = parameter.name?.asString() ?: return@forEach
             val type = parameter.type.resolve().toTypeName()
-            val propertySpec = PropertySpec.builder(name, type).initializer(name).build()
+            val propertySpec = PropertySpec.Companion.builder(name, type).initializer(name).build()
             classBuilder.addProperty(propertySpec)
             constructorBuilder.addParameter(name, type)
         }
@@ -101,6 +88,7 @@ class SingleMemoryCacheProcessor(
     }
 
     private fun buildInterface(
+        baseInterface: KClass<*>,
         packageName: String,
         repositoryName: String,
         dataType: KSType,
@@ -109,10 +97,10 @@ class SingleMemoryCacheProcessor(
         return TypeSpec.interfaceBuilder(repositoryName)
             .addSuperinterface(
                 ClassName(
-                    SingleCacheLiveRepository::class.java.packageName,
-                    SingleCacheLiveRepository::class.simpleName!!
+                    baseInterface.java.packageName,
+                    baseInterface.simpleName!!
                 ).parameterizedBy(
-                    ClassName(packageName,"${repositoryName}.${parametersDataClass.name!!}"),
+                    ClassName(packageName, "${repositoryName}.${parametersDataClass.name!!}"),
                     dataType.className
                 )
             )
@@ -137,6 +125,7 @@ class SingleMemoryCacheProcessor(
     }
 
     private fun buildImpl(
+        baseClass: KClass<*>,
         packageName: String,
         repositoryName: String,
         dataType: KSType,
@@ -155,24 +144,29 @@ class SingleMemoryCacheProcessor(
             .addSuperinterface(ClassName(packageName, repositoryName))
             .superclass(
                 ClassName(
-                    BaseSingleCacheLiveRepository::class.java.packageName,
-                    BaseSingleCacheLiveRepository::class.simpleName!!
+                    baseClass.java.packageName,
+                    baseClass.simpleName!!
                 ).parameterizedBy(
-                    ClassName(packageName,"${repositoryName}.${parametersDataClass.name!!}"),
+                    ClassName(packageName, "${repositoryName}.${parametersDataClass.name!!}"),
                     dataType.className
                 )
             )
             .addProperty(
-                PropertySpec.builder("call", LambdaTypeName.get(
-                    parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
-                    returnType = dataType.className
-                ).copy(suspending = true))
+                PropertySpec.builder(
+                    "call", LambdaTypeName.get(
+                        parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
+                        returnType = dataType.className
+                    ).copy(suspending = true)
+                )
                     .initializer("call")
                     .addModifiers(KModifier.PRIVATE)
                     .build()
             )
             .addProperty(
-                PropertySpec.builder("dataType", KClass::class.asTypeName().parameterizedBy(dataType.className))
+                PropertySpec.Companion.builder(
+                    "dataType",
+                    KClass::class.asTypeName().parameterizedBy(dataType.className)
+                )
                     .initializer("${dataType.simpleName}::class")
                     .addModifiers(KModifier.OVERRIDE)
                     .build()
