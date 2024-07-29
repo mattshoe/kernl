@@ -17,6 +17,8 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
 
     protected abstract fun repository(): AssociativeMemoryCacheLiveRepository<TParams, TResponse>
 
+    protected abstract val testData: Map<TParams, TResponse>
+
     @Before
     fun setUp() {
         subject = repository()
