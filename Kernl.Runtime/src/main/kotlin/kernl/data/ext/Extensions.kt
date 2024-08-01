@@ -76,3 +76,11 @@ fun <T: Any> DataResult<T>.orElse(default: (Throwable) -> T): T {
     }
 }
 
+fun <T: Any> Throwable.asDataResult(): DataResult<T> {
+    return DataResult.Error(this)
+}
+
+fun <T: Any> T.asDataResult(): DataResult<T> {
+    return DataResult.Success(this)
+}
+
