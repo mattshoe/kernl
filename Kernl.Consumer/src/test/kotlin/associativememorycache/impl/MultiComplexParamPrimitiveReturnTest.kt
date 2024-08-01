@@ -4,11 +4,13 @@ import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMe
 import io.github.mattshoe.shoebox.models.ServiceRequest
 import io.github.mattshoe.shoebox.models.ServiceResponse
 import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiComplexParamPrimitiveReturn
-import singlememorycache.AssociativeMemoryCacheScenariosTest
+import associativememorycache.AssociativeMemoryCacheScenariosTest
 
 class MultiComplexParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<MultiComplexParamPrimitiveReturn.Params, Int>() {
+
     override fun repository(): AssociativeMemoryCacheLiveRepository<MultiComplexParamPrimitiveReturn.Params, Int> {
         return MultiComplexParamPrimitiveReturn.Factory { id, bar ->
+            onFetch(MultiComplexParamPrimitiveReturn.Params(id, bar))
             id.data.toInt() + bar.code
         }
     }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
@@ -26,6 +27,12 @@ class BaseSingleCacheLiveRepositoryUnitTest {
         fun beforeClass() {
             mockkObject(DataSource.Companion)
         }
+
+        @AfterClass
+        @JvmStatic
+        fun afterClass() {
+            unmockkAll()
+        }
     }
 
     @Before
@@ -34,6 +41,7 @@ class BaseSingleCacheLiveRepositoryUnitTest {
 
         every { DataSource.Builder } returns datasourceBuilderRequest
         every { datasourceBuilderRequest.memoryCache(String::class) } returns memoryCachedDataSourceBuilderRequest
+        every { memoryCachedDataSourceBuilderRequest.dispatcher(any()) } returns memoryCachedDataSourceBuilderRequest
         every { memoryCachedDataSourceBuilderRequest.build() } returns mockDataSource
     }
 
@@ -70,8 +78,8 @@ class BaseSingleCacheLiveRepositoryUnitTest {
         }
     }
 
-    private fun TestScope.makeSubject(): TestSingleCacheLiveRepository {
-        return TestSingleCacheLiveRepository(coroutineContext[CoroutineDispatcher]!!)
+    private fun TestScope.makeSubject(): StubSingleCacheLiveRepository {
+        return StubSingleCacheLiveRepository(coroutineContext[CoroutineDispatcher]!!)
     }
 }
 

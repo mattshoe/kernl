@@ -3,11 +3,13 @@ package associativememorycache.impl
 import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMemoryCacheLiveRepository
 import io.github.mattshoe.shoebox.models.ServiceResponse
 import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiParamComplexReturn
-import singlememorycache.AssociativeMemoryCacheScenariosTest
+import associativememorycache.AssociativeMemoryCacheScenariosTest
+import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiNullableSameParamPrimitiveReturn
 
 class MultiParamComplexReturnTest : AssociativeMemoryCacheScenariosTest<MultiParamComplexReturn.Params, ServiceResponse>() {
     override fun repository(): AssociativeMemoryCacheLiveRepository<MultiParamComplexReturn.Params, ServiceResponse> {
         return MultiParamComplexReturn.Factory { id, bar ->
+            onFetch(MultiParamComplexReturn.Params(id, bar))
             ServiceResponse(id.toInt() + bar)
         }
     }

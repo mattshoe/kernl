@@ -3,7 +3,7 @@ package data.repo.singlecache
 import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.BaseSingleCacheLiveRepository
 import kotlinx.coroutines.CoroutineDispatcher
 
-class TestSingleCacheLiveRepository(
+class StubSingleCacheLiveRepository(
     dispatcher: CoroutineDispatcher
 ): BaseSingleCacheLiveRepository<Int, String>(dispatcher) {
     override val dataType = String::class

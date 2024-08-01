@@ -12,6 +12,7 @@ abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>(
     private val dataSource by lazy {
         DataSource.Builder
             .memoryCache(dataType)
+            .dispatcher(dispatcher)
             .build()
     }
 

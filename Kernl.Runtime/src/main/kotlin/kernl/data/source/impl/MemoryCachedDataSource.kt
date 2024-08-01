@@ -18,13 +18,14 @@ internal open class MemoryCachedDataSource<T: Any>(
     private val dispatcher: CoroutineDispatcher
 ): DataSource<T> {
     private val dataMutex = Mutex()
-    protected open  val _data = MutableSharedFlow<io.github.mattshoe.shoebox.kernl.data.DataResult<T>>(replay = 1)
+    protected open val _data = MutableSharedFlow<DataResult<T>>(replay = 1)
     private lateinit var dataRetrievalAction: suspend () -> T
 
-    final override var value: io.github.mattshoe.shoebox.kernl.data.DataResult<T>? = null
+    final override var value: DataResult<T>? = null
         private set
 
-    override val data: Flow<io.github.mattshoe.shoebox.kernl.data.DataResult<T>> = _data
+    override val data: Flow<DataResult<T>>
+        get() = _data
 
     override suspend fun initialize(forceFetch: Boolean, dataRetrieval: suspend () -> T) = withContext(dispatcher) {
         fetchData(forceFetch, dataRetrieval)
@@ -39,7 +40,7 @@ internal open class MemoryCachedDataSource<T: Any>(
 
     override suspend fun invalidate() {
         _data.resetReplayCache()
-        with (io.github.mattshoe.shoebox.kernl.data.DataResult.Invalidated<T>()) {
+        with (DataResult.Invalidated<T>()) {
             _data.emit(this)
             value = this
         }
@@ -52,15 +53,19 @@ internal open class MemoryCachedDataSource<T: Any>(
                 dataRetrieval?.let {
                     this@MemoryCachedDataSource.dataRetrievalAction = it
                 }
-                val data: io.github.mattshoe.shoebox.kernl.data.DataResult<T> = io.github.mattshoe.shoebox.kernl.data.DataResult.Success(
+                val dataResult: DataResult<T> = DataResult.Success(
                     dataRetrievalAction.invoke()
                 )
-                _data.emit(data)
-                value = data
+                _data.emit(dataResult)
+                value = dataResult
             } catch (e: CancellationException) {
+                println("Cancelled!!! $e")
                 throw e
             } catch (e: Throwable) {
-                _data.emit(io.github.mattshoe.shoebox.kernl.data.DataResult.Error(e))
+                println("DS error: $e")
+                val dataResult = DataResult.Error<T>(e)
+                _data.emit(dataResult)
+                value = dataResult
             } finally {
                 dataMutex.unlock()
             }

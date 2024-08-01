@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":Kernl.Annotations"))
     implementation(project(":Kernl.Runtime"))
 
-    implementation("io.github.mattshoe.shoebox:Stratify:1.1.0-beta15")
+    implementation(libs.stratify)
     implementation(libs.kotlin.poet)
     implementation(libs.kotlin.poet.ksp)
     implementation(libs.kotlinx.coroutines)

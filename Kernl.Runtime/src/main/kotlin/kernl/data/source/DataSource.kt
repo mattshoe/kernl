@@ -14,7 +14,7 @@ interface DataSource<T: Any> {
             get() = DataSourceBuilderRequest()
     }
 
-    val value: io.github.mattshoe.shoebox.kernl.data.DataResult<T>?
+    val value: DataResult<T>?
 
     /**
      * ***Stream producing the most up-to-date value for [T].***
@@ -25,7 +25,7 @@ interface DataSource<T: Any> {
      * Any time this [DataSource] is refreshed or initialized, the new data
      * will be emitted via this [Flow].
      */
-    val data: Flow<io.github.mattshoe.shoebox.kernl.data.DataResult<T>>
+    val data: Flow<DataResult<T>>
 
     /**
      * ***Initialize this [DataSource] with the retrieval operation used to fetch the data.***
@@ -59,7 +59,7 @@ interface DataSource<T: Any> {
     suspend fun refresh()
 
     /**
-     * Invalidate any existing data in [this] [DataSource]. An emission of [DataResult.Invalidated]
+     * Invalidate any existing data in [this][DataSource]. An emission of [DataResult.Invalidated]
      * will be emitted immediately and any replay caches will be cleared.
      */
     suspend fun invalidate()

@@ -4,11 +4,13 @@ import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMe
 import io.github.mattshoe.shoebox.models.ServiceRequest
 import io.github.mattshoe.shoebox.models.ServiceResponse
 import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiMixedParamComplexReturn
-import singlememorycache.AssociativeMemoryCacheScenariosTest
+import associativememorycache.AssociativeMemoryCacheScenariosTest
+import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiComplexParamComplexReturn
 
 class MultiMixedParamComplexReturnTest : AssociativeMemoryCacheScenariosTest<MultiMixedParamComplexReturn.Params, ServiceResponse>() {
     override fun repository(): AssociativeMemoryCacheLiveRepository<MultiMixedParamComplexReturn.Params, ServiceResponse> {
         return MultiMixedParamComplexReturn.Factory { id, bar ->
+            onFetch(MultiMixedParamComplexReturn.Params(id, bar))
             ServiceResponse(id.toInt() + bar.data.toInt())
         }
     }

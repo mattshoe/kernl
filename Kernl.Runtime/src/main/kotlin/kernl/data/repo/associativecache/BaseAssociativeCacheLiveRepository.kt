@@ -3,16 +3,14 @@ package io.github.mattshoe.shoebox.kernl.data.repo.associativecache
 import io.github.mattshoe.shoebox.kernl.data.DataResult
 import io.github.mattshoe.shoebox.kernl.data.source.DataSource
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.reflect.KClass
 
-abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
+abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>(
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+):
     AssociativeMemoryCacheLiveRepository<TParams, TData> {
 
     private data class CacheEntry<TData: Any>(
@@ -23,7 +21,6 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
     abstract val dataType: KClass<TData>
 
     abstract suspend fun fetchData(params: TParams): TData
-    protected open fun checkCache(params: TParams): TData? = null
 
     override fun stream(params: TParams, forceFetch: Boolean): Flow<DataResult<TData>> {
         return initializeNewStream(params, forceFetch)
@@ -34,36 +31,30 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
 
     override fun latestValue(params: TParams): DataResult<TData>? {
         return try {
-            checkCache(params)?.let {
-                DataResult.Success(it)
-            } ?: dataCache[params]?.dataSource?.value
+            dataCache[params]?.dataSource?.value
         } catch (e: Throwable) {
             null
         }
     }
 
     override suspend fun refresh(params: TParams) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             with (findDataCacheEntry(params)) {
-                updateDataCache(this, params) {
-                    doFetchData(
-                        this,
-                        params,
-                        true
-                    )
+                dataSource.initialize(forceFetch = true) {
+                    fetchData(params)
                 }
             }
         }
     }
 
     override suspend fun invalidate(params: TParams) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             dataCache[params]?.dataSource?.invalidate()
         }
     }
 
     override suspend fun invalidateAll() {
-        withContext(Dispatchers.IO) {
+        withContext(dispatcher) {
             invalidateAllDataSources()
         }
     }
@@ -83,8 +74,8 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
     private suspend fun loadDataIntoCache(params: TParams, forceFetch: Boolean) {
         dataCacheMutex.withLock {
             with (findDataCacheEntry(params)) {
-                updateDataCache(this, params) {
-                    doFetchData(this, params, forceFetch)
+                dataSource.initialize(forceFetch) {
+                    fetchData(params)
                 }
 
                 dataCache[params] = this
@@ -92,15 +83,17 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
         }
     }
 
-    private fun getDataFromDataCache(params: TParams): Flow<DataResult<TData>> {
-        return dataCache[params]
-            ?.dataSource
-            ?.data
-            ?: flowOf(
-                DataResult.Error(
-                    IllegalAccessError("No data found in the network cache!")
+    private suspend fun getDataFromDataCache(params: TParams): Flow<DataResult<TData>> {
+        return dataCacheMutex.withLock {
+            dataCache[params]
+                ?.dataSource
+                ?.data
+                ?: flowOf(
+                    DataResult.Error(
+                        IllegalAccessError("No data found in the network cache!")
+                    )
                 )
-            )
+        }
     }
 
     private fun findDataCacheEntry(params: TParams): CacheEntry<TData> {
@@ -108,30 +101,9 @@ abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>:
             ?: CacheEntry(
                 DataSource.Builder
                     .memoryCache(dataType)
+                    .dispatcher(dispatcher)
                     .build()
             )
-    }
-
-    private suspend fun updateDataCache(
-        cacheEntry: CacheEntry<TData>,
-        params: TParams,
-        onCacheMiss: suspend () -> Unit
-    ) {
-        checkCache(params)?.let {
-            cacheEntry.dataSource.initialize(forceFetch = true) {
-                it
-            }
-        } ?: onCacheMiss()
-    }
-
-    private suspend fun doFetchData(
-        cacheEntry: CacheEntry<TData>,
-        params: TParams,
-        forceFetch: Boolean
-    ) {
-        cacheEntry.dataSource.initialize(forceFetch) {
-            fetchData(params)
-        }
     }
 
     private suspend fun invalidateAllDataSources() {

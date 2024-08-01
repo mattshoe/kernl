@@ -23,7 +23,7 @@ dependencies {
 
 allprojects {
     repositories {
-        mavenLocal()
+//        mavenLocal()
         mavenCentral()
         google()
     }
@@ -33,7 +33,7 @@ allprojects {
 
     plugins.withId("org.jetbrains.kotlin.jvm") {
         kotlin {
-            jvmToolchain(19)
+            jvmToolchain(11)
         }
     }
 

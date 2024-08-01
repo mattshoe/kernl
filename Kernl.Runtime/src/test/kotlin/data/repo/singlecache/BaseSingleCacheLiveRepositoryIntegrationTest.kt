@@ -3,7 +3,6 @@ package data.repo.singlecache
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.DataResult
 import io.github.mattshoe.shoebox.kernl.data.DataResult.Error
 import io.github.mattshoe.shoebox.kernl.data.DataResult.Success
 import io.mockk.clearAllMocks
@@ -208,7 +207,7 @@ class BaseSingleCacheLiveRepositoryIntegrationTest {
     }
 
 
-    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): TestSingleCacheLiveRepository {
-        return TestSingleCacheLiveRepository(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
+    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): StubSingleCacheLiveRepository {
+        return StubSingleCacheLiveRepository(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
     }
 }
