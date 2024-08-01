@@ -2,6 +2,7 @@ package io.github.mattshoe.shoebox.kernl.data.ext
 
 import io.github.mattshoe.shoebox.kernl.data.DataResult
 import io.github.mattshoe.shoebox.kernl.data.error.InvalidationException
+import kotlinx.coroutines.flow.*
 import java.lang.Error
 
 /**
@@ -29,7 +30,7 @@ fun <T: Any> DataResult<T>.unwrap(): T {
     return when (this) {
         is DataResult.Success -> this.data
         is DataResult.Error -> throw this.error
-        is DataResult.Invalidated -> throw InvalidationException("Attempted to unwrap an Invalidated data result.")
+        is DataResult.Invalidated -> throw invalidationException()
     }
 }
 
@@ -83,4 +84,26 @@ fun <T: Any> Throwable.asDataResult(): DataResult<T> {
 fun <T: Any> T.asDataResult(): DataResult<T> {
     return DataResult.Success(this)
 }
+
+fun <T: Any> Flow<DataResult<T>>.onEachDataResult(action: suspend (T) -> Unit): Flow<DataResult<T>> {
+    return onEach {
+        if (it is DataResult.Success) {
+            action(it.data)
+        }
+    }
+}
+
+fun <T: Any> Flow<DataResult<T>>.catchDataResult(
+    action: suspend FlowCollector<T>.(cause: Throwable) -> Unit
+): Flow<T> {
+    return transform {
+        when (it) {
+            is DataResult.Success -> emit(it.data)
+            is DataResult.Error -> action(it.error)
+            is DataResult.Invalidated -> action(invalidationException())
+        }
+    }
+}
+
+private fun invalidationException() = InvalidationException("Attempted to unwrap an Invalidated data result.")
 
