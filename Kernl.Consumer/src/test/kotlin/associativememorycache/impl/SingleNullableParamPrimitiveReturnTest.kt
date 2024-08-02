@@ -1,7 +1,7 @@
 package associativememorycache.impl
 
-import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMemoryCacheLiveRepository
-import kernl.io.github.mattshoe.shoebox.associativememorycache.SingleNullableParamPrimitiveReturn
+import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.SingleNullableParamPrimitiveReturn
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
 class SingleNullableParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<SingleNullableParamPrimitiveReturn.Params, Int>() {

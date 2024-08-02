@@ -1,8 +1,8 @@
 package singlememorycache.impl
 
-import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.SingleCacheLiveRepository
-import io.github.mattshoe.shoebox.models.ServiceRequest
-import kernl.io.github.mattshoe.shoebox.singlememorycache.SingleNullableComplexParamPrimitiveReturn
+import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.models.ServiceRequest
+import kernl.org.mattshoe.shoebox.kernl.singlememorycache.SingleNullableComplexParamPrimitiveReturn
 import singlememorycache.SingleMemoryCacheScenariosTest
 
 class SingleNullableComplexParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<SingleNullableComplexParamPrimitiveReturn.Params, Int>() {

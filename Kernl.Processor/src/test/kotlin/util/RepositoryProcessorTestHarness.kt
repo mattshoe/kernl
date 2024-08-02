@@ -2,7 +2,7 @@ package util
 
 import com.google.common.truth.Truth
 import com.tschuchort.compiletesting.*
-import io.github.mattshoe.shoebox.kernl.KernlProcessorProvider
+import org.mattshoe.shoebox.kernl.processor.KernlProcessorProvider
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Test
 import java.io.File
@@ -16,9 +16,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             "NoParamRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoParamRepository")
@@ -35,9 +35,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             "NoReturnRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoReturnRepository")
@@ -54,9 +54,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             "UnitReturnRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "UnitReturnRepository")
@@ -73,9 +73,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             "NoParamUnitReturnRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoParamUnitReturnRepository")
@@ -92,9 +92,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             "NoParamNoReturnRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "NoParamNoReturnRepository")
@@ -111,9 +111,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             fileName = "MyTestRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "MyTestRepository")
@@ -122,10 +122,10 @@ abstract class RepositoryProcessorTestHarness {
                 
             """.trimIndent(),
             expectedOutput = """
-                package io.github.mattshoe.test.kernl
+                package org.mattshoe.test.kernl
                 
-                import io.github.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import io.github.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
@@ -157,9 +157,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             fileName = "MultiParamRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "MultiParamRepository")
@@ -167,10 +167,10 @@ abstract class RepositoryProcessorTestHarness {
                 }
             """.trimIndent(),
             expectedOutput = """
-                package io.github.mattshoe.test.kernl
+                package org.mattshoe.test.kernl
 
-                import io.github.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import io.github.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
                 import kotlin.Int
                 import kotlin.String
                 import kotlin.reflect.KClass
@@ -206,9 +206,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             fileName = "DifferentReturnTypeRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
                     $annotationText(name = "DifferentReturnTypeRepository")
@@ -216,10 +216,10 @@ abstract class RepositoryProcessorTestHarness {
                 }
             """.trimIndent(),
             expectedOutput = """
-                package io.github.mattshoe.test.kernl
+                package org.mattshoe.test.kernl
                 
-                import io.github.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import io.github.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
                 import kotlin.Int
                 import kotlin.String
                 import kotlin.reflect.KClass
@@ -254,9 +254,9 @@ abstract class RepositoryProcessorTestHarness {
         assertOutput(
             fileName = "ComplexReturnTypeRepository",
             sourceContent =  """
-                package io.github.mattshoe.test
+                package org.mattshoe.test
     
-                import io.github.mattshoe.shoebox.kernl.annotations.Kernl
+                import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 data class ComplexType(val data: String, val number: Int)
     
@@ -266,11 +266,11 @@ abstract class RepositoryProcessorTestHarness {
                 }
             """.trimIndent(),
             expectedOutput = """
-                package io.github.mattshoe.test.kernl
+                package org.mattshoe.test.kernl
                 
-                import io.github.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import io.github.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
-                import io.github.mattshoe.test.ComplexType
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.test.ComplexType
                 import kotlin.String
                 import kotlin.reflect.KClass
                 

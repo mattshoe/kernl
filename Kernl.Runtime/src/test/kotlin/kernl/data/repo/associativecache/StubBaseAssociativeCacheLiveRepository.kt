@@ -1,6 +1,6 @@
 package kernl.data.repo.associativecache
 
-import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.BaseAssociativeCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.BaseAssociativeCacheLiveRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

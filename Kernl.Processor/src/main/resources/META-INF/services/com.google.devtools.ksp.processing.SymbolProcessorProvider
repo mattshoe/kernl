@@ -1,1 +1,1 @@
-io.github.mattshoe.shoebox.kernl.KernlProcessorProvider
+org.mattshoe.shoebox.kernl.processor.KernlProcessorProvider

@@ -3,8 +3,8 @@ package kernl.data.repo.associativecache
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.DataResult
-import io.github.mattshoe.shoebox.kernl.data.ext.unwrap
+import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.kernl.runtime.ext.unwrap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -193,10 +193,10 @@ class BaseAssociativeCacheLiveRepositoryTest {
     fun `WHEN invalidateAll() is invoked THEN all listeners receive emission`() = runTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
-            val turbine2 = subject.stream(43).testIn(backgroundScope)
-            val turbine3 = subject.stream(44).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
+            val turbine2 = subject.stream(43).testIn(backgroundScope)
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
+            val turbine3 = subject.stream(44).testIn(backgroundScope)
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
             assertEmissionValues(42, 43, 44)

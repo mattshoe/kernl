@@ -32,9 +32,9 @@ You'll notice there are 3 distinct libraries. This is to keep your final `jar`/`
 including the minimum runtime dependencies. Things like annotations are only needed at compile time.
 ```kotlin
 dependencies {
-    ksp("io.github.mattshoe.shoebox:Kernl.Processor:1.0.0")
-    compileOnly("io.github.mattshoe.shoebox:Kernl.Annotations:1.0.0")
-    implementation("io.github.mattshoe.shoebox:Kernl.Runtime:1.0.0")
+    ksp("org.mattshoe.shoebox:Kernl.Processor:1.0.0")
+    compileOnly("org.mattshoe.shoebox:Kernl.Annotations:1.0.0")
+    implementation("org.mattshoe.shoebox:Kernl.Runtime:1.0.0")
 }
 ```
 

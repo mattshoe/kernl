@@ -1,8 +1,8 @@
 package nocache.impl
 
-import io.github.mattshoe.shoebox.kernl.data.repo.nocache.NoCacheRepository
-import io.github.mattshoe.shoebox.models.ServiceResponse
-import kernl.io.github.mattshoe.shoebox.nocache.NoCacheSingleParamComplexReturn
+import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
+import org.mattshoe.shoebox.kernl.models.ServiceResponse
+import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheSingleParamComplexReturn
 import nocache.NoCacheScenariosTest
 
 // Single primitive parameter, complex return

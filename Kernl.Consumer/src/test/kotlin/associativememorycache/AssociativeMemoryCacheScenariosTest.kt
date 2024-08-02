@@ -2,8 +2,8 @@ package associativememorycache
 
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.DataResult
-import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMemoryCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
