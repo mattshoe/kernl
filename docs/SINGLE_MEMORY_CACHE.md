@@ -1,4 +1,4 @@
-# `@Kernl.SingleMemoryCache`
+# `@Kernl.SingleCache.InMemory`
 The `Kernl.SingleMemoryCache` annotation generates a repository that holds a single cached value in memory. <br> 
 Any updates to the cached value are broadcast immediately to all listeners.
 
@@ -21,7 +21,7 @@ Let's imagine you have a Retrofit service such as the following:
 
 ```kotlin
 interface MyService {
-    @Kernl.SingleMemoryCache("MyRepository")
+    @Kernl.SingleCache.InMemory("MyRepository")
     @GET("foo/{id}/{someParam}")
     suspend fun getMyResponse(
         @Path("id") id: String, 

@@ -23,7 +23,7 @@ class SingleMemoryCacheProcessor(
     logger
 ) {
 
-    override val annotationClass = Kernl.SingleMemoryCache::class
+    override val annotationClass = Kernl.SingleCache.InMemory::class
 
     override suspend fun process(
         declaration: KSFunctionDeclaration,

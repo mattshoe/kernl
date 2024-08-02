@@ -30,4 +30,4 @@ for the given parameters should no longer be used in your app.
 
 
 ## Example Usage
-See [@Kernl.AssociativeMemoryCache](ASSOCIATIVE_MEMORY_CACHE.md) for examples of usage.
+See [@Kernl.AssociativeCache.InMemory](ASSOCIATIVE_MEMORY_CACHE.md) for examples of usage.

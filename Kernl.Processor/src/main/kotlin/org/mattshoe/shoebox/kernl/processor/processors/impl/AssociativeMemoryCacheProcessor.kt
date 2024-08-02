@@ -18,7 +18,7 @@ class AssociativeMemoryCacheProcessor(
     logger
 ) {
     override val targetClass = KSFunctionDeclaration::class
-    override val annotationClass = Kernl.AssociativeMemoryCache::class
+    override val annotationClass = Kernl.AssociativeCache.InMemory::class
 
     override suspend fun process(
         declaration: KSFunctionDeclaration,
