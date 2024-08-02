@@ -30,4 +30,4 @@ should no longer be used in your app.
 
 
 ## Example Usage
-See [SingleMemoryCache](SINGLE_MEMORY_CACHE.md) for examples of usage.
+See [@Kernl.SingleMemoryCache](SINGLE_MEMORY_CACHE.md) for examples of usage.
