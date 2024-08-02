@@ -1,9 +1,9 @@
 package data.repo.singlecache
 
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.source.DataSource
-import io.github.mattshoe.shoebox.kernl.data.source.builder.DataSourceBuilderRequest
-import io.github.mattshoe.shoebox.kernl.data.source.builder.MemoryCacheDataSourceBuilder
+import org.mattshoe.shoebox.kernl.runtime.source.DataSource
+import org.mattshoe.shoebox.kernl.runtime.source.builder.DataSourceBuilderRequest
+import org.mattshoe.shoebox.kernl.runtime.source.builder.MemoryCacheDataSourceBuilder
 import io.mockk.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi

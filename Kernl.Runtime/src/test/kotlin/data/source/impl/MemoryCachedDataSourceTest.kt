@@ -2,7 +2,7 @@ package data.source.impl
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.source.impl.MemoryCachedDataSource
+import org.mattshoe.shoebox.kernl.runtime.source.impl.MemoryCachedDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ class MemoryCachedDataSourceTest {
 
             subject.initialize { expectedValue }
 
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success(expectedValue))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success(expectedValue))
         }
     }
 
@@ -42,7 +42,7 @@ class MemoryCachedDataSourceTest {
 
             subject.initialize { throw expectedValue }
 
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Error<String>(expectedValue))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Error<String>(expectedValue))
         }
     }
 
@@ -57,7 +57,7 @@ class MemoryCachedDataSourceTest {
 
             advanceUntilIdle()
 
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success(expectedValue))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success(expectedValue))
         }
     }
 
@@ -89,7 +89,7 @@ class MemoryCachedDataSourceTest {
 
             advanceUntilIdle()
 
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success(expectedValue))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success(expectedValue))
         }
     }
 
@@ -105,7 +105,7 @@ class MemoryCachedDataSourceTest {
                     counter++
                 }
             }
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success("0"))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success("0"))
 
             launch {
                 subject.refresh()
@@ -119,7 +119,7 @@ class MemoryCachedDataSourceTest {
 
             advanceUntilIdle()
 
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success("1"))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success("1"))
         }
     }
 
@@ -132,10 +132,10 @@ class MemoryCachedDataSourceTest {
                     counter++
                 }
             }
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success("0"))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success("0"))
 
             subject.refresh()
-            Truth.assertThat(awaitItem()).isEqualTo(io.github.mattshoe.shoebox.kernl.data.DataResult.Success("1"))
+            Truth.assertThat(awaitItem()).isEqualTo(org.mattshoe.shoebox.kernl.runtime.DataResult.Success("1"))
         }
     }
 

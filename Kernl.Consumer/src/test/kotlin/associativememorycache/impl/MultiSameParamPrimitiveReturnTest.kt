@@ -1,9 +1,9 @@
 package associativememorycache.impl
 
-import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMemoryCacheLiveRepository
-import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiSameParamPrimitiveReturn
+import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiSameParamPrimitiveReturn
 import associativememorycache.AssociativeMemoryCacheScenariosTest
-import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiSameParamComplexReturn
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiSameParamComplexReturn
 
 class MultiSameParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<MultiSameParamPrimitiveReturn.Params, Int>() {
     override fun repository(): AssociativeMemoryCacheLiveRepository<MultiSameParamPrimitiveReturn.Params, Int> {

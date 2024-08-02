@@ -1,11 +1,10 @@
 package associativememorycache.impl
 
-import io.github.mattshoe.shoebox.kernl.data.repo.associativecache.AssociativeMemoryCacheLiveRepository
-import io.github.mattshoe.shoebox.models.ServiceRequest
-import io.github.mattshoe.shoebox.models.ServiceResponse
-import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiNullableComplexParamPrimitiveReturn
+import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
+import org.mattshoe.shoebox.kernl.models.ServiceRequest
+import org.mattshoe.shoebox.kernl.models.ServiceResponse
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiNullableComplexParamPrimitiveReturn
 import associativememorycache.AssociativeMemoryCacheScenariosTest
-import kernl.io.github.mattshoe.shoebox.associativememorycache.MultiNullableComplexParamComplexReturn
 
 class MultiNullableComplexParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<MultiNullableComplexParamPrimitiveReturn.Params, Int>() {
     override fun repository(): AssociativeMemoryCacheLiveRepository<MultiNullableComplexParamPrimitiveReturn.Params, Int> {

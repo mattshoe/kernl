@@ -1,6 +1,6 @@
 package data.repo.singlecache
 
-import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.BaseSingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.BaseSingleCacheLiveRepository
 import kotlinx.coroutines.CoroutineDispatcher
 
 class StubSingleCacheLiveRepository(

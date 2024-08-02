@@ -2,9 +2,9 @@ package kernl.data.ext
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.DataResult
-import io.github.mattshoe.shoebox.kernl.data.error.InvalidationException
-import io.github.mattshoe.shoebox.kernl.data.ext.*
+import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.kernl.runtime.error.InvalidationException
+import org.mattshoe.shoebox.kernl.runtime.ext.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.runTest

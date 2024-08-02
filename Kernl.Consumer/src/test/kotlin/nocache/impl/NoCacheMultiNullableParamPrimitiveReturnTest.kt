@@ -1,7 +1,7 @@
 package nocache.impl
 
-import io.github.mattshoe.shoebox.kernl.data.repo.nocache.NoCacheRepository
-import kernl.io.github.mattshoe.shoebox.nocache.NoCacheMultiNullableParamPrimitiveReturn
+import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
+import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheMultiNullableParamPrimitiveReturn
 import nocache.NoCacheScenariosTest
 
 // Multiple nullable different primitive parameters, primitive return
