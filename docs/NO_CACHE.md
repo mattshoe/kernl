@@ -76,14 +76,15 @@ class MyViewModel @Inject constructor(
 
     fun loadData(id: String, someParam: Int, otherParam: Boolean) {
         viewModelScope.launch {
-            val result = myNoCacheRepository.fetch(
-                MyNoCacheRepository.Params(id, someParam, otherParam)
-            )
-            when (result) {
-                is DataResult.Success -> _state.udpate { YourState.Success(result.data) }
-                else -> _state.update { YourState.Error }
-            }
-            
+            try {
+                val result = myNoCacheRepository.fetch(
+                    MyNoCacheRepository.Params(id, someParam, otherParam)
+                )
+                _state.udpate { YourState.Success(result.data) }
+            } catch (e: Throwable) {
+                ensureActive()
+                _state.update { YourState.Error }
+            }            
         }
     }
 }
