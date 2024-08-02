@@ -29,7 +29,7 @@ class KernlSymbolProcessor: StratifySymbolProcessor() {
 
     private fun singleMemoryCacheStrategy(environment: SymbolProcessorEnvironment): AnnotationStrategy {
         return AnnotationStrategy(
-            annotation = Kernl.SingleMemoryCache::class,
+            annotation = Kernl.SingleCache.InMemory::class,
             processors = listOf(
                 SingleMemoryCacheProcessor(
                     environment.logger,
@@ -41,7 +41,7 @@ class KernlSymbolProcessor: StratifySymbolProcessor() {
 
     private fun associativeMemoryCacheStrategy(environment: SymbolProcessorEnvironment): AnnotationStrategy {
         return AnnotationStrategy(
-            annotation = Kernl.AssociativeMemoryCache::class,
+            annotation = Kernl.AssociativeCache.InMemory::class,
             processors = listOf(
                 AssociativeMemoryCacheProcessor(
                     environment.logger,

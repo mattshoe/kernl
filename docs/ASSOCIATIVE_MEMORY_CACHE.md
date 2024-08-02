@@ -1,4 +1,4 @@
-# `@Kernl.AssociativeMemoryCache`
+# `@Kernl.AssociativeCache.InMemory`
 The Kernl.AssociativeMemoryCache annotation generates a repository that holds multiple cached values in memory, each associated with a unique set of parameters. 
 Any updates to the cached values are broadcast immediately to all listeners.
 
@@ -21,7 +21,7 @@ Let's imagine you have a Retrofit service such as the following:
 
 ```kotlin
 interface MyService {
-    @Kernl.AssociativeMemoryCache("MyAssociativeRepository")
+    @Kernl.AssociativeCache.InMemory("MyAssociativeRepository")
     @GET("foo/{id}/{someParam}")
     suspend fun getMyResponse(
         @Path("id") id: String,

@@ -6,6 +6,6 @@ import util.RepositoryProcessorTestHarness
 @OptIn(ExperimentalCompilerApi::class)
 class SingleMemoryCacheFunctionProcessorTest: RepositoryProcessorTestHarness() {
 
-    override val annotationText = "@Kernl.SingleMemoryCache"
+    override val annotationText = "@Kernl.SingleCache.InMemory"
 
 }

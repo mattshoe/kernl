@@ -7,90 +7,90 @@ import org.mattshoe.shoebox.kernl.models.ServiceResponse
 interface SingleMemoryCacheScenarios {
 
     // Single primitive parameter, primitive return
-    @Kernl.SingleMemoryCache("SingleParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("SingleParamPrimitiveReturn")
     suspend fun singleParamPrimitiveReturn(id: String): Int
 
     // Multiple same primitive parameters, primitive return
-    @Kernl.SingleMemoryCache("MultiSameParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiSameParamPrimitiveReturn")
     suspend fun multiSameParamPrimitiveReturn(id: String, bar: String): Int
 
     // Multiple different primitive parameters, primitive return
-    @Kernl.SingleMemoryCache("MultiParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiParamPrimitiveReturn")
     suspend fun multiParamPrimitiveReturn(id: String, bar: Int): Int
 
     // Single primitive parameter, complex return
-    @Kernl.SingleMemoryCache("SingleParamComplexReturn")
+    @Kernl.SingleCache.InMemory("SingleParamComplexReturn")
     suspend fun singleParamComplexReturn(id: String): ServiceResponse
 
     // Multiple different primitive parameters, complex return
-    @Kernl.SingleMemoryCache("MultiParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiParamComplexReturn")
     suspend fun multiParamComplexReturn(id: String, bar: Int): ServiceResponse
 
     // Multiple same complex parameters, complex return
-    @Kernl.SingleMemoryCache("MultiSameParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiSameParamComplexReturn")
     suspend fun multiSameParamComplexReturn(id: String, bar: ServiceResponse): ServiceResponse
 
     // Multiple different complex parameters, complex return
-    @Kernl.SingleMemoryCache("MultiComplexParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiComplexParamComplexReturn")
     suspend fun multiComplexParamComplexReturn(id: ServiceRequest, bar: ServiceResponse): ServiceResponse
 
     // Single nullable primitive parameter, primitive return
-    @Kernl.SingleMemoryCache("SingleNullableParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("SingleNullableParamPrimitiveReturn")
     suspend fun singleNullableParamPrimitiveReturn(id: String?): Int
 
     // Multiple nullable same primitive parameters, primitive return
-    @Kernl.SingleMemoryCache("MultiNullableSameParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableSameParamPrimitiveReturn")
     suspend fun multiNullableSameParamPrimitiveReturn(id: String?, bar: String?): Int
 
     // Multiple nullable different primitive parameters, primitive return
-    @Kernl.SingleMemoryCache("MultiNullableParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableParamPrimitiveReturn")
     suspend fun multiNullableParamPrimitiveReturn(id: String?, bar: Int?): Int
 
     // Single nullable primitive parameter, complex return
-    @Kernl.SingleMemoryCache("SingleNullableParamComplexReturn")
+    @Kernl.SingleCache.InMemory("SingleNullableParamComplexReturn")
     suspend fun singleNullableParamComplexReturn(id: String?): ServiceResponse
 
     // Multiple nullable same complex parameters, complex return
-    @Kernl.SingleMemoryCache("MultiNullableSameParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableSameParamComplexReturn")
     suspend fun multiNullableSameParamComplexReturn(id: String?, bar: ServiceResponse?): ServiceResponse
 
     // Multiple nullable different complex parameters, complex return
-    @Kernl.SingleMemoryCache("MultiNullableComplexParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableComplexParamComplexReturn")
     suspend fun multiNullableComplexParamComplexReturn(id: ServiceRequest?, bar: ServiceResponse?): ServiceResponse
 
     // Single complex parameter, primitive return
-    @Kernl.SingleMemoryCache("SingleComplexParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("SingleComplexParamPrimitiveReturn")
     suspend fun singleComplexParamPrimitiveReturn(id: ServiceRequest): Int
 
     // Single complex parameter, complex return
-    @Kernl.SingleMemoryCache("SingleComplexParamComplexReturn")
+    @Kernl.SingleCache.InMemory("SingleComplexParamComplexReturn")
     suspend fun singleComplexParamComplexReturn(id: ServiceRequest): ServiceResponse
 
     // Multiple different complex parameters, primitive return
-    @Kernl.SingleMemoryCache("MultiComplexParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiComplexParamPrimitiveReturn")
     suspend fun multiComplexParamPrimitiveReturn(id: ServiceRequest, bar: ServiceResponse): Int
 
     // Single nullable complex parameter, primitive return
-    @Kernl.SingleMemoryCache("SingleNullableComplexParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("SingleNullableComplexParamPrimitiveReturn")
     suspend fun singleNullableComplexParamPrimitiveReturn(id: ServiceRequest?): Int
 
     // Multiple nullable different complex parameters, primitive return
-    @Kernl.SingleMemoryCache("MultiNullableComplexParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableComplexParamPrimitiveReturn")
     suspend fun multiNullableComplexParamPrimitiveReturn(id: ServiceRequest?, bar: ServiceResponse?): Int
 
     // Multiple mixed parameters (primitive and complex), primitive return
-    @Kernl.SingleMemoryCache("MultiMixedParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiMixedParamPrimitiveReturn")
     suspend fun multiMixedParamPrimitiveReturn(id: String, bar: ServiceRequest): Int
 
     // Multiple mixed parameters (primitive and complex), complex return
-    @Kernl.SingleMemoryCache("MultiMixedParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiMixedParamComplexReturn")
     suspend fun multiMixedParamComplexReturn(id: String, bar: ServiceRequest): ServiceResponse
 
     // Multiple mixed nullable parameters (primitive and complex), primitive return
-    @Kernl.SingleMemoryCache("MultiNullableMixedParamPrimitiveReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableMixedParamPrimitiveReturn")
     suspend fun multiNullableMixedParamPrimitiveReturn(id: String?, bar: ServiceRequest?): Int
 
     // Multiple mixed nullable parameters (primitive and complex), complex return
-    @Kernl.SingleMemoryCache("MultiNullableMixedParamComplexReturn")
+    @Kernl.SingleCache.InMemory("MultiNullableMixedParamComplexReturn")
     suspend fun multiNullableMixedParamComplexReturn(id: String?, bar: ServiceRequest?): ServiceResponse
 }

@@ -2,32 +2,47 @@ package org.mattshoe.shoebox.kernl.annotations
 
 @Target(AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class Kernl(
-    val name: String
-) {
+annotation class Kernl {
+
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.SOURCE)
     annotation class NoCache(
         val name: String
     )
 
-    @Target(AnnotationTarget.FUNCTION)
+    @Target(AnnotationTarget.ANNOTATION_CLASS)
     @Retention(AnnotationRetention.SOURCE)
-    annotation class SingleMemoryCache(
-        val name: String
-    )
+    annotation class SingleCache {
+        @Target(AnnotationTarget.FUNCTION)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class InMemory(
+            val name: String
+        )
 
-    @Target(AnnotationTarget.FUNCTION)
-    @Retention(AnnotationRetention.SOURCE)
-    annotation class AssociativeMemoryCache(
-        val name: String
-    )
+        @Target(AnnotationTarget.FUNCTION)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Disk(
+            val name: String
+        )
 
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+    }
+
+    @Target(AnnotationTarget.ANNOTATION_CLASS)
     @Retention(AnnotationRetention.SOURCE)
-    annotation class Persistent(
-        val name: String,
-    )
+    annotation class AssociativeCache {
+        @Target(AnnotationTarget.FUNCTION)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class InMemory(
+            val name: String
+        )
+
+        @Target(AnnotationTarget.FUNCTION)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Disk(
+            val name: String
+        )
+
+    }
 }
 
 
