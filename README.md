@@ -25,11 +25,11 @@ dependencies {
 
 ### 2. Define Your Service Interface
 
-Annotate your service methods with `@Kernl.SingleMemoryCache` to indicate that a repository should be generated for them.
+Annotate your service methods with `@Kernl.SingleCache.InMemory` to indicate that a repository should be generated for them.
 
 ```kotlin
 interface MyService {
-    @Kernl.SingleMemoryCache("MyRepository")
+    @Kernl.SingleCache.InMemory("MyRepository")
     suspend fun getMyResponse(id: String, someParam: Int, otherParam: Boolean): MyResponseData
 }
 ```
@@ -139,8 +139,8 @@ class MyViewModel(
 
 ### Annotations
 - [@Kernl.NoCache](docs/NO_CACHE.md)
-- [@Kernl.SingleMemoryCache](docs/SINGLE_MEMORY_CACHE.md)
-- [@Kernl.AssociativeMemoryCache](docs/ASSOCIATIVE_MEMORY_CACHE.md)
+- [@Kernl.SingleCache.InMemory](docs/SINGLE_MEMORY_CACHE.md)
+- [@Kernl.AssociativeCache.InMemory](docs/ASSOCIATIVE_MEMORY_CACHE.md)
 
 ### Repositories
 - [NoCacheRepository](docs/NO_CACHE_REPOSITORY.md)
