@@ -1,4 +1,4 @@
-package io.github.mattshoe.shoebox
+package org.mattshoe.shoebox
 
 fun main() {
     println("Hello World!")

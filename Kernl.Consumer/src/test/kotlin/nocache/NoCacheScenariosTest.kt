@@ -1,7 +1,7 @@
 package nocache
 
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.repo.nocache.NoCacheRepository
+import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest

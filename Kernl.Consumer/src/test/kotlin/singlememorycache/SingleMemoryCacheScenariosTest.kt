@@ -2,8 +2,8 @@ package singlememorycache
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.DataResult
-import io.github.mattshoe.shoebox.kernl.data.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest

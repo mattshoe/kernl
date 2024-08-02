@@ -9,6 +9,7 @@ compileTestingKsp = "1.6.0"
 compileTesting = "1.5.0"
 mockkVersion = "1.13.12"
 dokka = "1.9.20"
+stratify = "1.1.0-beta16"
 
 [libraries]
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
@@ -18,10 +19,10 @@ truth = { module = "com.google.truth:truth", version.ref = "truth" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 kotlin-poet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinPoet"}
-ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp"}
 compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "compileTestingKsp" }
 compile-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "compileTesting"}
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion"}
+stratify = { module = "io.github.mattshoe.shoebox:Stratify", version.ref = "stratify"}
 
 
 [plugins]

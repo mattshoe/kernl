@@ -3,9 +3,8 @@ package data.repo.singlecache
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
-import io.github.mattshoe.shoebox.kernl.data.DataResult
-import io.github.mattshoe.shoebox.kernl.data.DataResult.Error
-import io.github.mattshoe.shoebox.kernl.data.DataResult.Success
+import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
+import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -191,7 +190,7 @@ class BaseSingleCacheLiveRepositoryIntegrationTest {
         val subject = makeSubject()
         subject.invalidate()
         subject.data.test {
-            Truth.assertThat(awaitItem() is io.github.mattshoe.shoebox.kernl.data.DataResult.Invalidated).isTrue()
+            Truth.assertThat(awaitItem() is org.mattshoe.shoebox.kernl.runtime.DataResult.Invalidated).isTrue()
         }
     }
 
@@ -203,12 +202,12 @@ class BaseSingleCacheLiveRepositoryIntegrationTest {
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
             subject.invalidate()
-            Truth.assertThat(awaitItem() is io.github.mattshoe.shoebox.kernl.data.DataResult.Invalidated).isTrue()
+            Truth.assertThat(awaitItem() is org.mattshoe.shoebox.kernl.runtime.DataResult.Invalidated).isTrue()
         }
     }
 
 
-    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): TestSingleCacheLiveRepository {
-        return TestSingleCacheLiveRepository(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
+    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): StubSingleCacheLiveRepository {
+        return StubSingleCacheLiveRepository(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
     }
 }
