@@ -5,25 +5,10 @@ Kernl is a Kotlin Symbol Processing (KSP) library designed to automatically gene
 
 ## Features
 
-### 1. Automated Repository Generation
-Kernl automatically generates repository interfaces and implementation classes from your service interfaces, reducing the need for repetitive boilerplate code.
-
-### 2. In-Memory Caching
-Out-of-the-box support for in-memory caching ensures that your repositories store and retrieve data efficiently, reducing unnecessary network calls and improving performance.
-
-### 3. Real-Time Data Updates
-Automatically keep all observers updated with the latest data changes, ensuring your application always displays the most current information.
-
-### 4. Easy Invalidation and Cache Management
-Built-in support for cache invalidation allows you to easily manage and refresh your data, maintaining the accuracy and relevance of your application's state.
-
-### 5. Seamless Integration with Dependency Injection
-Kernl integrates smoothly with popular dependency injection frameworks like Dagger, Hilt, and Koin, simplifying the setup and management of repositories in your projects.
-
-### 6. Customizable Fetch Logic
-Define custom data fetch logic with ease, allowing you to tailor the data retrieval process to meet your specific application needs.
-
-
+1. **Automated Repository Generation:** Eliminates boilerplate by generating repository interfaces and implementations.
+2. **Flexible Caching:** Choose in-memory or disk caching, with simple invalidation and refreshing.
+3. **Real-Time Data Sync:** Ensure your entire application stays in sync.
+4. Flexible Integration: Compatible with Dagger, Hilt, Koin, etc.
 
 ## Quick Start
 

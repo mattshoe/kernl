@@ -1,6 +1,6 @@
 package org.mattshoe.shoebox.kernl.annotations
 
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class Kernl(
     val name: String
