@@ -1,5 +1,10 @@
 package org.mattshoe.shoebox.kernl.annotations
 
+import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
+import org.mattshoe.shoebox.kernl.KernlPolicy
+import kotlin.reflect.KClass
+
+
 @Target(AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class Kernl {
@@ -16,13 +21,15 @@ annotation class Kernl {
         @Target(AnnotationTarget.FUNCTION)
         @Retention(AnnotationRetention.SOURCE)
         annotation class InMemory(
-            val name: String
+            val name: String,
+            val policy: KClass<out KernlPolicy> = DefaultKernlPolicy::class
         )
 
         @Target(AnnotationTarget.FUNCTION)
         @Retention(AnnotationRetention.SOURCE)
         annotation class Disk(
-            val name: String
+            val name: String,
+            val policy: KClass<out KernlPolicy> = DefaultKernlPolicy::class
         )
 
     }
@@ -33,13 +40,15 @@ annotation class Kernl {
         @Target(AnnotationTarget.FUNCTION)
         @Retention(AnnotationRetention.SOURCE)
         annotation class InMemory(
-            val name: String
+            val name: String,
+            val policy: KClass<out KernlPolicy> = DefaultKernlPolicy::class
         )
 
         @Target(AnnotationTarget.FUNCTION)
         @Retention(AnnotationRetention.SOURCE)
         annotation class Disk(
-            val name: String
+            val name: String,
+            val policy: KClass<out KernlPolicy> = DefaultKernlPolicy::class
         )
 
     }

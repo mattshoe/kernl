@@ -10,6 +10,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.mattshoe.shoebox.kernl.Kernl
+import org.mattshoe.shoebox.kernl.KernlEvent
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
@@ -46,6 +48,62 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
                 Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
 
                 subject.invalidate(params)
+
+                Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
+                Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
+                Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
+
+                Truth.assertThat(fetchInvocations).hasSize(1)
+                Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
+            }
+            fetchInvocations.clear()
+        }
+    }
+
+    @Test
+    fun `multiple streamers all receive updates on global invalidation`() = runTest(UnconfinedTestDispatcher()) {
+        testData.forEach {(params, response) ->
+            turbineScope {
+                val turbine1 = subject.stream(params).testIn(backgroundScope)
+                val turbine2 = subject.stream(params).testIn(backgroundScope)
+                val turbine3 = subject.stream(params).testIn(backgroundScope)
+
+                Truth.assertThat((turbine1.awaitItem() as DataResult.Success).data).isEqualTo(response)
+                Truth.assertThat((turbine2.awaitItem() as DataResult.Success).data).isEqualTo(response)
+                Truth.assertThat((turbine3.awaitItem() as DataResult.Success).data).isEqualTo(response)
+
+                Truth.assertThat(fetchInvocations).hasSize(1)
+                Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
+
+                Kernl.globalEvent(KernlEvent.Invalidate())
+
+                Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
+                Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
+                Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
+
+                Truth.assertThat(fetchInvocations).hasSize(1)
+                Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
+            }
+            fetchInvocations.clear()
+        }
+    }
+
+    @Test
+    fun `multiple streamers all receive updates on global invalidation with specific params`() = runTest(UnconfinedTestDispatcher()) {
+        testData.forEach {(params, response) ->
+            turbineScope {
+                val turbine1 = subject.stream(params).testIn(backgroundScope)
+                val turbine2 = subject.stream(params).testIn(backgroundScope)
+                val turbine3 = subject.stream(params).testIn(backgroundScope)
+
+                Truth.assertThat((turbine1.awaitItem() as DataResult.Success).data).isEqualTo(response)
+                Truth.assertThat((turbine2.awaitItem() as DataResult.Success).data).isEqualTo(response)
+                Truth.assertThat((turbine3.awaitItem() as DataResult.Success).data).isEqualTo(response)
+
+                Truth.assertThat(fetchInvocations).hasSize(1)
+                Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
+
+                Kernl.globalEvent(KernlEvent.Invalidate(params))
 
                 Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
                 Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
