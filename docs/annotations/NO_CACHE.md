@@ -7,7 +7,7 @@ Every call to fetch data will result in a fresh data retrieval operation.
 This will be the name of the generated repository. This value is not optional.
 
 ## Generated Repository
-Your generated repository will always be an implementation of the [NoCacheKernl](NO_CACHE_KERNL) interface.
+Your generated repository will always be an implementation of the [NoCacheKernl](../kernl/NO_CACHE_KERNL.md) interface.
 
 Let's imagine you have a Retrofit service such as the following:
 

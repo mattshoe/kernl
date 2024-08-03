@@ -15,7 +15,7 @@ The generated repository exposes methods to refresh and invalidate the data for 
 This will be the name of the generated repository. This value is not optional.
 
 ## Generated Repository
-Your generated repository will always be an implementation of the [AssociativeMemoryCacheKernl](ASSOCIATIVE_MEMORY_CACHE_KERNLmd) interface.
+Your generated repository will always be an implementation of the [AssociativeMemoryCacheKernl](../kernl/ASSOCIATIVE_MEMORY_CACHE_KERNLmd) interface.
 
 Let's imagine you have a Retrofit service such as the following:
 
