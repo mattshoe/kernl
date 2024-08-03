@@ -241,7 +241,7 @@ class UserRepository(
 - [`ValidDataResult`](docs/VALID_DATA_RESULT.md)
 - [`ErrorDataResult`](docs/ERROR_DATA_RESULT.md)
 - [`Kernl`](docs/kernl/KERNL.md)
-- - [`DefaultKernlPolicy`](docs/kernl/DEFAULT_KERNL_POLICY.md)
+- [`DefaultKernlPolicy`](docs/kernl/DEFAULT_KERNL_POLICY.md)
 - [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
 - [`CacheStrategy`](docs/kernl/CACHE_STRATEGY.md)
 - [`InvalidationStrategy`](docs/kernl/INVALIDATION_STRATEGY.md)
