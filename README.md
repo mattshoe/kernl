@@ -33,7 +33,6 @@ will typically be on a Retrofit service method.
 See [Annotations](#annotations)
 for a list of annotations to use.
 
-#### Option 1: Use DefaultKernlPolicy
 ```kotlin
 interface UserDataService {
     @Kernl.SingleCache.InMemory("UserData")
@@ -41,20 +40,19 @@ interface UserDataService {
 }
 ```
 
-#### Option 2: Use Your Own Kernl Policy
+#### Optional Step: Create Your Own [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
 ```kotlin
-interface UserDataService {
-    @Kernl.SingleCache.InMemory("UserData", UserDataKernlPolicy::class)
-    suspend fun getUserData(id: String, someParam: Int, otherParam: Boolean): UserData
-}
-
 class UserDataKernlPolicy: KernlPolicy, Disposable {
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _events = MutableSharedFlow<KernlEvent>()
 
-    override val timeToLive = 25.minutes
     override val events = _events
+    // Data is only valid for 25 minutes
+    override val timeToLive = 25.minutes
+    // Load data from disk first, then fall back to network
     override val cacheStrategy = CacheStrategy.DiskFirst
+    // Pre-emptively refresh data when it is about to expire
+    override val invalidationStrategy = InvalidationStrategy.Preemptive(leadTime = 30.seconds, retries = 3)
 
     init {
         /**
@@ -84,12 +82,10 @@ class UserDataKernlPolicy: KernlPolicy, Disposable {
 }
 ```
 
-
-
 ### 3. Bind Your **Kernl**
 
 **Kernl** was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
-via its associated Factory. This allows you to use `**Kernl**` with any dependency injection framework. Examples included below.
+via its associated Factory. This allows you to use **Kernl** with any dependency injection framework. Examples included below.
 
 #### With DefaultKernlPolicy
 ```kotlin
@@ -147,8 +143,6 @@ interface UserDataModule {
 <details>
     <summary><b>Other Popular Dependency Injection Examples</b></summary>
 
-
-
 #### Hilt Sample
 ```kotlin
 @Module
@@ -185,6 +179,7 @@ class UserDataConfiguration {
     }
 }
 ```
+
 </details>
 
 
@@ -245,6 +240,12 @@ class UserRepository(
 - [`DataResult`](docs/DATA_RESULT.md)
 - [`ValidDataResult`](docs/VALID_DATA_RESULT.md)
 - [`ErrorDataResult`](docs/ERROR_DATA_RESULT.md)
+- [`Kernl`](docs/kernl/KERNL.md)
+- - [`DefaultKernlPolicy`](docs/kernl/DEFAULT_KERNL_POLICY.md)
+- [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
+- [`CacheStrategy`](docs/kernl/CACHE_STRATEGY.md)
+- [`InvalidationStrategy`](docs/kernl/INVALIDATION_STRATEGY.md)
+- [`KernlEvent`](docs/kernl/KERNL_EVENT.md)
 
 ### Extensions
 - [`valueOrNull()`](docs/extensions/VALUE_OR_NULL.md)
