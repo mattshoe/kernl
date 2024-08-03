@@ -13,9 +13,6 @@ The encapsulated data of a successful data retrieval operation, or the default v
 
 # Usage
 ```kotlin
-/**
- * Demonstrates unwrapping a DataResult with a default value.
- */
 fun sampleOrElse(dataResult: DataResult<String>): String {
     return dataResult.orElse { "some default value" }
 }

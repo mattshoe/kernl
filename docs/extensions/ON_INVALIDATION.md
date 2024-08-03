@@ -18,11 +18,6 @@ A `Flow` of [`ValidDataResult`](../VALID_DATA_RESULT.md).<br>
 
 # Usage
 ```kotlin
-/**
- * Demonstrates performing an action when a DataResult.Invalidated is emitted by the Flow.
- *
- * @sample sampleOnInvalidation
- */
 fun sampleOnInvalidation(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
         someFlow
         .onInvalidation {

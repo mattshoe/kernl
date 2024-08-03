@@ -12,9 +12,6 @@ The encapsulated data of a successful data retrieval operation, or `null` if the
 
 ## Usage
 ```kotlin
-/**
- * Demonstrates converting a Throwable to a DataResult.
- */
 fun sampleValueOrNull(dataResult: DataResult<String>): String? {
     return dataResult.valueOrNull()
 }

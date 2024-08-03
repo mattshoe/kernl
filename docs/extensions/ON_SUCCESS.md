@@ -13,9 +13,6 @@ A `Flow` of [`DataResult`](../DATA_RESULT.md).
 
 # Usage
 ```kotlin
-/**
- * Demonstrates performing an action on each DataResult.Success emitted by the Flow.
- */
 fun sampleOnSuccess(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onSuccess {

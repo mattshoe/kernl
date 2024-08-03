@@ -20,9 +20,6 @@ The encapsulated data of a successful data retrieval operation.
 
 # Usage
 ```kotlin
-/**
- * Demonstrates unwrapping a DataResult.
- */
 fun sampleUnwrap(dataResult: DataResult<String>): String {
     return try {
         dataResult.unwrap()

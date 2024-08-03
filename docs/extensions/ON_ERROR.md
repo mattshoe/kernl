@@ -17,9 +17,6 @@ A `Flow` of data of type `T`. <br> **_Note that this is no longer encapsulated b
 
 # Usage
 ```kotlin
-/**
- * Demonstrates catching DataResult.Error emissions and performing an action.
- */
 fun sampleOnError(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onInvalidation {

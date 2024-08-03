@@ -10,9 +10,6 @@ A [`DataResult.Error`](../DATA_RESULT.md) containing this `Throwable`.
 
 # Usage
 ```kotlin
-/**
- * Demonstrates converting a Throwable to a DataResult.
- */
 fun sampleThrowableAsDataResult(throwable: Throwable): ValidDataResult<String> {
     return try {
         fetchData().asDataResult()
