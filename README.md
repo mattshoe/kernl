@@ -25,10 +25,15 @@ dependencies {
 }
 ```
 
-### 2. Define Your Service Interface
+### 2. Annotate
 
-Annotate your service methods with `@Kernl.SingleCache.InMemory` to indicate that a repository should be generated for them.
+Annotate any method and give it a name to indicate that a `Kernl` should be generated for that method. This annotation 
+will typically be on a Retrofit service method.
 
+See [Annotations](#annotations)
+for a list of annotations to use.
+
+#### Option 1: Use DefaultKernlPolicy
 ```kotlin
 interface UserDataService {
     @Kernl.SingleCache.InMemory("UserData")
@@ -36,11 +41,57 @@ interface UserDataService {
 }
 ```
 
+#### Option 2: Use Your Own Kernl Policy
+```kotlin
+interface UserDataService {
+    @Kernl.SingleCache.InMemory("UserData", UserDataKernlPolicy::class)
+    suspend fun getUserData(id: String, someParam: Int, otherParam: Boolean): UserData
+}
+
+class UserDataKernlPolicy: KernlPolicy, Disposable {
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val _events = MutableSharedFlow<KernlEvent>()
+
+    override val timeToLive = 25.minutes
+    override val events = _events
+    override val cacheStrategy = CacheStrategy.DiskFirst
+
+    init {
+        /**
+         * Demonstration of forcing a refresh every X minutes
+         * Not a particularly useful feature in this case, but this
+         * is just for example
+         */
+        coroutineScope.launch {
+            while (coroutineContext.isActive) {
+                delay(10.minutes)
+                refresh()
+            }
+        }
+    }
+
+    suspend fun refresh() {
+        _events.emit(KernlEvent.Refresh())
+    }
+
+    suspend fun invalidate() {
+        _events.emit(KernlEvent.Invalidate())
+    }
+
+    override fun dispose() {
+        coroutineScope.cancel()
+    }
+}
+```
+
+
+
 ### 3. Bind Your **Kernl**
 
 **Kernl** was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
 via its associated Factory. This allows you to use `**Kernl**` with any dependency injection framework. Examples included below.
 
+#### With DefaultKernlPolicy
 ```kotlin
 // Option 1: Pass function pointer to the factory
 val useDataKernl = UserDataKernl.Factory(serviceImpl::getUserData)
@@ -51,7 +102,18 @@ val useDataKernl = UserDataKernl.Factory { id, someParam, otherParam ->
 }
 ```
 
-#### Dagger Sample
+#### With Custom KernlPolicy
+```kotlin
+// Option 1: Pass function pointer to the factory
+val useDataKernl = UserDataKernl.Factory(kernlPolicy, serviceImpl::getUserData)
+
+// Option 2: Pass lambda to the factory
+val useDataKernl = UserDataKernl.Factory(kernlPolicy) { id, someParam, otherParam ->
+    service.getUserData(id, someParam, otherParam)
+}
+```
+
+#### Dagger Sample with DefaultKernlPolicy
 ```kotlin
 @Module
 interface UserDataModule {
@@ -61,6 +123,22 @@ interface UserDataModule {
             service: UserDataService
         ): UserDataKernl {
             return UserDataKernl.Factory(service::getUserData)
+        }
+    }
+}
+```
+
+#### Dagger Sample with Custom KernlPolicy
+```kotlin
+@Module
+interface UserDataModule {
+    companion object {
+        @Provides
+        fun provideUserDataKernl(
+            service: UserDataService,
+            kernlPolicy: UserDataKernlPolicy
+        ): UserDataKernl {
+            return UserDataKernl.Factory(kernlPolicy, service::getUserData)
         }
     }
 }
