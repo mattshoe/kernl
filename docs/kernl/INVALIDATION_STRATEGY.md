@@ -6,7 +6,7 @@ Represents the strategy used to determine how cache invalidation should be handl
 
 ### `data object TakeNoAction : InvalidationStrategy`
 
-A strategy where no action is taken upon cache invalidation. This approach leaves the cache as is, without refreshing or invalidating the data.
+A strategy where no action is taken upon cache invalidation. This approach leaves the cache as is, without refreshing the data.
 
 **Use Case:** Use this strategy when you expect refreshes to be triggered manually by consumers of the Kernl.
 - **Scenario:** Suitable for applications where manual control over cache refreshes is preferred, such as admin tools or specific user-initiated actions.
@@ -15,7 +15,8 @@ A strategy where no action is taken upon cache invalidation. This approach leave
 
 
 ### `data object LazyRefresh : InvalidationStrategy`
-A strategy where data is refreshed only when it is next requested. This approach delays the refresh operation until the data is needed, reducing unnecessary refreshes.
+A strategy where data is refreshed only when it is next requested. This approach triggers a refresh operation once the
+data is requested after it has been invalidated, reducing unnecessary refreshes.
 
 **Use Case:** Use this strategy to balance resource usage and data freshness, ensuring data is refreshed only when needed.
 - **Scenario:** Suitable for applications where resource usage needs to be minimized, and data can be slightly out-of-date until accessed.
