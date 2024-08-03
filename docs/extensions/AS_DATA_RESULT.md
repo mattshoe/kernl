@@ -5,8 +5,9 @@ data within a [`DataResult`](../DATA_RESULT.md) type, allowing them to be handle
 
 **This method will automatically recognize any `Throwable` and wrap it as `DataResult.Error`.**
 
-### Returns: [`DataResult<T>`](../DATA_RESULT.md)
-A [`DataResult.Error`](../DATA_RESULT.md) containing this `Throwable`.
+### Returns: [`ValidDataResult<T>`](../DATA_RESULT.md)
+A [`ValidDataResult`](../VALID_DATA_RESULT.md) encapsulating `T`, which will either be [`DataResult.Success`](../DATA_RESULT.md) 
+or [`DataResult.Error`](../DATA_RESULT.md).
 
 # Usage
 ```kotlin
