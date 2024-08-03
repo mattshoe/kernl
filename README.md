@@ -171,7 +171,7 @@ class UserRepository(
 - [`unwrap()`](docs/extensions/UNWRAP.md)
 - [`unwrap { ... }`](docs/extensions/UNWRAP_WITH_ERROR_HANDLING.md)
 - [`orElse { ... }`](docs/extensions/OR_ELSE.md)
-- [`Throwable.asDataResult()`](docs/extensions/AS_DATA_RESULT)
+- [`asDataResult()`](docs/extensions/AS_DATA_RESULT)
 - [`onSuccess { ... }`](docs/extensions/ON_SUCCESS.md)
 - [`onError { ... }`](docs/extensions/ON_ERROR.md)
 - [`onInvalidation { ... }`](docs/extensions/ON_INVALIDATION.md)
