@@ -43,42 +43,14 @@ interface UserDataService {
 ### 3. (Optional) Create Your Own [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
 ```kotlin
 class UserDataKernlPolicy: KernlPolicy, Disposable {
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val _events = MutableSharedFlow<KernlEvent>()
-
-    override val events = _events
+    // You could use this to expose public triggers to affect Kernls en-masse
+    override val events = MutableSharedFlow<KernlEvenet>()
     // Data is only valid for 25 minutes
     override val timeToLive = 25.minutes
     // Load data from disk first, then fall back to network
     override val cacheStrategy = CacheStrategy.DiskFirst
     // Pre-emptively refresh data when it is about to expire
     override val invalidationStrategy = InvalidationStrategy.Preemptive(leadTime = 30.seconds, retries = 3)
-
-    init {
-        /**
-         * Demonstration of forcing a refresh every X minutes
-         * Not a particularly useful feature in this case, but this
-         * is just for example
-         */
-        coroutineScope.launch {
-            while (coroutineContext.isActive) {
-                delay(10.minutes)
-                refresh()
-            }
-        }
-    }
-
-    suspend fun refresh() {
-        _events.emit(KernlEvent.Refresh())
-    }
-
-    suspend fun invalidate() {
-        _events.emit(KernlEvent.Invalidate())
-    }
-
-    override fun dispose() {
-        coroutineScope.cancel()
-    }
 }
 ```
 
