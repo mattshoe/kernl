@@ -40,7 +40,7 @@ interface UserDataService {
 }
 ```
 
-#### Optional Step: Create Your Own [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
+### 3. (Optional) Create Your Own [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
 ```kotlin
 class UserDataKernlPolicy: KernlPolicy, Disposable {
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -82,7 +82,7 @@ class UserDataKernlPolicy: KernlPolicy, Disposable {
 }
 ```
 
-### 3. Bind Your **Kernl**
+### 4. Bind Your **Kernl**
 
 **Kernl** was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
 via its associated Factory. This allows you to use **Kernl** with any dependency injection framework. Examples included below.
@@ -183,7 +183,7 @@ class UserDataConfiguration {
 </details>
 
 
-### 4. Use Your **Kernl**!
+### 5. Use Your **Kernl**!
 
 Now you can just inject your **Kernl** and use it wherever you see fit. This will typically be injected into your repository
 layer to interface with the rest of your app, but every architecture is unique, so use it where it suits your architecture
