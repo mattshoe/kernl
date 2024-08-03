@@ -1,6 +1,6 @@
 package nocache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
 import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheMultiNullableComplexParamPrimitiveReturn
@@ -8,7 +8,7 @@ import nocache.NoCacheScenariosTest
 
 // Multiple nullable different complex parameters, primitive return
 class NoCacheMultiNullableComplexParamPrimitiveReturnTest: NoCacheScenariosTest<NoCacheMultiNullableComplexParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): NoCacheRepository<NoCacheMultiNullableComplexParamPrimitiveReturn.Params, Int> {
+    override fun repository(): NoCacheKernl<NoCacheMultiNullableComplexParamPrimitiveReturn.Params, Int> {
         return NoCacheMultiNullableComplexParamPrimitiveReturn.Factory { id, bar ->
             (id?.data?.toInt() ?: 0) + (bar?.code ?: 0)
         }

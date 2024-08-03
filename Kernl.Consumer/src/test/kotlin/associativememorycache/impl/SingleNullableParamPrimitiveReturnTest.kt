@@ -1,11 +1,11 @@
 package associativememorycache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
 import kernl.org.mattshoe.shoebox.kernl.associativememorycache.SingleNullableParamPrimitiveReturn
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
 class SingleNullableParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<SingleNullableParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): AssociativeMemoryCacheLiveRepository<SingleNullableParamPrimitiveReturn.Params, Int> {
+    override fun repository(): AssociativeMemoryCacheKernl<SingleNullableParamPrimitiveReturn.Params, Int> {
         return SingleNullableParamPrimitiveReturn.Factory { id ->
             onFetch(SingleNullableParamPrimitiveReturn.Params(id))
             id?.toInt() ?: 0

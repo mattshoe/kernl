@@ -10,5 +10,7 @@ ext {
 }
 
 dependencies {
+    implementation(project(":Kernl.Common"))
+    implementation(libs.kotlinx.coroutines)
     testImplementation(kotlin("test"))
 }

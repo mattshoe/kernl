@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 internal class PublisherDataSource<T: Any>(
     dispatcher: CoroutineDispatcher
 ): MemoryCachedDataSource<T>(dispatcher) {
-    override val _data = MutableSharedFlow<org.mattshoe.shoebox.kernl.runtime.DataResult<T>>(replay = 0)
+    override val _data = MutableSharedFlow<DataResult<T>>(replay = 0)
 }

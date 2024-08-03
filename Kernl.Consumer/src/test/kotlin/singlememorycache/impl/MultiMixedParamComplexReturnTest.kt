@@ -1,13 +1,13 @@
 package singlememorycache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
 import kernl.org.mattshoe.shoebox.kernl.singlememorycache.MultiMixedParamComplexReturn
 import singlememorycache.SingleMemoryCacheScenariosTest
 
 class MultiMixedParamComplexReturnTest : SingleMemoryCacheScenariosTest<MultiMixedParamComplexReturn.Params, ServiceResponse>() {
-    override fun repository(): SingleCacheLiveRepository<MultiMixedParamComplexReturn.Params, ServiceResponse> {
+    override fun repository(): SingleCacheKernl<MultiMixedParamComplexReturn.Params, ServiceResponse> {
         return MultiMixedParamComplexReturn.Factory { id, bar ->
             ServiceResponse(id.toInt() + bar.data.toInt())
         }

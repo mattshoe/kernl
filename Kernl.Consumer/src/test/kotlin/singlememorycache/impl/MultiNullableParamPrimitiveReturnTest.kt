@@ -1,11 +1,11 @@
 package singlememorycache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import kernl.org.mattshoe.shoebox.kernl.singlememorycache.MultiNullableParamPrimitiveReturn
 import singlememorycache.SingleMemoryCacheScenariosTest
 
 class MultiNullableParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<MultiNullableParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): SingleCacheLiveRepository<MultiNullableParamPrimitiveReturn.Params, Int> {
+    override fun repository(): SingleCacheKernl<MultiNullableParamPrimitiveReturn.Params, Int> {
         return MultiNullableParamPrimitiveReturn.Factory { id, bar ->
             (id?.toInt() ?: 0) + (bar ?: 0)
         }

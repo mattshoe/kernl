@@ -1,14 +1,16 @@
-# Kernl
+# **Kernl**
 
-Kernl is a Kotlin Symbol Processing (KSP) library designed to automatically generate repository classes for your service interfaces. This library helps reduce boilerplate code and ensures a consistent architecture by generating repository interfaces and implementation classes based on annotated service methods.
-
+**Kernl** is a Kotlin library built to simplify the majority of data management scenarios. **Kernl** provides a flexible and declarative 
+approach to defining your data management strategies. **Kernl** gives you granular control over all aspects of caching, from 
+in-memory network caching to offline backups in poor network conditions to database persistence to Key-Value storage.
 
 ## Features
 
-1. **Automated Repository Generation:** Eliminates boilerplate by generating repository interfaces and implementations.
-2. **Flexible Caching:** Choose in-memory or disk caching, with simple invalidation and refreshing.
-3. **Real-Time Data Sync:** Ensure your entire application stays in sync.
-4. Flexible Integration: Compatible with Dagger, Hilt, Koin, etc.
+1. **Declarative APIs:** Define the rules and **Kernl** generates the code to execute it.
+2. **Performance:** **Kernl** uses KSP to generate code rather than relying on reflection to build functionality.
+2. **Flexible Caching:** Use **Kernl**-provided policies or build your own custom policies to define your needs.
+4. **Flexible Integration**: Integrates easily with all major dependency injection frameworks.
+3. **Real-Time Data Sync:** Ensure your entire application stays in sync with **Kernl**'s managed streams.
 
 ## Quick Start
 
@@ -28,66 +30,68 @@ dependencies {
 Annotate your service methods with `@Kernl.SingleCache.InMemory` to indicate that a repository should be generated for them.
 
 ```kotlin
-interface MyService {
-    @Kernl.SingleCache.InMemory("MyRepository")
-    suspend fun getMyResponse(id: String, someParam: Int, otherParam: Boolean): MyResponseData
+interface UserDataService {
+    @Kernl.SingleCache.InMemory("UserData")
+    suspend fun getUserData(id: String, someParam: Int, otherParam: Boolean): UserData
 }
 ```
 
-### 3. Bind Your Repository
+### 3. Bind Your **Kernl**
 
-Kernl was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
-via its associated Factory. This allows you to use `Kernl` with any dependency injection framework. Examples included below.
+**Kernl** was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
+via its associated Factory. This allows you to use `**Kernl**` with any dependency injection framework. Examples included below.
 
 ```kotlin
 // Option 1: Pass function pointer to the factory
-val myRepo = MyRepository.Factory(service::getMyResponse)
+val useDataKernl = UserDataKernl.Factory(serviceImpl::getUserData)
 
 // Option 2: Pass lambda to the factory
-val repo = MyRepository.Factory { id, someParam, otherParam ->
-    service.getMyResponse(id, someParam, otherParam)
+val useDataKernl = UserDataKernl.Factory { id, someParam, otherParam ->
+    service.getUserData(id, someParam, otherParam)
 }
 ```
-
-<details>
-    <summary><b>Dependency Injection Examples</b></summary>
 
 #### Dagger Sample
 ```kotlin
 @Module
-interface MyServiceModule {
+interface UserDataModule {
     companion object {
         @Provides
-        fun provideMyRepository(
-            service: MyService
-        ): MyRepository {
-            return MyRepository.Factory(service::getMyResponse)
+        fun provideUserDataKernl(
+            service: UserDataService
+        ): UserDataKernl {
+            return UserDataKernl.Factory(service::getUserData)
         }
     }
 }
 ```
 
+<details>
+    <summary><b>Other Popular Dependency Injection Examples</b></summary>
+
+
+
 #### Hilt Sample
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
-object MyServiceModule {
+object UserDateModule {
     
     @Singleton
     @Provides
-    fun provideMyRepository(
-        service: MyService
-    ): MyServiceRepository {
-        return MyRepository.Factory(service::getMyResponse)
+    fun provideUserDataKernl(
+        service: UserDataService
+    ): UserDataKernl {
+        return UserDataKernl.Factory(service::getUserData)
     }
 }
 ```
 
 #### Koin Sample
 ```kotlin
-val myServiceModule = module {
-    single<MyRepository> {
-        MyRepository.Factory(get<MyService>()::getMyResponse)
+val userDataKernl = module {
+    single<UserDataKernl> {
+        UserDataKernl.Factory(service::getUserData)
     }
 }
 ```
@@ -95,40 +99,54 @@ val myServiceModule = module {
 #### Spring Sample
 ```kotlin
 @Configuration
-class MyServiceConfiguration {
+class UserDataConfiguration {
 
     @Bean
-    fun myRepository(service: MyService): MyRepository {
-        return MyRepository.Factory(service::getMyResponse)
+    fun userDataKernl(service: UserDataService): UserDataKernl {
+        return UserDataKernl.Factory(service::getUserData)
     }
 }
 ```
 </details>
 
 
-### 4. Use Your Repository!
+### 4. Use Your **Kernl**!
 
-Now you can use your repository anywhere you need it!
+Now you can just inject your **Kernl** and use it wherever you see fit. This will typically be injected into your repository
+layer to interface with the rest of your app, but every architecture is unique, so use it where it suits your architecture
+best.
 
 ```kotlin
-class MyViewModel(
-    private val myRepository: MyRepository
+class UserRepository(
+    private val userDataKernl: UserDataKernl
 ) {
+    private val _userData = MutableSharedFlow<UserData>()
+    private val _errors = MutableSharedFlow<Error>()
+    
+    val userData: Flow<UserData> = _userData
+    val errors: Flow<Error> = _errors
+    
     init {
-        myRepository.data
-            .onEach {
-                // process data
-            }.catch {
-                // this should never be hit, as errors are encapsulated in DataResult
+        userDataKernl.data
+            .onSuccess {
+                _userData.emit(it)
+            }.onInvalidation {
+                handleInvalidation()
+            }.onError {
+                _errors.emit(it.error)
             }.launchIn(viewModelScope)
     }
     
-    fun loadData(id: String, someParam: Int, otherParam: Boolean) {
-        viewModelScope.launch {
-            myRepository.fetch(
-                MyRepository.Params(id, someParam, otherParam)
-            )
-        }
+    suspend fun loadUser(id: String, someParam: Int, otherParam: Boolean) {
+        userDataKernl.fetch(
+            UserDataKernl.Params(id, someParam, otherParam)
+        )
+    }
+    
+    private suspend fun handleInvalidation() {
+        userDataKernl.refresb(
+            UserDataKernl.Params(id, someParam, otherParam)
+        )
     }
 }
 ```
@@ -138,12 +156,25 @@ class MyViewModel(
 # API Documentation 
 
 ### Annotations
-- [@Kernl.NoCache](docs/NO_CACHE.md)
-- [@Kernl.SingleCache.InMemory](docs/SINGLE_MEMORY_CACHE.md)
-- [@Kernl.AssociativeCache.InMemory](docs/ASSOCIATIVE_MEMORY_CACHE.md)
+- [`@Kernl.NoCache`](docs/annotations/NO_CACHE.md)
+- [`@Kernl.SingleCache.InMemory`](docs/annotations/SINGLE_MEMORY_CACHE.md)
+- [`@Kernl.AssociativeCache.InMemory`](docs/annotations/ASSOCIATIVE_MEMORY_CACHE.md)
 
-### Repositories
-- [NoCacheRepository](docs/NO_CACHE_REPOSITORY.md)
-- [SingleCacheLiveRepository](docs/SINGLE_CACHE_LIVE_REPOSITORY.md)
-- [AssociativeCacheLiveRepository](docs/ASSOCIATIVE_MEMORY_CACHE_LIVE_REPOSITORY.md)
-- [DataResult](docs/DATA_RESULT.md)
+### Kernl
+- [`NoCacheKernl`](docs/**Kernl**/NO_CACHE_KERNL.md)
+- [`SingleCacheKernl`](docs/**Kernl**/SINGLE_CACHE_KERNL.md)
+- [`AssociativeCacheKernl`](docs/**Kernl**/ASSOCIATIVE_MEMORY_CACHE_KERNLmd)
+- [`DataResult`](docs/DATA_RESULT.md)
+- [`ValidDataResult`](docs/VALID_DATA_RESULT.md)
+- [`ErrorDataResult`](docs/ERROR_DATA_RESULT.md)
+
+### Extensions
+- [`valueOrNull()`](docs/extensions/VALUE_OR_NULL.md)
+- [`unwrap()`](docs/extensions/UNWRAP.md)
+- [`unwrap { ... }`](docs/extensions/UNWRAP_WITH_ERROR_HANDLING.md)
+- [`orElse { ... }`](docs/extensions/OR_ELSE.md)
+- [`asDataResult()`](docs/extensions/AS_DATA_RESULT)
+- [`onSuccess { ... }`](docs/extensions/ON_SUCCESS.md)
+- [`onError { ... }`](docs/extensions/ON_ERROR.md)
+- [`onInvalidation { ... }`](docs/extensions/ON_INVALIDATION.md)
+- [`cacheDataResult { ... }`](docs/extensions/CATCH_DATA_RESULT.md)

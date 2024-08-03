@@ -4,8 +4,8 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import org.mattshoe.shoebox.kernl.annotations.Kernl
-import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
-import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.BaseAssociativeCacheLiveRepository
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.inmemory.BaseAssociativeCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -29,8 +29,8 @@ class AssociativeMemoryCacheProcessor(
         listOf(
             async {
                 codeGenerator.generate(
-                    AssociativeMemoryCacheLiveRepository::class,
-                    BaseAssociativeCacheLiveRepository::class,
+                    AssociativeMemoryCacheKernl::class,
+                    BaseAssociativeCacheKernl::class,
                     declaration,
                     repositoryName,
                     packageDestination,

@@ -5,10 +5,11 @@ import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import org.mattshoe.shoebox.kernl.KernlEvent
+import org.mattshoe.shoebox.kernl.runtime.ext.selectivelyDistinct
 
 /**
  * This implementation of [DataSource] only caches data in-memory rather than on-disk.
@@ -25,7 +26,7 @@ internal open class MemoryCachedDataSource<T: Any>(
         private set
 
     override val data: Flow<DataResult<T>>
-        get() = _data
+        get() = _data.selectivelyDistinct { it is DataResult.Invalidated }
 
     override suspend fun initialize(forceFetch: Boolean, dataRetrieval: suspend () -> T) = withContext(dispatcher) {
         fetchData(forceFetch, dataRetrieval)
