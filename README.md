@@ -1,6 +1,6 @@
 # **Kernl**
 
-**Kernl** is a library built to simplify the majority of data management scenarios. **Kernl** provides a flexible and declarative 
+**Kernl** is a Kotlin library built to simplify the majority of data management scenarios. **Kernl** provides a flexible and declarative 
 approach to defining your data management strategies. **Kernl** gives you granular control over all aspects of caching, from 
 in-memory network caching to offline backups in poor network conditions to database persistence to Key-Value storage.
 
