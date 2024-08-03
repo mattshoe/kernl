@@ -1,16 +1,16 @@
-# Kernl
+# **Kernl**
 
-Kernl is a library built to simplify the majority of data management scenarios. Kernl provides a flexible and declarative 
-approach to defining your data management strategies. Kernl gives you granular control over all aspects of caching, from 
-in-memory network caching to offline backups in poor network conditions to database persistence to persistent Key-Value storage.
+**Kernl** is a library built to simplify the majority of data management scenarios. **Kernl** provides a flexible and declarative 
+approach to defining your data management strategies. **Kernl** gives you granular control over all aspects of caching, from 
+in-memory network caching to offline backups in poor network conditions to database persistence to Key-Value storage.
 
 ## Features
 
-1. **Declarative Caching:** Define the rules and Kernl generates the code to execute it.
-2. **Performance:** Kernl uses KSP to generate code rather than relying on reflection to build functionality.
-2. **Flexible API:** Use Kernl-provided policies or build your own custom policies to define your needs.
+1. **Declarative APIs:** Define the rules and **Kernl** generates the code to execute it.
+2. **Performance:** **Kernl** uses KSP to generate code rather than relying on reflection to build functionality.
+2. **Flexible Caching:** Use **Kernl**-provided policies or build your own custom policies to define your needs.
 4. **Flexible Integration**: Integrates easily with all major dependency injection frameworks.
-3. **Real-Time Data Sync:** Ensures your entire application stays in sync with managed streams.
+3. **Real-Time Data Sync:** Ensure your entire application stays in sync with **Kernl**'s managed streams.
 
 ## Quick Start
 
@@ -36,10 +36,10 @@ interface UserDataService {
 }
 ```
 
-### 3. Bind Your Kernl
+### 3. Bind Your **Kernl**
 
-Kernl was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
-via its associated Factory. This allows you to use `Kernl` with any dependency injection framework. Examples included below.
+**Kernl** was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
+via its associated Factory. This allows you to use `**Kernl**` with any dependency injection framework. Examples included below.
 
 ```kotlin
 // Option 1: Pass function pointer to the factory
@@ -110,9 +110,9 @@ class UserDataConfiguration {
 </details>
 
 
-### 4. Use Your Kernl!
+### 4. Use Your **Kernl**!
 
-Now you can just inject your Kernl and use it wherever you see fit. This will typically be injected into your repository
+Now you can just inject your **Kernl** and use it wherever you see fit. This will typically be injected into your repository
 layer to interface with the rest of your app, but every architecture is unique, so use it where it suits your architecture
 best.
 
@@ -160,11 +160,13 @@ class UserRepository(
 - [`@Kernl.SingleCache.InMemory`](docs/annotations/SINGLE_MEMORY_CACHE.md)
 - [`@Kernl.AssociativeCache.InMemory`](docs/annotations/ASSOCIATIVE_MEMORY_CACHE.md)
 
-### Kernls
-- [`NoCacheKernl`](docs/kernl/NO_CACHE_KERNL.md)
-- [`SingleCacheKernl`](docs/kernl/SINGLE_CACHE_KERNL.md)
-- [`AssociativeCacheKernl`](docs/kernl/ASSOCIATIVE_MEMORY_CACHE_KERNLmd)
+### Kernl
+- [`NoCacheKernl`](docs/**Kernl**/NO_CACHE_KERNL.md)
+- [`SingleCacheKernl`](docs/**Kernl**/SINGLE_CACHE_KERNL.md)
+- [`AssociativeCacheKernl`](docs/**Kernl**/ASSOCIATIVE_MEMORY_CACHE_KERNLmd)
 - [`DataResult`](docs/DATA_RESULT.md)
+- [`ValidDataResult`](docs/VALID_DATA_RESULT.md)
+- [`ErrorDataResult`](docs/ERROR_DATA_RESULT.md)
 
 ### Extensions
 - [`valueOrNull()`](docs/extensions/VALUE_OR_NULL.md)
