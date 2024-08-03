@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.kernl.runtime.repo.associativecache
+package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.inmemory
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -6,12 +6,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
 import kotlin.reflect.KClass
 
-abstract class BaseAssociativeCacheLiveRepository<TParams: Any, TData: Any>(
+abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ):
-    AssociativeMemoryCacheLiveRepository<TParams, TData> {
+    AssociativeMemoryCacheKernl<TParams, TData> {
 
     private data class CacheEntry<TData: Any>(
         val dataSource: DataSource<TData>

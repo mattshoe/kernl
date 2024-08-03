@@ -7,8 +7,8 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import org.mattshoe.shoebox.kernl.annotations.Kernl
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.BaseSingleCacheLiveRepository
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory.BaseSingleCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import org.mattshoe.shoebox.util.className
 import org.mattshoe.shoebox.util.simpleName
@@ -34,8 +34,8 @@ class SingleMemoryCacheProcessor(
         listOf(
             async {
                 codeGenerator.generate(
-                    SingleCacheLiveRepository::class,
-                    BaseSingleCacheLiveRepository::class,
+                    SingleCacheKernl::class,
+                    BaseSingleCacheKernl::class,
                     declaration,
                     repositoryName,
                     packageDestination,
@@ -109,8 +109,8 @@ class SingleMemoryCacheProcessor(
         return TypeSpec.interfaceBuilder(repositoryName)
             .addSuperinterface(
                 ClassName(
-                    SingleCacheLiveRepository::class.java.packageName,
-                    SingleCacheLiveRepository::class.simpleName!!
+                    SingleCacheKernl::class.java.packageName,
+                    SingleCacheKernl::class.simpleName!!
                 ).parameterizedBy(
                     ClassName(packageName,"${repositoryName}.${parametersDataClass.name!!}"),
                     dataType.className
@@ -155,8 +155,8 @@ class SingleMemoryCacheProcessor(
             .addSuperinterface(ClassName(packageName, repositoryName))
             .superclass(
                 ClassName(
-                    BaseSingleCacheLiveRepository::class.java.packageName,
-                    BaseSingleCacheLiveRepository::class.simpleName!!
+                    BaseSingleCacheKernl::class.java.packageName,
+                    BaseSingleCacheKernl::class.simpleName!!
                 ).parameterizedBy(
                     ClassName(packageName,"${repositoryName}.${parametersDataClass.name!!}"),
                     dataType.className

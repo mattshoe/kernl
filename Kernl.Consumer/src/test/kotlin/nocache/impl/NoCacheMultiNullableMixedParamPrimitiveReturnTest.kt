@@ -1,13 +1,13 @@
 package nocache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheMultiNullableMixedParamPrimitiveReturn
 import nocache.NoCacheScenariosTest
 
 // Multiple mixed nullable parameters (primitive and complex), primitive return
 class NoCacheMultiNullableMixedParamPrimitiveReturnTest: NoCacheScenariosTest<NoCacheMultiNullableMixedParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): NoCacheRepository<NoCacheMultiNullableMixedParamPrimitiveReturn.Params, Int> {
+    override fun repository(): NoCacheKernl<NoCacheMultiNullableMixedParamPrimitiveReturn.Params, Int> {
         return NoCacheMultiNullableMixedParamPrimitiveReturn.Factory { id, bar ->
             (id?.toInt() ?: 0) + (bar?.data?.toInt() ?: 0)
         }

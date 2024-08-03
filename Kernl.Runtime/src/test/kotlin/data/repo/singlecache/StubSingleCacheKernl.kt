@@ -1,11 +1,11 @@
 package data.repo.singlecache
 
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.BaseSingleCacheLiveRepository
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory.BaseSingleCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 
-class StubSingleCacheLiveRepository(
+class StubSingleCacheKernl(
     dispatcher: CoroutineDispatcher
-): BaseSingleCacheLiveRepository<Int, String>(dispatcher) {
+): BaseSingleCacheKernl<Int, String>(dispatcher) {
     override val dataType = String::class
     var operation: suspend (Int) -> String = { it.toString() }
 

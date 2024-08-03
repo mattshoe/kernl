@@ -1,12 +1,12 @@
 package singlememorycache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import kernl.org.mattshoe.shoebox.kernl.singlememorycache.SingleComplexParamPrimitiveReturn
 import singlememorycache.SingleMemoryCacheScenariosTest
 
 class SingleComplexParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<SingleComplexParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): SingleCacheLiveRepository<SingleComplexParamPrimitiveReturn.Params, Int> {
+    override fun repository(): SingleCacheKernl<SingleComplexParamPrimitiveReturn.Params, Int> {
         return SingleComplexParamPrimitiveReturn.Factory { id ->
             id.data.toInt()
         }

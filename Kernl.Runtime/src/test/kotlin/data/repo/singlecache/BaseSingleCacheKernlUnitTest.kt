@@ -16,7 +16,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-class BaseSingleCacheLiveRepositoryUnitTest {
+class BaseSingleCacheKernlUnitTest {
     private val mockDataSource: DataSource<String> = mockk(relaxed = true)
     private val datasourceBuilderRequest: DataSourceBuilderRequest = mockk(relaxed = true)
     private val memoryCachedDataSourceBuilderRequest: MemoryCacheDataSourceBuilder<String> = mockk(relaxed = true)
@@ -78,8 +78,8 @@ class BaseSingleCacheLiveRepositoryUnitTest {
         }
     }
 
-    private fun TestScope.makeSubject(): StubSingleCacheLiveRepository {
-        return StubSingleCacheLiveRepository(coroutineContext[CoroutineDispatcher]!!)
+    private fun TestScope.makeSubject(): StubSingleCacheKernl {
+        return StubSingleCacheKernl(coroutineContext[CoroutineDispatcher]!!)
     }
 }
 

@@ -6,28 +6,22 @@ import com.google.common.truth.Truth
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ext.unwrap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import javax.xml.crypto.Data
 import kotlin.time.Duration
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class BaseAssociativeCacheLiveRepositoryTest {
-    private lateinit var subject: StubBaseAssociativeCacheLiveRepository
+class BaseAssociativeCacheKernlTest {
+    private lateinit var subject: StubBaseAssociativeCacheKernl
     private val dispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun before() {
-        subject = StubBaseAssociativeCacheLiveRepository(dispatcher)
+        subject = StubBaseAssociativeCacheKernl(dispatcher)
     }
 
     @Test

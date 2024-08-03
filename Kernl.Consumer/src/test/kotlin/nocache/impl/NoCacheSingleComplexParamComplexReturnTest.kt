@@ -1,6 +1,6 @@
 package nocache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
 import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheSingleComplexParamComplexReturn
@@ -8,7 +8,7 @@ import nocache.NoCacheScenariosTest
 
 // Single complex parameter, complex return
 class NoCacheSingleComplexParamComplexReturnTest: NoCacheScenariosTest<NoCacheSingleComplexParamComplexReturn.Params, ServiceResponse>() {
-    override fun repository(): NoCacheRepository<NoCacheSingleComplexParamComplexReturn.Params, ServiceResponse> {
+    override fun repository(): NoCacheKernl<NoCacheSingleComplexParamComplexReturn.Params, ServiceResponse> {
         val foo =  NoCacheSingleComplexParamComplexReturn.Factory { id ->
             ServiceResponse(id.data.toInt())
         }

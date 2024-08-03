@@ -94,7 +94,7 @@ fun <T: Any> Flow<DataResult<T>>.onEachDataResult(action: suspend (T) -> Unit): 
 }
 
 fun <T: Any> Flow<DataResult<T>>.catchDataResult(
-    action: suspend FlowCollector<T>.(cause: Throwable) -> Unit
+    action: suspend FlowCollector<T>.(cause: Throwable) -> Unit = { }
 ): Flow<T> {
     return transform {
         when (it) {

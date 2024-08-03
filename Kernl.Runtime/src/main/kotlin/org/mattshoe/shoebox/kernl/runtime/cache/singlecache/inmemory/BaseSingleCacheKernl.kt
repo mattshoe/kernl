@@ -1,14 +1,15 @@
-package org.mattshoe.shoebox.kernl.runtime.repo.singlecache
+package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory
 
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import kotlin.reflect.KClass
 
-abstract class BaseSingleCacheLiveRepository<TParams: Any, TData: Any>(
+abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-): SingleCacheLiveRepository<TParams, TData> {
+): SingleCacheKernl<TParams, TData> {
     private val dataSource by lazy {
         DataSource.Builder
             .memoryCache(dataType)

@@ -3,7 +3,7 @@ package associativememorycache
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheLiveRepository
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -13,13 +13,13 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
-    lateinit var subject: AssociativeMemoryCacheLiveRepository<TParams, TResponse>
+    lateinit var subject: AssociativeMemoryCacheKernl<TParams, TResponse>
 
     protected abstract val testData: Map<TParams, TResponse>
     private lateinit var dispatcher: CoroutineDispatcher
     private val fetchInvocations = mutableListOf<TParams>()
 
-    protected abstract fun repository(): AssociativeMemoryCacheLiveRepository<TParams, TResponse>
+    protected abstract fun repository(): AssociativeMemoryCacheKernl<TParams, TResponse>
     protected fun onFetch(params: TParams) {
         fetchInvocations.add(params)
     }

@@ -3,7 +3,7 @@ package singlememorycache
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.repo.singlecache.SingleCacheLiveRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -12,9 +12,9 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
-    lateinit var subject: SingleCacheLiveRepository<TParams, TResponse>
+    lateinit var subject: SingleCacheKernl<TParams, TResponse>
 
-    protected abstract fun repository(): SingleCacheLiveRepository<TParams, TResponse>
+    protected abstract fun repository(): SingleCacheKernl<TParams, TResponse>
 
     protected abstract val testData: Map<TParams, TResponse>
 

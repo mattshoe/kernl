@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.kernl.runtime.repo.singlecache
+package org.mattshoe.shoebox.kernl.runtime.cache.singlecache
 
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * This repository will guarantee that only ONE data retrieval operation can ever be in flight at a given time.
  */
-interface SingleCacheLiveRepository<TParams: Any, TData: Any> {
+interface SingleCacheKernl<TParams: Any, TData: Any> {
     /**
      * ### Stream producing the most up-to-date value for this repository.
      *

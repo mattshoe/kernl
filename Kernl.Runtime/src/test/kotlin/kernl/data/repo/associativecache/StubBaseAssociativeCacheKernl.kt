@@ -1,14 +1,12 @@
 package kernl.data.repo.associativecache
 
-import org.mattshoe.shoebox.kernl.runtime.repo.associativecache.BaseAssociativeCacheLiveRepository
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.inmemory.BaseAssociativeCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlin.reflect.KClass
 
-class StubBaseAssociativeCacheLiveRepository(
+class StubBaseAssociativeCacheKernl(
     dispatcher: CoroutineDispatcher
-) : BaseAssociativeCacheLiveRepository<Int, String>(
+) : BaseAssociativeCacheKernl<Int, String>(
     dispatcher
 ) {
     override val dataType: KClass<String> = String::class

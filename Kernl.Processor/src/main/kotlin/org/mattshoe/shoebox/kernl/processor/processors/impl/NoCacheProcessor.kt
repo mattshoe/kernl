@@ -7,13 +7,13 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import org.mattshoe.shoebox.kernl.annotations.Kernl
-import org.mattshoe.shoebox.kernl.runtime.repo.nocache.BaseNoCacheRepository
-import org.mattshoe.shoebox.kernl.runtime.repo.nocache.NoCacheRepository
+import org.mattshoe.shoebox.kernl.runtime.cache.nocache.BaseNoCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import org.mattshoe.shoebox.util.className
 import kotlinx.coroutines.*
 
-class NoCacheProcessor(
+class  NoCacheProcessor(
     logger: KSPLogger
 ): RepositoryFunctionProcessor(logger) {
 
@@ -94,8 +94,8 @@ class NoCacheProcessor(
         return TypeSpec.interfaceBuilder(repositoryName)
             .addSuperinterface(
                 ClassName(
-                    NoCacheRepository::class.java.packageName,
-                    NoCacheRepository::class.simpleName!!
+                    NoCacheKernl::class.java.packageName,
+                    NoCacheKernl::class.simpleName!!
                 ).parameterizedBy(
                     ClassName(packageName,"${repositoryName}.${parametersDataClass.name!!}"),
                     dataType.className
@@ -140,8 +140,8 @@ class NoCacheProcessor(
             .addSuperinterface(ClassName(packageName, repositoryName))
             .superclass(
                 ClassName(
-                    BaseNoCacheRepository::class.java.packageName,
-                    BaseNoCacheRepository::class.simpleName!!
+                    BaseNoCacheKernl::class.java.packageName,
+                    BaseNoCacheKernl::class.simpleName!!
                 ).parameterizedBy(
                     ClassName(packageName,"${repositoryName}.${parametersDataClass.name!!}"),
                     dataType.className
@@ -157,7 +157,7 @@ class NoCacheProcessor(
                     .build()
             )
             .addFunction(
-                FunSpec.builder("fetch")
+                FunSpec.builder("fetchData")
                     .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
                     .addParameter("params", ClassName(packageName, "$repositoryName.${parametersDataClass.name!!}"))
                     .returns(dataType.className)

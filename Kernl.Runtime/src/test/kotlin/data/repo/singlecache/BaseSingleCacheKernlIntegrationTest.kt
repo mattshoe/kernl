@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-class BaseSingleCacheLiveRepositoryIntegrationTest {
+class BaseSingleCacheKernlIntegrationTest {
     private val unconfinedTestDispatcher = UnconfinedTestDispatcher()
     private val standardTestDispatcher = StandardTestDispatcher()
 
@@ -207,7 +207,7 @@ class BaseSingleCacheLiveRepositoryIntegrationTest {
     }
 
 
-    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): StubSingleCacheLiveRepository {
-        return StubSingleCacheLiveRepository(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
+    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): StubSingleCacheKernl {
+        return StubSingleCacheKernl(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
     }
 }
