@@ -6,27 +6,27 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
-fun <T: Any> Flow<org.mattshoe.shoebox.kernl.runtime.DataResult<T>>.unwrapDataResult(): Flow<T>
+fun <T: Any> Flow<DataResult<T>>.unwrapDataResult(): Flow<T>
     = filter {
-        it is org.mattshoe.shoebox.kernl.runtime.DataResult.Success
+        it is DataResult.Success
     }.map {
-        (it as org.mattshoe.shoebox.kernl.runtime.DataResult.Success).data
+        (it as DataResult.Success).data
     }
 
-fun <T: Any> Flow<org.mattshoe.shoebox.kernl.runtime.DataResult<T>>.catchDataResult(flowCollector: FlowCollector<Throwable>): Flow<T>
+fun <T: Any> Flow<DataResult<T>>.catchDataResult(flowCollector: FlowCollector<Throwable>): Flow<T>
     = filter {
-        if (it is org.mattshoe.shoebox.kernl.runtime.DataResult.Error) {
+        if (it is DataResult.Error) {
             flowCollector.emit(it.error)
         }
-        it is org.mattshoe.shoebox.kernl.runtime.DataResult.Success
+        it is DataResult.Success
     }.map {
-        (it as org.mattshoe.shoebox.kernl.runtime.DataResult.Success).data
+        (it as DataResult.Success).data
     }
 
-fun <T: Any> Flow<org.mattshoe.shoebox.kernl.runtime.DataResult<T>>.onInvalidation(flowCollector: FlowCollector<Unit>): Flow<org.mattshoe.shoebox.kernl.runtime.DataResult<T>>
+fun <T: Any> Flow<DataResult<T>>.onInvalidation(flowCollector: FlowCollector<Unit>): Flow<DataResult<T>>
     = filter {
-        if (it is org.mattshoe.shoebox.kernl.runtime.DataResult.Invalidated) {
+        if (it is DataResult.Invalidated) {
             flowCollector.emit(Unit)
         }
-        it is org.mattshoe.shoebox.kernl.runtime.DataResult.Success
+        it is DataResult.Success
     }

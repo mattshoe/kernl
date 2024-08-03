@@ -124,12 +124,12 @@ abstract class RepositoryProcessorTestHarness {
             expectedOutput = """
                 package org.mattshoe.test.kernl
                 
-                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheKernl
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheKernl
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
-                public interface MyTestRepository : SingleCacheLiveRepository<MyTestRepository.Params, String> {
+                public interface MyTestRepository : SingleCacheKernl<MyTestRepository.Params, String> {
                   public data class Params(
                     public val `param`: String,
                   )
@@ -142,7 +142,7 @@ abstract class RepositoryProcessorTestHarness {
                 
                 private class MyTestRepositoryImpl(
                   private val call: suspend (String) -> String,
-                ) : BaseSingleCacheLiveRepository<MyTestRepository.Params, String>(),
+                ) : BaseSingleCacheKernl<MyTestRepository.Params, String>(),
                     MyTestRepository {
                   override val dataType: KClass<String> = String::class
                 
@@ -169,14 +169,14 @@ abstract class RepositoryProcessorTestHarness {
             expectedOutput = """
                 package org.mattshoe.test.kernl
 
-                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheKernl
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheKernl
                 import kotlin.Int
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
                 public interface MultiParamRepository :
-                    SingleCacheLiveRepository<MultiParamRepository.Params, String> {
+                    SingleCacheKernl<MultiParamRepository.Params, String> {
                   public data class Params(
                     public val param1: String,
                     public val param2: Int,
@@ -190,7 +190,7 @@ abstract class RepositoryProcessorTestHarness {
                 
                 private class MultiParamRepositoryImpl(
                   private val call: suspend (String, Int) -> String,
-                ) : BaseSingleCacheLiveRepository<MultiParamRepository.Params, String>(),
+                ) : BaseSingleCacheKernl<MultiParamRepository.Params, String>(),
                     MultiParamRepository {
                   override val dataType: KClass<String> = String::class
                 
@@ -218,14 +218,14 @@ abstract class RepositoryProcessorTestHarness {
             expectedOutput = """
                 package org.mattshoe.test.kernl
                 
-                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheKernl
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheKernl
                 import kotlin.Int
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
                 public interface DifferentReturnTypeRepository :
-                    SingleCacheLiveRepository<DifferentReturnTypeRepository.Params, Int> {
+                    SingleCacheKernl<DifferentReturnTypeRepository.Params, Int> {
                   public data class Params(
                     public val `param`: String,
                   )
@@ -238,7 +238,7 @@ abstract class RepositoryProcessorTestHarness {
                 
                 private class DifferentReturnTypeRepositoryImpl(
                   private val call: suspend (String) -> Int,
-                ) : BaseSingleCacheLiveRepository<DifferentReturnTypeRepository.Params, Int>(),
+                ) : BaseSingleCacheKernl<DifferentReturnTypeRepository.Params, Int>(),
                     DifferentReturnTypeRepository {
                   override val dataType: KClass<Int> = Int::class
                 
@@ -268,14 +268,14 @@ abstract class RepositoryProcessorTestHarness {
             expectedOutput = """
                 package org.mattshoe.test.kernl
                 
-                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheLiveRepository
-                import org.mattshoe.shoebox.`data`.repo.SingleCacheLiveRepository
+                import org.mattshoe.shoebox.`data`.repo.BaseSingleCacheKernl
+                import org.mattshoe.shoebox.`data`.repo.SingleCacheKernl
                 import org.mattshoe.test.ComplexType
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
                 public interface ComplexReturnTypeRepository :
-                    SingleCacheLiveRepository<ComplexReturnTypeRepository.Params, ComplexType> {
+                    SingleCacheKernl<ComplexReturnTypeRepository.Params, ComplexType> {
                   public data class Params(
                     public val `param`: String,
                   )
@@ -288,7 +288,7 @@ abstract class RepositoryProcessorTestHarness {
                 
                 private class ComplexReturnTypeRepositoryImpl(
                   private val call: suspend (String) -> ComplexType,
-                ) : BaseSingleCacheLiveRepository<ComplexReturnTypeRepository.Params, ComplexType>(),
+                ) : BaseSingleCacheKernl<ComplexReturnTypeRepository.Params, ComplexType>(),
                     ComplexReturnTypeRepository {
                   override val dataType: KClass<ComplexType> = ComplexType::class
                 

@@ -8,7 +8,7 @@ import java.io.File
  * A data class that contains ksp processed result.
  */
 @OptIn(ExperimentalCompilerApi::class)
-data class KspCompileResult constructor(
+data class KspCompileResult(
     val result: KotlinCompilation.Result,
     val generatedFiles: List<File>
 )
