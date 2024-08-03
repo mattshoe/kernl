@@ -143,7 +143,7 @@ class MyViewModel(
 - [@Kernl.AssociativeCache.InMemory](docs/ASSOCIATIVE_MEMORY_CACHE.md)
 
 ### Repositories
-- [NoCacheRepository](docs/NO_CACHE_REPOSITORY.md)
-- [SingleCacheLiveRepository](docs/SINGLE_CACHE_LIVE_REPOSITORY.md)
-- [AssociativeCacheLiveRepository](docs/ASSOCIATIVE_MEMORY_CACHE_LIVE_REPOSITORY.md)
+- [NoCacheKernl](docs/NO_CACHE_KERNL)
+- [SingleCacheKernl](docs/SINGLE_CACHE_KERNL)
+- [AssociativeCacheKernl](docs/ASSOCIATIVE_MEMORY_CACHE_KERNLmd)
 - [DataResult](docs/DATA_RESULT.md)

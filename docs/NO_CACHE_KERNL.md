@@ -1,4 +1,4 @@
-# `NoCacheRepository<TParams: Any, TData: Any>`
+# `NoCacheKernl<TParams: Any, TData: Any>`
 Repository that does not cache values. Every call to fetch data will result in a fresh data retrieval operation.
 
 ### `suspend fun fetch(params: TParams): TData`

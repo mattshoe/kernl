@@ -1,4 +1,4 @@
-# `SingleCacheLiveRepository<TParams: Any, TData: Any>`
+# `SingleCacheKernl<TParams: Any, TData: Any>`
 Repository that holds a single cached value in memory. <br>
 Any updates to the cached value are broadcast immediately to all listeners.
 

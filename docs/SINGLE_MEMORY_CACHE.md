@@ -15,7 +15,7 @@ The generated repository exposes methods to `refresh` and `invalidate` the data 
 This will be the name of the generated repository. This value is not optional.
 
 ## Generated Repository
-Your generated repository will always be an implementation of the [SingleCacheLiveRepository](SINGLE_CACHE_LIVE_REPOSITORY.md) interface.
+Your generated repository will always be an implementation of the [SingleCacheKernl](SINGLE_CACHE_KERNL) interface.
 
 Let's imagine you have a Retrofit service such as the following:
 

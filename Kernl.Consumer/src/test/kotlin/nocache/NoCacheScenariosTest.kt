@@ -13,9 +13,8 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 abstract class NoCacheScenariosTest<TParams: Any, TResponse: Any> {
     lateinit var subject: NoCacheKernl<TParams, TResponse>
 
-    protected abstract fun repository(): NoCacheKernl<TParams, TResponse>
-
     protected abstract val testData: Map<TParams, TResponse>
+    protected abstract fun repository(): NoCacheKernl<TParams, TResponse>
 
     @Before
     fun setUp() {
@@ -28,6 +27,5 @@ abstract class NoCacheScenariosTest<TParams: Any, TResponse: Any> {
             val actualResponse = subject.fetch(params)
             Truth.assertThat(actualResponse).isEqualTo(DataResult.Success(response))
         }
-
     }
 }

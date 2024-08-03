@@ -7,13 +7,13 @@ Every call to fetch data will result in a fresh data retrieval operation.
 This will be the name of the generated repository. This value is not optional.
 
 ## Generated Repository
-Your generated repository will always be an implementation of the [NoCacheRepository](NO_CACHE_REPOSITORY.md) interface.
+Your generated repository will always be an implementation of the [NoCacheKernl](NO_CACHE_KERNL) interface.
 
 Let's imagine you have a Retrofit service such as the following:
 
 ```kotlin
 interface MyService {
-    @Kernl.NoCache("MyNoCacheRepository")
+    @Kernl.NoCache("MyNoCacheKernl")
     @GET("foo/{id}/{someParam}")
     suspend fun getMyResponse(
         @Path("id") id: String,
@@ -29,10 +29,10 @@ is created every time you invoke the `Factory` method.
 
 ```kotlin
 // Option 1: Pass your Service impl's function pointer to the Factory method
-val myRepo = MyNoCacheRepository.Factory(service::getMyResponse)
+val myRepo = MyNoCacheKernl.Factory(service::getMyResponse)
 
 // Option 2: Pass a lambda to the factory
-val myRepo = MyNoCacheRepository.Factory { id, someParam, otherParam ->
+val myRepo = MyNoCacheKernl.Factory { id, someParam, otherParam ->
     service.getMyResponse(id, someParam, otherParam)
 }
 ```
@@ -46,10 +46,10 @@ the pattern should be similar for any dependency injection framework
 interface MyServiceModule {
     companion object {
         @Provides
-        fun provideMyNoCacheRepository(
+        fun provideMyNoCacheKernl(
             service: MyService
-        ): MyNoCacheRepository {
-            return MyNoCacheRepository.Factory(service::getMyResponse)
+        ): MyNoCacheKernl {
+            return MyNoCacheKernl.Factory(service::getMyResponse)
         }
     }
 }
@@ -61,7 +61,7 @@ The `Kernl` library is in no way tied to the Android SDK.
 
 ```kotlin
 class MyViewModel @Inject constructor(
-    private val myNoCacheRepository: MyNoCacheRepository
+    private val myNoCacheKernl: MyNoCacheKernl
 ): ViewModel() {
     private val _state = MutableStateFlow<YourState>(YourState.Loading)
     val state: StateFlow<YourState> = _state
@@ -77,8 +77,8 @@ class MyViewModel @Inject constructor(
     fun loadData(id: String, someParam: Int, otherParam: Boolean) {
         viewModelScope.launch {
             try {
-                val result = myNoCacheRepository.fetch(
-                    MyNoCacheRepository.Params(id, someParam, otherParam)
+                val result = myNoCacheKernl.fetch(
+                    MyNoCacheKernl.Params(id, someParam, otherParam)
                 )
                 _state.udpate { YourState.Success(result.data) }
             } catch (e: Throwable) {

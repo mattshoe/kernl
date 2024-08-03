@@ -1,4 +1,4 @@
-# `AssociativeCacheLiveRepository<TParams: Any, TData: Any>`
+# `AssociativeCacheKernl<TParams: Any, TData: Any>`
 Repository that holds multiple cached values in memory, each associated with a unique set of parameters.
 Any updates to the cached values are broadcast immediately to all listeners.
 

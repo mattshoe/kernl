@@ -8,7 +8,7 @@ import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
 import kotlin.reflect.KClass
 
-fun <TParams: Any, TData: Any> noCacheRepository(
+fun <TParams: Any, TData: Any> NoCacheKernl(
     fetchData: suspend (TParams) -> TData
 ): NoCacheKernl<TParams, TData> {
     return object : BaseNoCacheKernl<TParams, TData>() {
@@ -16,7 +16,7 @@ fun <TParams: Any, TData: Any> noCacheRepository(
     }
 }
 
-fun <TParams: Any, TData: Any> singleCacheLiveRepository(
+fun <TParams: Any, TData: Any> SingleCacheKernl(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
 ): SingleCacheKernl<TParams, TData> {
