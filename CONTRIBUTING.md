@@ -47,14 +47,7 @@ This section guides you through submitting an enhancement suggestion for Kernl, 
 - **Provide specific examples for the problem the enhancement solves, or the advantage it provides**.
 - **Describe the current behavior** and **explain how the enhancement improves this**.
 
-### Pull Requests
-
-The process described here has several goals:
-- Maintain Kernl quality
-- Fix problems that are important to users
-- Engage the community in working toward the best possible Kernl
-- Enable a sustainable system for Kernl maintainers to review contributions
-
+## Pull Requests
 Please follow these steps to have your contribution considered by the maintainers:
 
 1. **Fork the repository** and create a `feature/XXX` branch from `develop`.
@@ -62,7 +55,9 @@ Please follow these steps to have your contribution considered by the maintainer
 3. **If you've changed APIs**, update the documentation.
    - This includes README, KDocs, and any other associated documentation.
 4. **Ensure the test suite passes**.
-5. **Submit a pull request**.
+5. **Open a pull request**.
+6. **Tag the Title** with the [Issue](https://github.com/mattshoe/kernl/issues)# the PR is associated with
+   - PRs should usually be associated with a [task board](https://github.com/users/mattshoe/projects/2) issue
 
 ## Style Guide
 
