@@ -1,6 +1,6 @@
 # Contributing to Kernl
 
-First off, thanks for taking the time to contribute! 🎉
+First off, thanks for taking the time to contribute!
 
 The following is a set of guidelines for contributing to Kernl, a library to simplify KSP development. 
 These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in
