@@ -206,9 +206,9 @@ class UserRepository(
 - [`@Kernl.AssociativeCache.InMemory`](docs/annotations/ASSOCIATIVE_MEMORY_CACHE.md)
 
 ### Kernl
-- [`NoCacheKernl`](docs/Kernl/NO_CACHE_KERNL.md)
-- [`SingleCacheKernl`](docs/Kernl/SINGLE_CACHE_KERNL.md)
-- [`AssociativeCacheKernl`](docs/Kernl/ASSOCIATIVE_MEMORY_CACHE_KERNLmd)
+- [`NoCacheKernl`](docs/kernl/NO_CACHE_KERNL.md)
+- [`SingleCacheKernl`](docs/kernl/SINGLE_CACHE_KERNL.md)
+- [`AssociativeCacheKernl`](docs/kernl/ASSOCIATIVE_MEMORY_CACHE_KERNLmd)
 - [`DataResult`](docs/DATA_RESULT.md)
 - [`ValidDataResult`](docs/VALID_DATA_RESULT.md)
 - [`ErrorDataResult`](docs/ERROR_DATA_RESULT.md)
