@@ -196,8 +196,6 @@ class UserRepository(
 }
 ```
 
-
-
 # API Documentation 
 
 ### Annotations
@@ -229,3 +227,10 @@ class UserRepository(
 - [`onError { ... }`](docs/extensions/ON_ERROR.md)
 - [`onInvalidation { ... }`](docs/extensions/ON_INVALIDATION.md)
 - [`cacheDataResult { ... }`](docs/extensions/CATCH_DATA_RESULT.md)
+
+# Contributing
+Contributors are absolutely welcome! This is a relatively ambitious project, so the help is always greatly appreciated. 
+Bonus points if you have domain expertise in caching in general, or serialization methods such as KotlinX, ProtoBuf,
+Gson, Moshi, etc, etc. Expertise is not a requirement by any means though!
+
+See our [Contributing](CONTRIBUTING.md) documentation for how to get started!
