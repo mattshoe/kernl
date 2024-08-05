@@ -41,16 +41,15 @@ interface UserDataService {
 ```
 
 ### 3. (Optional) Create Your Own [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
+Refer to [`KernlPolicy`](docs/kernl/KERNL_POLICY.md) for further customization options
 ```kotlin
 class UserDataKernlPolicy: KernlPolicy, Disposable {
+    override val timeToLive = 25.minutes
+    override val cacheStrategy = CacheStrategy.DiskFirst
+    override val invalidationStrategy = InvalidationStrategy.LazyRefresh
+    
     // You could use this to expose public triggers to affect Kernls en-masse
     override val events = MutableSharedFlow<KernlEvenet>()
-    // Data is only valid for 25 minutes
-    override val timeToLive = 25.minutes
-    // Load data from disk first, then fall back to network
-    override val cacheStrategy = CacheStrategy.DiskFirst
-    // Pre-emptively refresh data when it is about to expire
-    override val invalidationStrategy = InvalidationStrategy.Preemptive(leadTime = 30.seconds, retries = 3)
 }
 ```
 
