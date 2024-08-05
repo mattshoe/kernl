@@ -4,6 +4,8 @@ Defines the policy for managing the lifecycle and behavior of cached data in a K
 
 Implementing this interface allows you to customize how data is cached, invalidated, and refreshed.
 
+See [DefaultKernlPolicy](DEFAULT_KERNL_POLICY.md) for details on default values.
+
 ## Properties
 
 ### `val timeToLive: Duration`
