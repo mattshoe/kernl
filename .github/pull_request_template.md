@@ -11,19 +11,20 @@ Example: "[#123] Add new feature to bar the foo"
 <!-- Briefly describe the changes introduced by this PR -->
 
 ## Checklist
+<!-- Replace [ ] with [x] to indicate completion -->
 
 - **I have added tests to cover any code changes**
-  - [:x:] Unit Tests
-  - [:x:] Consumer Tests (Integration tests in the Kernl.Consumer module)
-  - [:x:] Compilation Tests (Integration tests in the Kernl.Processor module for any KSP updates)
+  - [ ] Unit Tests
+  - [ ] Consumer Tests (Integration tests in the Kernl.Consumer module)
+  - [ ] Compilation Tests (Integration tests in the Kernl.Processor module for any KSP updates)
 - **I have added new documentation for all new code and updated existing documentation:**
-  - [:x:] KDocs
-  - [:x:] README.md
-  - [:x:] docs/*.md
+  - [ ] KDocs
+  - [ ] README.md
+  - [ ] docs/*.md
 - **I have updated all existing  documentation to reflect any changes:**
-  - [:x:] KDocs
-  - [:x:] README.md
-  - [:x:] docs/*.md
+  - [ ] KDocs
+  - [ ] README.md
+  - [ ] docs/*.md
 
 ## Additional Context
 <!-- Add any other context or screenshots about the PR -->
