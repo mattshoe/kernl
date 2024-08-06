@@ -20,7 +20,7 @@ class TestKernlPolicy: KernlPolicy {
     override val cacheStrategy: CacheStrategy
         get() = _cacheStrategy
 
-    private var _invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction
+    private var _invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction()
     override val invalidationStrategy: InvalidationStrategy
         get() = _invalidationStrategy
 
