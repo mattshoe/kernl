@@ -4,11 +4,14 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
+import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val kernlPolicy: KernlPolicy = DefaultKernlPolicy
 ): SingleCacheKernl<TParams, TData> {
     private val dataSource by lazy {
         DataSource.Builder
