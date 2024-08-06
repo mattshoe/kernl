@@ -3,10 +3,11 @@ package associativememorycache
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -75,7 +76,11 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
                 Truth.assertThat(fetchInvocations).hasSize(1)
                 Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
 
+                advanceUntilIdle()
+
                 Kernl.globalEvent(KernlEvent.Invalidate())
+
+                advanceUntilIdle()
 
                 Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
                 Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()

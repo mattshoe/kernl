@@ -4,12 +4,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlPolicy
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.inmemory.BaseAssociativeCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory.BaseAssociativeCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.BaseNoCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory.BaseSingleCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import kotlin.reflect.KClass
 
 fun <TParams: Any, TData: Any> NoCacheKernl(

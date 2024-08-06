@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory
+package org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory
 
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
@@ -13,6 +13,13 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val kernlPolicy: KernlPolicy = DefaultKernlPolicy
 ): SingleCacheKernl<TParams, TData> {
+    private val coroutineScope by lazy {
+        CoroutineScope(
+    SupervisorJob()
+            + dispatcher
+            + CoroutineName(this::class.qualifiedName.toString())
+        )
+    } 
     private val dataSource by lazy {
         DataSource.Builder
             .memoryCache(dataType)
@@ -45,5 +52,9 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
         withContext(dispatcher) {
             dataSource.invalidate()
         }
+    }
+
+    override fun close() {
+        coroutineScope.cancel()
     }
 }
