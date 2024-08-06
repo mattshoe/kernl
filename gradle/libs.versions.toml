@@ -1,5 +1,5 @@
 [versions]
-ksp = "2.0.0-1.0.21"
+ksp = "2.0.10-RC2-1.0.24"
 kotlinxCoroutines = "1.9.0-RC"
 junit = "4.13.2"
 truth = "1.4.2"

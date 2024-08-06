@@ -1,7 +1,7 @@
 import org.apache.tools.ant.taskdefs.Java
 
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.0.10-RC2"
     id("maven-publish")
     signing
 }
