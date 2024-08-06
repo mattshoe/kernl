@@ -296,46 +296,68 @@ class BaseAssociativeCacheKernlTest {
 
     @Test
     fun `WHEN global Kernl invalidateAll() is invoked THEN all listeners receive emission`() = runTest(dispatcher) {
+        println("Global Invalidate Test Started")
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
+            println("awaiting turbine1 - pre_invalidate")
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             val turbine2 = subject.stream(43).testIn(backgroundScope)
+            println("awaiting turbine2 - pre_invalidate")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
+            println("awaiting turbine3 - pre_invalidate")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
+            println("asserting emission values")
             assertEmissionValues(42, 43, 44)
 
+            println("posting Invalidation globally")
             Kernl.globalEvent(KernlEvent.Invalidate())
 
+            println("awaiting Item for turbine1")
             Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
+            println("awaiting Item for turbine2")
             Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
+            println("awaiting Item for turbine3")
             Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
             advanceUntilIdle()
+            println("asserting final emission values")
             assertEmissionValues(42, 43, 44)
         }
+        println("Test Fin")
     }
 
     @Test
     fun `WHEN global Kernl invalidate(params) is invoked THEN relevant listeners receive emission`() = runTest(dispatcher) {
+        println("Global Parameterized Invalidated Test Started")
         turbineScope {
+            println("awaiting turbine1 - pre_invalidate")
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
+            println("awaiting turbine2 - pre_invalidate")
             val turbine2 = subject.stream(43).testIn(backgroundScope)
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
+            println("awaiting turbine3 - pre_invalidate")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
+            println("asserting emission values")
             assertEmissionValues(42, 43, 44)
 
+            println("posting Invalidation for: 42")
             Kernl.globalEvent(KernlEvent.Invalidate(42))
 
+            println("awaiting Item for turbine1")
             Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
             advanceUntilIdle()
+            println("expecting on events turbine2")
             turbine2.expectNoEvents()
+            println("expecting on events turbine3")
             turbine3.expectNoEvents()
+            println("asserting finall emissions")
             assertEmissionValues(42, 43, 44)
         }
+        println("Test Fin")
     }
 
     @Test
