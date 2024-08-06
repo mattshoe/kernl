@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache
+package org.mattshoe.shoebox.kernl.runtime.cache.associativecache
 
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-//package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.disk
+//package org.mattshoe.shoebox.kernl.runtime.cache.associativecache.disk
 //
 //import kotlinx.coroutines.CoroutineDispatcher
 //import kotlinx.coroutines.Dispatchers

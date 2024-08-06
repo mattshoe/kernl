@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.disk
+package org.mattshoe.shoebox.kernl.runtime.cache.associativecache.disk
 
 interface DiskCache<T> {
     suspend fun put(key: String, value: T)
