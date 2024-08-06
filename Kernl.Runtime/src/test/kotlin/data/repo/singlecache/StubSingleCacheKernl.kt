@@ -1,6 +1,6 @@
 package data.repo.singlecache
 
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory.BaseSingleCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 
 class StubSingleCacheKernl(

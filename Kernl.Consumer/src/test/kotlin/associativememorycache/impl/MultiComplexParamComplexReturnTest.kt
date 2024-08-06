@@ -1,7 +1,7 @@
 package associativememorycache.impl
 
 import associativememorycache.AssociativeMemoryCacheScenariosTest
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
 import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiComplexParamComplexReturn

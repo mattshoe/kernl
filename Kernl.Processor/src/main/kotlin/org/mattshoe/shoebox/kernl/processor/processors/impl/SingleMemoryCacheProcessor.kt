@@ -7,7 +7,7 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import org.mattshoe.shoebox.kernl.annotations.Kernl
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.singlecache.inmemory.BaseSingleCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import org.mattshoe.shoebox.util.className

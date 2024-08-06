@@ -1,7 +1,7 @@
 package kernl.data.repo.associativecache
 
 import kernl.data.TestKernlPolicy
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.inmemory.BaseAssociativeCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory.BaseAssociativeCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 import org.mattshoe.shoebox.kernl.KernlPolicy
 import kotlin.reflect.KClass

@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.inmemory
+package org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -12,7 +12,7 @@ import org.mattshoe.shoebox.kernl.KernlEvent
 import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.repo.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import kotlin.reflect.KClass
 
 abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
