@@ -253,8 +253,8 @@ class BaseAssociativeCacheKernlTest {
     }
 
     @Test
-    fun `WHEN different data is fetched, THEN other listener is not affected by invalidations`() = runTest(dispatcher, timeout = Duration.INFINITE) {
-        turbineScope(timeout = Duration.INFINITE) {
+    fun `WHEN different data is fetched, THEN other listener is not affected by invalidations`() = runTest(dispatcher) {
+        turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
 
