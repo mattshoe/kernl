@@ -1,28 +1,41 @@
 package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 
 class EagerRefreshInvalidationTracker(
-    private val strategy: InvalidationStrategy.EagerRefresh
-): BaseInvalidationTracker() {
+    private val strategy: InvalidationStrategy.EagerRefresh,
+    stopwatch: Stopwatch
+): BaseInvalidationTracker(stopwatch) {
 
-    override val _invalidationStream = MutableSharedFlow<Unit>()
+    private val manualRefreshStream = MutableSharedFlow<Unit>()
 
-    override val _refreshStream: Flow<Unit>
-        get() = _invalidationStream // Instead of posting invalidations, post refreshes when an invalidation should occur
+    override val invalidationStream = MutableSharedFlow<Unit>()
+
+    override val refreshStream: Flow<Unit>
+        get() = channelFlow {
+            timeToLive.events
+                .onEach {
+                    send(it)
+                }.launchIn(this)
+            manualRefreshStream
+                .onEach {
+                    send(it)
+                }.launchIn(this)
+        }
 
     override suspend fun shouldForceFetch(currentState: DataResult<*>?): Boolean  = false
 
     override suspend fun onDataChanged() {
-        timeToLiveFlow.reset(strategy.timeToLive)
+        resetTimeToLive(strategy.timeToLive)
     }
 
     override suspend fun onInvalidated() {
-        timeToLiveFlow.reset(strategy.timeToLive)
+//        manualRefreshStream.emit(Unit)
     }
 
 }
