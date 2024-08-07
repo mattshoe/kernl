@@ -30,8 +30,7 @@ sealed interface InvalidationStrategy {
      * @property retries The number of times the retrieval should be retried upon invalidation in the case of failure.
      */
     data class LazyRefresh(
-        override val timeToLive: Duration = Duration.INFINITE,
-        val retries: Int = 0
+        override val timeToLive: Duration = Duration.INFINITE
     ): InvalidationStrategy
 
     /**
@@ -44,8 +43,7 @@ sealed interface InvalidationStrategy {
      * @property retries The number of times the retrieval should be retried upon invalidation in the case of failure.
      */
     data class EagerRefresh(
-        override val timeToLive: Duration = Duration.INFINITE,
-        val retries: Int = 0
+        override val timeToLive: Duration = Duration.INFINITE
     ): InvalidationStrategy
 
     /**
@@ -61,7 +59,6 @@ sealed interface InvalidationStrategy {
      */
     data class PreemptiveRefresh(
         override val timeToLive: Duration = Duration.INFINITE,
-        val leadTime: Duration,
-        val retries: Int = 0
+        val leadTime: Duration
     ): InvalidationStrategy
 }

@@ -10,17 +10,15 @@ import kotlin.time.Duration
  * Implementing this interface allows you to customize how data is cached, invalidated, and refreshed.
  */
 interface KernlPolicy {
+
     /**
-     * The duration for which the cached data remains valid.
-     * After this duration, the data is considered stale and will be invalidated until it is refreshed.
+     * The strategy to employ when a data retrieval operation fails.
      *
-     * This value is used to determine the TTL (Time-To-Live) of the cache entries.
-     * For example, if the TTL is set to 5 minutes, the data will be considered valid for 5 minutes
-     * from the time it was cached.
-     *
-     * @return The duration for which the cached data is considered valid.
+     * Allows you to define how many attempts to make for each failure, along with the amount of time between
+     * subsequent requests.
      */
-    val timeToLive: Duration
+    val retryStrategy: RetryStrategy?
+
     /**
      * A flow of events that affect the cache, such as invalidation and refresh events.
      * This flow can be used to listen for, react to, and trigger changes in the cache state.

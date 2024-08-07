@@ -1,20 +1,15 @@
 package kernl.data
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import org.mattshoe.shoebox.kernl.CacheStrategy
-import org.mattshoe.shoebox.kernl.InvalidationStrategy
-import org.mattshoe.shoebox.kernl.KernlEvent
-import org.mattshoe.shoebox.kernl.KernlPolicy
-import kotlin.time.Duration
+import org.mattshoe.shoebox.kernl.*
 
 class TestKernlPolicy: KernlPolicy {
     private val _events = MutableSharedFlow<KernlEvent>()
     override val events = _events
 
-    private var _timeToLive = Duration.INFINITE
-    override val timeToLive
-        get() = _timeToLive
+    private var _retryStrategy: RetryStrategy? = null
+    override val retryStrategy: RetryStrategy?
+        get() = _retryStrategy
 
     private var _cacheStrategy: CacheStrategy = CacheStrategy.NetworkFirst
     override val cacheStrategy: CacheStrategy
@@ -24,8 +19,8 @@ class TestKernlPolicy: KernlPolicy {
     override val invalidationStrategy: InvalidationStrategy
         get() = _invalidationStrategy
 
-    fun setTimeToLive(duration: Duration) {
-        _timeToLive = duration
+    fun setRetryStrategy(strategy: RetryStrategy) {
+        _retryStrategy = strategy
     }
 
     fun setCacheStrategy(cacheStrategy: CacheStrategy) {
@@ -35,6 +30,7 @@ class TestKernlPolicy: KernlPolicy {
     fun setInvalidationStrategy(invalidationStrategy: InvalidationStrategy) {
         _invalidationStrategy = invalidationStrategy
     }
+
 
     suspend fun event(event: KernlEvent) {
         _events.emit(event)
