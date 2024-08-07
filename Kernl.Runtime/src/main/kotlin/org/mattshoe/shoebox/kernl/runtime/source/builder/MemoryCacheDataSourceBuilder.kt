@@ -11,6 +11,9 @@ class MemoryCacheDataSourceBuilder<T: Any>(
     clazz
 ) {
     override fun build(): DataSource<T> {
-        return MemoryCachedDataSource(dispatcher ?: Dispatchers.IO)
+        return MemoryCachedDataSource(
+            dispatcher = dispatcher ?: Dispatchers.IO,
+            retryStrategy = retryStrategy
+        )
     }
 }

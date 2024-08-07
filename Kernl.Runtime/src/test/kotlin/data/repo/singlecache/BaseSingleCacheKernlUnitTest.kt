@@ -42,6 +42,7 @@ class BaseSingleCacheKernlUnitTest {
         every { DataSource.Builder } returns datasourceBuilderRequest
         every { datasourceBuilderRequest.memoryCache(String::class) } returns memoryCachedDataSourceBuilderRequest
         every { memoryCachedDataSourceBuilderRequest.dispatcher(any()) } returns memoryCachedDataSourceBuilderRequest
+        every { memoryCachedDataSourceBuilderRequest.retryStrategy(any()) } returns memoryCachedDataSourceBuilderRequest
         every { memoryCachedDataSourceBuilderRequest.build() } returns mockDataSource
     }
 

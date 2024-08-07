@@ -359,7 +359,7 @@ class BaseSingleCacheKernlIntegrationTest {
             eventStream.emit(KernlEvent.Invalidate(43))
             advanceUntilIdle()
             expectNoEvents()
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -419,6 +419,75 @@ class BaseSingleCacheKernlIntegrationTest {
         }
     }
 
+    @Test
+    fun `WHEN kernl policy has no retry strategy THEN no retry is attempted`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val attempts = mutableListOf<Int>()
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.operation = { param ->
+            attempts.add(param)
+            throw RuntimeException()
+        }
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem() is DataResult.Error).isTrue()
+            advanceUntilIdle()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream,
+            retryStrategy = ExponentialBackoff()
+        )
+        val attempts = mutableListOf<Int>()
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.operation = { param ->
+            if (attempts.isEmpty()) {
+                attempts.add(param)
+                throw RuntimeException()
+            } else {
+                attempts.add(param)
+                param.toString()
+            }
+        }
+        subject.data.test {
+            subject.fetch(42)
+            advanceUntilIdle()
+            Truth.assertThat(awaitItem() is Success).isTrue()
+            Truth.assertThat(attempts.size).isEqualTo(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream,
+            retryStrategy = ExponentialBackoff()
+        )
+        val attempts = mutableListOf<Int>()
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.operation = { param ->
+            attempts.add(param)
+            throw RuntimeException()
+        }
+        subject.data.test {
+            subject.fetch(42)
+            advanceUntilIdle()
+            Truth.assertThat(awaitItem() is Error).isTrue()
+            Truth.assertThat(attempts.size).isEqualTo(3)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
         return StubSingleCacheKernl(
