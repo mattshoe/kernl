@@ -2,8 +2,7 @@ package org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
-import org.mattshoe.shoebox.kernl.KernlPolicy
+import org.mattshoe.shoebox.kernl.*
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
@@ -11,6 +10,7 @@ import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidatio
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
@@ -19,6 +19,7 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     private val stopwatch: Stopwatch = MonotonicStopwatch(),
     private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(stopwatch)
 ): SingleCacheKernl<TParams, TData> {
+    private val lastParams = AtomicReference<TParams>()
     private val coroutineScope by lazy {
         CoroutineScope(
             SupervisorJob()
@@ -32,8 +33,8 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
             .dispatcher(dispatcher)
             .build()
     }
+
     private val invalidationTracker = invalidationTrackerFactory.getTracker(kernlPolicy.invalidationStrategy)
-    private data class Initializer(val invalidation: Boolean)
 
     protected abstract val dataType: KClass<TData>
 
@@ -41,14 +42,22 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
         get() = dataSource.data
 
     init {
+        if (kernlPolicy.events !is GlobalKernlEventStream) {
+            Kernl.events
+                .onEach {
+                    handleKernlEvent(it)
+                }.launchIn(coroutineScope)
+        }
+        kernlPolicy.events
+            .onEach {
+                handleKernlEvent(it)
+            }.launchIn(coroutineScope)
         invalidationTracker.invalidationStream
             .onEach {
-                println("BaseSingleCacheKernl: invalidationStream emission")
                 invalidate()
             }.launchIn(coroutineScope)
         invalidationTracker.refreshStream
             .onEach {
-                println("BaseSingleCacheKernl: refreshStream emission")
                 refresh()
             }.launchIn(coroutineScope)
     }
@@ -57,11 +66,10 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
 
     override suspend fun fetch(params: TParams, forceRefresh: Boolean) {
         withContext(dispatcher) {
-            println("BaseSingleCacheKernl: Fetching data")
             val shouldForceFetch = forceRefresh || invalidationTracker.shouldForceFetch(dataSource.value)
             dataSource.initialize(forceFetch = shouldForceFetch) {
                 fetchData(params).also {
-                    println("BaseSingleCacheKernl: Data fetched, invoking onDataChanged")
+                    lastParams.set(params)
                     invalidationTracker.onDataChanged()
                 }
             }
@@ -86,5 +94,31 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
 
     override fun close() {
         coroutineScope.cancel()
+    }
+
+    private suspend fun handleKernlEvent(event: KernlEvent) {
+        when (event) {
+            is KernlEvent.Invalidate -> handleGlobalInvalidate(event.params)
+            is KernlEvent.Refresh -> handleGlobalRefresh(event.params)
+        }
+    }
+
+    private suspend fun handleGlobalInvalidate(eventParams: Any?) {
+        handleKernlEvent(eventParams) {
+            invalidate()
+        }
+    }
+
+    private suspend fun handleGlobalRefresh(eventParams: Any?) {
+        handleKernlEvent(eventParams) {
+            refresh()
+        }
+    }
+
+    private suspend fun handleKernlEvent(eventParams: Any?, action: suspend (TParams?) -> Unit) {
+        when (eventParams) {
+            null -> action(null)
+            lastParams.get() -> action(eventParams as? TParams)
+        }
     }
 }
