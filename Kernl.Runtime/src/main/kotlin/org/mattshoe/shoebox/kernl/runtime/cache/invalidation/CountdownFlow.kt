@@ -7,13 +7,8 @@ import kotlin.time.Duration
 @OptIn(ExperimentalCoroutinesApi::class)
 class CountdownFlow {
     private val intervalFlow = MutableSharedFlow<Duration>(replay = 1)
-    private val initialized = CompletableDeferred<Unit>()
 
     val events: Flow<Unit> = intervalFlow
-        .onStart {
-            println("TimerFlow.timer onStart invoked")
-            initialized.complete(Unit)
-        }
         .flatMapLatest { interval ->
             flow {
                 println("TimerFlow: Delaying ${interval.inWholeMilliseconds}ms")
@@ -24,7 +19,6 @@ class CountdownFlow {
         }
 
     suspend fun reset(newInterval: Duration) {
-        initialized.await()
         println("TimerFlow: Resetting interval to ${newInterval.inWholeMilliseconds}ms")
         intervalFlow.emit(newInterval)
     }

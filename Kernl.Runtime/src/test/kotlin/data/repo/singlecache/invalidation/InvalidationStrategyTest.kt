@@ -14,6 +14,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
 abstract class InvalidationStrategyTest {
@@ -29,7 +31,8 @@ abstract class InvalidationStrategyTest {
     
     protected abstract fun makeSubject(
         dispatcher: CoroutineDispatcher,
-        invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction()
+        invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(),
+        stopwatch: Stopwatch = MonotonicStopwatch()
     ): StubSingleCacheKernl
 
     @Test

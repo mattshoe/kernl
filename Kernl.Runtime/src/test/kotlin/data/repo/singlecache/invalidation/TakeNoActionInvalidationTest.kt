@@ -3,6 +3,7 @@ package data.repo.singlecache.invalidation
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import data.repo.singlecache.StubSingleCacheKernl
+import data.repo.singlecache.TestStopwatch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
@@ -11,6 +12,7 @@ import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.KernlPolicyDefaults
 import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
@@ -21,13 +23,15 @@ class TakeNoActionInvalidationTest: InvalidationStrategyTest() {
 
     override fun makeSubject(
         dispatcher: CoroutineDispatcher,
-        invalidationStrategy: InvalidationStrategy
+        invalidationStrategy: InvalidationStrategy,
+        stopwatch: Stopwatch
     ): StubSingleCacheKernl {
         return StubSingleCacheKernl(
             dispatcher,
             KernlPolicyDefaults.copy(
                 invalidationStrategy = invalidationStrategy
-            )
+            ),
+            stopwatch
         )
     }
 
@@ -35,7 +39,8 @@ class TakeNoActionInvalidationTest: InvalidationStrategyTest() {
     fun `WHEN timeToLive expires THEN data is invalidated`() = runTest(standardTestDispatcher) {
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.TakeNoAction(1000.milliseconds),
-            dispatcher = coroutineContext[CoroutineDispatcher]!!
+            dispatcher = coroutineContext[CoroutineDispatcher]!!,
+            stopwatch = TestStopwatch(testScheduler)
         )
 
         subject.data.test {

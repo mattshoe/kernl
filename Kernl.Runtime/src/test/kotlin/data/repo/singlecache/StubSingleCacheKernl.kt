@@ -1,16 +1,20 @@
 package data.repo.singlecache
 
-import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlPolicy
+import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 
 class StubSingleCacheKernl(
     dispatcher: CoroutineDispatcher,
-    kernlPolicy: KernlPolicy = DefaultKernlPolicy
+    kernlPolicy: KernlPolicy = DefaultKernlPolicy,
+    stopwatch: Stopwatch = MonotonicStopwatch()
 ): BaseSingleCacheKernl<Int, String>(
     dispatcher,
-    kernlPolicy
+    kernlPolicy,
+    stopwatch
 ) {
     override val dataType = String::class
     var operation: suspend (Int) -> String = { it.toString() }
@@ -20,3 +24,4 @@ class StubSingleCacheKernl(
     }
 
 }
+

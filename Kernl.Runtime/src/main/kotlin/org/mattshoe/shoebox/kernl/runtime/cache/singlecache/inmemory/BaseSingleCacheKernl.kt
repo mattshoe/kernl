@@ -9,12 +9,15 @@ import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactory
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val kernlPolicy: KernlPolicy = DefaultKernlPolicy,
-    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl()
+    private val stopwatch: Stopwatch = MonotonicStopwatch(),
+    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(stopwatch)
 ): SingleCacheKernl<TParams, TData> {
     private val coroutineScope by lazy {
         CoroutineScope(
