@@ -61,10 +61,8 @@ internal open class MemoryCachedDataSource<T: Any>(
                 _data.emit(dataResult)
                 value = dataResult
             } catch (e: CancellationException) {
-                println("Cancelled!!! $e")
                 throw e
             } catch (e: Throwable) {
-                println("DS error: $e")
                 val dataResult = DataResult.Error<T>(e)
                 _data.emit(dataResult)
                 value = dataResult
