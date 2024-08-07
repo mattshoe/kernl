@@ -10,8 +10,9 @@ class TakeNoActionInvalidationTracker(
 
     override suspend fun shouldForceFetch(currentState: DataResult<*>?) = false
 
-    override suspend fun onDataChanged() = timeToLiveFlow.reset(strategy.timeToLive)
+    override suspend fun onDataChanged() {
+        resetTimeToLive(strategy.timeToLive)
+    }
 
     override suspend fun onInvalidated() { }
-
 }

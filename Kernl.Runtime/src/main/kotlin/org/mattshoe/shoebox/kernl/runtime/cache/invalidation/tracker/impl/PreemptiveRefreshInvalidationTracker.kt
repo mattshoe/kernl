@@ -6,31 +6,31 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.TimerFlow
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PreemptiveRefreshInvalidationTracker(
     private val strategy: InvalidationStrategy.PreemptiveRefresh
 ): BaseInvalidationTracker() {
-    private val preemptiveTimer = TimerFlow()
+    private val preemptiveTimer = CountdownFlow()
 
     override val _invalidationStream = MutableSharedFlow<Unit>()
 
     override val _refreshStream: Flow<Unit> = super._refreshStream
         .flatMapLatest {
-            preemptiveTimer.timer
+            preemptiveTimer.events
         }
 
     override suspend fun shouldForceFetch(currentState: DataResult<*>?): Boolean  = false
 
     override suspend fun onDataChanged() {
-        timeToLiveFlow.reset(strategy.timeToLive)
+        resetTimeToLive(strategy.timeToLive)
         preemptiveTimer.reset(strategy.timeToLive.minus(strategy.leadTime))
     }
 
     override suspend fun onInvalidated() {
-        timeToLiveFlow.reset(strategy.timeToLive)
+        timeToLive.reset(strategy.timeToLive)
     }
 
 }

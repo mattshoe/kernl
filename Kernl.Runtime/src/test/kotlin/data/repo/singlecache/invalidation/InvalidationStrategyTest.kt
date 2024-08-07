@@ -15,7 +15,7 @@ import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
 abstract class InvalidationStrategyTest {
     protected val unconfinedTestDispatcher = UnconfinedTestDispatcher()
     protected val standardTestDispatcher = StandardTestDispatcher()
@@ -27,14 +27,14 @@ abstract class InvalidationStrategyTest {
         clearAllMocks()
     }
     
-    protected abstract fun TestScope.makeSubject(
-        dispatcher: CoroutineDispatcher? = null,
+    protected abstract fun makeSubject(
+        dispatcher: CoroutineDispatcher,
         invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction()
     ): StubSingleCacheKernl
 
     @Test
     fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.data.test {
             subject.fetch(42)
 
@@ -44,7 +44,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN dataRetrieval fails THEN error is emitted`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.data.test {
             val expectedValue = RuntimeException("oops")
             subject.operation = {
@@ -60,7 +60,7 @@ abstract class InvalidationStrategyTest {
     @Test
     fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() =
         runTest(unconfinedTestDispatcher) {
-            val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+            val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
             subject.data.test {
                 subject.fetch(42)
                 advanceUntilIdle()
@@ -76,7 +76,7 @@ abstract class InvalidationStrategyTest {
     @Test
     fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() =
         runTest(standardTestDispatcher) {
-            val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+            val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
 
             subject.data.test {
                 subject.operation = {
@@ -106,7 +106,7 @@ abstract class InvalidationStrategyTest {
     fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() =
         runTest(standardTestDispatcher) {
             var counter = 0
-            val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+            val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
 
             subject.data.test {
                 subject.operation = {
@@ -136,7 +136,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN refresh is invoked THEN new item is emitted`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         var counter = 0
         subject.data.test {
             subject.operation = {
@@ -154,7 +154,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN multiple listeners THEN all receive updates`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
             val turbine2 = subject.data.testIn(backgroundScope)
@@ -176,7 +176,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
 
@@ -193,12 +193,12 @@ abstract class InvalidationStrategyTest {
 
     @Test(expected = IllegalStateException::class)
     fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runTest {
-        makeSubject(invalidationStrategy = invalidationStrategy).refresh()
+        makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!).refresh()
     }
 
     @Test
     fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.invalidate()
         subject.data.test {
             Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
@@ -207,7 +207,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest {
-        val subject = makeSubject(invalidationStrategy = invalidationStrategy)
+        val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.data.test {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(DataResult.Success("42"))
