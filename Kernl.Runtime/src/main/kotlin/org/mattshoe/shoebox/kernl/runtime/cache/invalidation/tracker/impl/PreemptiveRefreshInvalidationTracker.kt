@@ -8,37 +8,50 @@ import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidatio
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PreemptiveRefreshInvalidationTracker(
     private val strategy: InvalidationStrategy.PreemptiveRefresh,
     stopwatch: Stopwatch
 ): BaseInvalidationTracker(stopwatch) {
-    private val preemptiveTimer = CountdownFlow()
+    private val preemptiveCountdown = CountdownFlow("PreemptiveCountdown")
+    private val manualRefreshStream = MutableSharedFlow<Unit>()
 
     override val _invalidationStream = MutableSharedFlow<Unit>()
 
-    override val _refreshStream: Flow<Unit> = super._refreshStream
-        .onStart {
-            println("refresh stream started")
-        }
-        .flatMapLatest {
-            println("flatmapping preemptive timer")
-            channelFlow {
-                println("collecting preemptiveTimer")
-                preemptiveTimer.events.collect {
-                    println("preemptiveTimer emission")
+    override val refreshStream: Flow<Unit> =
+        channelFlow {
+            _invalidationStream
+                .onEach {
+                    println("invalidation forwarded to refresh!")
                     send(it)
-                }
-            }
+                }.launchIn(this)
+            preemptiveCountdown.events
+                .onEach {
+                    println("preemptiveTimer forwarded to refresh!")
+                    send(it)
+                }.launchIn(this)
+            manualRefreshStream
+                .onEach {
+                    println("manual refresh forwarded to refresh!")
+                    send(it)
+                }.launchIn(this)
+        }.onStart {
+            println("Preemptive Refresh stream started")
+        }.onEach {
+            println("Preemptive stream emission!")
         }
 
     override suspend fun shouldForceFetch(currentState: DataResult<*>?): Boolean  = false
 
     override suspend fun onDataChanged() {
+        println("resetting ttl!")
         resetTimeToLive(strategy.timeToLive)
-        preemptiveTimer.reset(strategy.timeToLive.minus(strategy.leadTime))
+        println("Resetting preemptive countdown!")
+        preemptiveCountdown.reset(strategy.timeToLive.minus(strategy.leadTime))
     }
 
-    override suspend fun onInvalidated() { }
+    override suspend fun onInvalidated() {
+        preemptiveCountdown.stop()
+        manualRefreshStream.emit(Unit)
+    }
 
 }

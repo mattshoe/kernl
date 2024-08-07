@@ -20,7 +20,6 @@ class MonotonicStopwatch: Stopwatch {
     }
 
     private fun now(): TimeSource.Monotonic.ValueTimeMark {
-        println("invoked now()")
         return TimeSource.Monotonic.markNow()
     }
 }

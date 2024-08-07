@@ -14,7 +14,7 @@ class CountdownFlowTest {
 
     @Test
     fun `WHEN reset is called AND delay is 500ms THEN timer emits after 500ms`() = runTest {
-        val countdownTimer = CountdownFlow()
+        val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
             // Reset the timer with a delay of 500ms
@@ -30,7 +30,7 @@ class CountdownFlowTest {
 
     @Test
     fun `WHEN reset is called multiple times THEN timer respects the latest interval`() = runTest {
-        val countdownTimer = CountdownFlow()
+        val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
             countdownTimer.reset(1000.milliseconds)
@@ -51,7 +51,7 @@ class CountdownFlowTest {
 
     @Test
     fun `WHEN reset is called concurrently THEN timer handles concurrent resets correctly`() = runTest {
-        val countdownTimer = CountdownFlow()
+        val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
             // Reset the timer with a delay of 1000ms
@@ -69,7 +69,7 @@ class CountdownFlowTest {
 
     @Test
     fun `WHEN timer initialized THEN timer does not emit before first reset`() = runTest {
-        val countdownTimer = CountdownFlow()
+        val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
             // Allow time before any reset

@@ -12,7 +12,7 @@ import kotlin.time.TimeSource
 abstract class BaseInvalidationTracker(
     protected val timeToLiveStopwatch: Stopwatch
 ): InvalidationTracker {
-    val timeToLive = CountdownFlow()
+    val timeToLive = CountdownFlow("TimeToLiveCountdown")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     protected open val _invalidationStream: Flow<Unit> = timeToLive.events
@@ -24,7 +24,6 @@ abstract class BaseInvalidationTracker(
         get() = _refreshStream
 
     protected fun now(): TimeSource.Monotonic.ValueTimeMark {
-        println("invoked now()")
         return TimeSource.Monotonic.markNow()
     }
 
