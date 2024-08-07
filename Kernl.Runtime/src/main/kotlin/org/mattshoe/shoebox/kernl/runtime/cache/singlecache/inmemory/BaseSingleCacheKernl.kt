@@ -30,6 +30,7 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     private val dataSource by lazy {
         DataSource.Builder
             .memoryCache(dataType)
+            .retryStrategy(kernlPolicy.retryStrategy)
             .dispatcher(dispatcher)
             .build()
     }

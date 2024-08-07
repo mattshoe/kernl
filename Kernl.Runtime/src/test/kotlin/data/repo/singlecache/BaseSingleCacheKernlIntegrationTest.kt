@@ -359,7 +359,7 @@ class BaseSingleCacheKernlIntegrationTest {
             eventStream.emit(KernlEvent.Invalidate(43))
             advanceUntilIdle()
             expectNoEvents()
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }

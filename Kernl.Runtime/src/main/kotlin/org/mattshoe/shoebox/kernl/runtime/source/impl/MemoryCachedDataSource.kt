@@ -1,22 +1,21 @@
 package org.mattshoe.shoebox.kernl.runtime.source.impl
 
+import kotlinx.coroutines.*
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
-import org.mattshoe.shoebox.kernl.KernlEvent
+import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.ext.selectivelyDistinct
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * This implementation of [DataSource] only caches data in-memory rather than on-disk.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 internal open class MemoryCachedDataSource<T: Any>(
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val retryStrategy: RetryStrategy? = null
 ): DataSource<T> {
     private val dataMutex = Mutex()
     protected open val _data = MutableSharedFlow<DataResult<T>>(replay = 1)
@@ -55,7 +54,9 @@ internal open class MemoryCachedDataSource<T: Any>(
                     this@MemoryCachedDataSource.dataRetrievalAction = it
                 }
                 val dataResult: DataResult<T> = DataResult.Success(
-                    dataRetrievalAction.invoke()
+                    fetchWithRetryStrategy(retryStrategy) {
+                        dataRetrievalAction.invoke()
+                    }
                 )
                 _data.emit(dataResult)
                 value = dataResult
@@ -79,6 +80,29 @@ internal open class MemoryCachedDataSource<T: Any>(
     }
 
     private fun noOtherServiceCallsAreInFlight() = dataMutex.tryLock()
+
+    private suspend fun <T> fetchWithRetryStrategy(
+        strategy: RetryStrategy?,
+        block: suspend () -> T
+    ): T {
+        if (strategy == null) {
+            return block()
+        } else {
+            var nextDelay = strategy.initialDelay
+            repeat(strategy.maxAttempts) { attempt ->
+                try {
+                    return block()
+                } catch (e: Throwable) {
+                    if (attempt == strategy.maxAttempts - 1) {
+                        throw e
+                    }
+                }
+                delay(nextDelay)
+                nextDelay = (nextDelay.inWholeMilliseconds * strategy.backoffFactor).milliseconds
+            }
+        }
+        throw IllegalStateException("Unable to fetch data for ${this::class.qualifiedName}")
+    }
 
 }
 
