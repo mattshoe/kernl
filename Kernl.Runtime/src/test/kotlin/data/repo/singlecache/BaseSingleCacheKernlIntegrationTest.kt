@@ -9,10 +9,15 @@ import io.mockk.clearAllMocks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
 import org.junit.Before
 import org.junit.Test
+import org.mattshoe.shoebox.kernl.*
+import org.mattshoe.shoebox.kernl.runtime.DataResult
+import kotlin.math.exp
+import kotlin.time.Duration
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
 class BaseSingleCacheKernlIntegrationTest {
@@ -25,7 +30,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runTest {
+    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         subject.data.test {
             subject.fetch(42)
@@ -35,7 +40,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval fails THEN error is emitted`() = runTest {
+    fun `WHEN dataRetrieval fails THEN error is emitted`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         subject.data.test {
             val expectedValue = RuntimeException("oops")
@@ -65,7 +70,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() = runTest(standardTestDispatcher) {
+    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
 
         subject.data.test {
@@ -93,7 +98,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runTest(standardTestDispatcher) {
+    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runTest(StandardTestDispatcher()) {
         var counter = 0
         val subject = makeSubject()
 
@@ -124,7 +129,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked THEN new item is emitted`() = runTest {
+    fun `WHEN refresh is invoked THEN new item is emitted`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         var counter = 0
         subject.data.test {
@@ -142,7 +147,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN multiple listeners THEN all receive updates`() = runTest {
+    fun `WHEN multiple listeners THEN all receive updates`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -160,11 +165,15 @@ class BaseSingleCacheKernlIntegrationTest {
             Truth.assertThat(turbine1.awaitItem()).isEqualTo(Success("96"))
             Truth.assertThat(turbine2.awaitItem()).isEqualTo(Success("96"))
             Truth.assertThat(turbine3.awaitItem()).isEqualTo(Success("96"))
+
+            turbine1.cancelAndIgnoreRemainingEvents()
+            turbine2.cancelAndIgnoreRemainingEvents()
+            turbine3.cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runTest {
+    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -176,38 +185,247 @@ class BaseSingleCacheKernlIntegrationTest {
 
             subject.data.test {
                 Truth.assertThat(awaitItem()).isEqualTo(Success("96"))
+                cancelAndIgnoreRemainingEvents()
             }
         }
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runTest {
+    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runTest(StandardTestDispatcher()) {
         makeSubject().refresh()
     }
 
     @Test
-    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runTest {
+    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         subject.invalidate()
         subject.data.test {
-            Truth.assertThat(awaitItem() is org.mattshoe.shoebox.kernl.runtime.DataResult.Invalidated).isTrue()
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest {
+    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
         val subject = makeSubject()
         subject.data.test {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
             subject.invalidate()
-            Truth.assertThat(awaitItem() is org.mattshoe.shoebox.kernl.runtime.DataResult.Invalidated).isTrue()
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val subject = makeSubject()
+        advanceUntilIdle()
+
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            Kernl.globalEvent(KernlEvent.Invalidate())
+
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global invalidate is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val subject = makeSubject()
+
+        subject.data.test(Duration.INFINITE) {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            Kernl.globalEvent(KernlEvent.Invalidate(42))
+
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global invalidate is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runTest(StandardTestDispatcher()) {
+        val subject = makeSubject()
+
+        subject.data.test(Duration.INFINITE) {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            Kernl.globalEvent(KernlEvent.Invalidate(43))
+            advanceUntilIdle()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global refresh is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val subject = makeSubject()
+
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            Kernl.globalEvent(KernlEvent.Refresh())
+
+            Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global refresh is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val subject = makeSubject()
+
+        subject.data.test(Duration.INFINITE) {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            Kernl.globalEvent(KernlEvent.Refresh(42))
+
+            Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global refresh is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runTest(StandardTestDispatcher()) {
+        val subject = makeSubject()
+
+        subject.data.test(Duration.INFINITE) {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            Kernl.globalEvent(KernlEvent.Refresh(43))
+            advanceUntilIdle()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            eventStream.emit(KernlEvent.Invalidate())
+
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy invalidate is invoked after fetch and params match THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            eventStream.emit(KernlEvent.Invalidate(42))
+
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy invalidate is invoked after fetch and params do not match THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            eventStream.emit(KernlEvent.Invalidate(43))
+            advanceUntilIdle()
+            expectNoEvents()
+            
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy refresh is invoked after fetch THEN new emission occurs`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            eventStream.emit(KernlEvent.Refresh())
+
+            Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy refresh is invoked after fetch and parameters match THEN new emission occurs`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            eventStream.emit(KernlEvent.Refresh(42))
+
+            Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN kernl policy refresh is invoked after fetch and parameters do not match THEN no emission occurs`() = runTest(StandardTestDispatcher()) {
+        val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
+        val policy = KernlPolicyDefaults.copy(
+            events = eventStream
+        )
+        val subject = makeSubject(kernlPolicy = policy)
+        subject.data.test {
+            subject.fetch(42)
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+
+            eventStream.emit(KernlEvent.Refresh(43))
+            advanceUntilIdle()
+            expectNoEvents()
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
 
-    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null): StubSingleCacheKernl {
-        return StubSingleCacheKernl(dispatcher ?: coroutineContext[CoroutineDispatcher]!!)
+    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
+        return StubSingleCacheKernl(
+            dispatcher ?: coroutineContext[CoroutineDispatcher]!!,
+            kernlPolicy
+        ).also {
+            advanceUntilIdle()
+        }
     }
 }
