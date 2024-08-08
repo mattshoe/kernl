@@ -9,6 +9,7 @@ import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import org.mattshoe.shoebox.util.className
 import org.mattshoe.shoebox.util.simpleName
 import kotlinx.coroutines.*
+import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import kotlin.reflect.KClass
 
 class MemoryCacheCodeGenerator {
@@ -109,13 +110,27 @@ class MemoryCacheCodeGenerator {
                 TypeSpec.companionObjectBuilder()
                     .addFunction(
                         FunSpec.builder("Factory")
-                            .addParameter("call", LambdaTypeName.get(
-                                parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
-                                returnType = dataType.className
-                            ).copy(suspending = true))
+                            .addParameter(
+                                ParameterSpec.builder("kernlPolicy", DefaultKernlPolicy::class)
+                                    .defaultValue(
+                                        "%T",
+                                        ClassName(
+                                            DefaultKernlPolicy::class.java.`package`.name,
+                                            DefaultKernlPolicy::class.simpleName!!
+                                        )
+                                    )
+                                    .build()
+                            )
+                            .addParameter(
+                                "call",
+                                LambdaTypeName.get(
+                                    parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
+                                    returnType = dataType.className
+                                ).copy(suspending = true)
+                            )
                             .returns(ClassName(packageName, repositoryName))
                             .addCode("""
-                                return ${repositoryName}Impl(call)
+                                return ${repositoryName}Impl(kernlPolicy,·call)
                             """.trimIndent())
                             .build()
                     )
@@ -135,10 +150,18 @@ class MemoryCacheCodeGenerator {
             .addModifiers(KModifier.PRIVATE)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
-                    .addParameter("call", LambdaTypeName.get(
-                        parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
-                        returnType = dataType.className
-                    ).copy(suspending = true))
+                    .addParameter(
+                        ParameterSpec
+                            .builder("kernlPolicy", DefaultKernlPolicy::class)
+                            .build()
+                    )
+                    .addParameter(
+                        "call",
+                        LambdaTypeName.get(
+                            parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
+                            returnType = dataType.className
+                        ).copy(suspending = true)
+                    )
                     .build()
             )
             .addSuperinterface(ClassName(packageName, repositoryName))
@@ -151,6 +174,7 @@ class MemoryCacheCodeGenerator {
                     dataType.className
                 )
             )
+            .addSuperclassConstructorParameter("%N·=·%N", "kernlPolicy", "kernlPolicy")
             .addProperty(
                 PropertySpec.builder(
                     "call", LambdaTypeName.get(
