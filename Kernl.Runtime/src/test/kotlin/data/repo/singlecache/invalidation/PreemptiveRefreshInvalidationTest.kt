@@ -13,7 +13,7 @@ import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.KernlPolicyDefaults
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 

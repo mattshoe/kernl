@@ -4,8 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 
 class StubSingleCacheKernl(
     dispatcher: CoroutineDispatcher,
