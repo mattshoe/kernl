@@ -1,12 +1,12 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
+package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
 
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.EagerRefreshInvalidationTracker
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.LazyRefreshInvalidationTracker
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.PreemptiveRefreshInvalidationTracker
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.TakeNoActionInvalidationTracker
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.EagerRefreshInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.LazyRefreshInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.PreemptiveRefreshInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl.TakeNoActionInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 
 class InvalidationTrackerFactoryImpl(
     private val stopwatch: Stopwatch

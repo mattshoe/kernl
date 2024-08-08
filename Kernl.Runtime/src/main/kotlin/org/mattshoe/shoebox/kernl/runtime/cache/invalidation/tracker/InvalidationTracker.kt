@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
+package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

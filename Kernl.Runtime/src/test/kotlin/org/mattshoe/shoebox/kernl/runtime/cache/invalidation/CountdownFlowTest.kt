@@ -5,7 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import kotlin.math.exp
 import kotlin.time.Duration.Companion.milliseconds
 
