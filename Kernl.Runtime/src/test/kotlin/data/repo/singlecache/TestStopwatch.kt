@@ -22,4 +22,8 @@ class TestStopwatch(private val scheduler: TestCoroutineScheduler): Stopwatch {
             Duration.ZERO
         }
     }
+
+    override fun stop() {
+        startTime = null
+    }
 }

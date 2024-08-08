@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import kotlin.time.Duration
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
@@ -20,11 +22,12 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
 
     @Before
     fun setUp() {
-        subject = repository()
     }
 
     @Test
     fun test() = runTest(UnconfinedTestDispatcher()) {
+        DefaultKernlResourceManager.startSession(this, Duration.INFINITE)
+        subject = repository()
         testData.forEach { (params, response) ->
             subject.fetch(params, true)
             subject.data.test {

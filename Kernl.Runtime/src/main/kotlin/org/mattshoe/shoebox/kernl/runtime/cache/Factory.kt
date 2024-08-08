@@ -10,6 +10,8 @@ import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory.BaseSingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.reflect.KClass
 
 fun <TParams: Any, TData: Any> NoCacheKernl(
@@ -23,12 +25,14 @@ fun <TParams: Any, TData: Any> NoCacheKernl(
 fun <TParams: Any, TData: Any> SingleCacheKernl(
     kernlPolicy: KernlPolicy = DefaultKernlPolicy,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager,
     typeOfData: KClass<TData>,
     fetchData: suspend (TParams) -> TData
 ): SingleCacheKernl<TParams, TData> {
     return object : BaseSingleCacheKernl<TParams, TData>(
         dispatcher,
-        kernlPolicy
+        kernlPolicy,
+        kernlResourceManager
     ) {
         override val dataType = typeOfData
         override suspend fun fetchData(params: TParams): TData = fetchData(params)

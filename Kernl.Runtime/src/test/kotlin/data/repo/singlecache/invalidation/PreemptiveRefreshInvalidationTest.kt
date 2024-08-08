@@ -4,16 +4,14 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import data.repo.singlecache.StubSingleCacheKernl
 import data.repo.singlecache.TestStopwatch
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.KernlPolicyDefaults
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
@@ -26,17 +24,17 @@ class PreemptiveRefreshInvalidationTest: InvalidationStrategyTest() {
     private val dispatcher = StandardTestDispatcher(scheduler)
     private val scope = TestScope(dispatcher)
 
-    override fun makeSubject(
+    override fun CoroutineScope.makeSubject(
         dispatcher: CoroutineDispatcher,
         invalidationStrategy: InvalidationStrategy,
-        stopwatch: Stopwatch
+        kernlResourceManager: KernlResourceManager
     ): StubSingleCacheKernl {
         return StubSingleCacheKernl(
             dispatcher,
             KernlPolicyDefaults.copy(
                 invalidationStrategy = invalidationStrategy
             ),
-            stopwatch
+            kernlResourceManager
         )
     }
 

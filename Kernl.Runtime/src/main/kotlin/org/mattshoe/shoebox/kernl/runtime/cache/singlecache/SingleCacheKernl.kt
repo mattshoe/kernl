@@ -11,7 +11,7 @@ import java.io.Closeable
  *
  * This repository will guarantee that only ONE data retrieval operation can ever be in flight at a given time.
  */
-interface SingleCacheKernl<TParams: Any, TData: Any>: Closeable {
+interface SingleCacheKernl<TParams: Any, TData: Any> {
     /**
      * ### Stream producing the most up-to-date value for this repository.
      *

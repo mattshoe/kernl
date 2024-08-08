@@ -6,7 +6,9 @@ import org.mattshoe.shoebox.kernl.runtime.source.builder.DataSourceBuilderReques
 import org.mattshoe.shoebox.kernl.runtime.source.builder.MemoryCacheDataSourceBuilder
 import io.mockk.*
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -14,6 +16,9 @@ import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
+import util.TestKernlResourceManager
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
 class BaseSingleCacheKernlUnitTest {
@@ -47,7 +52,7 @@ class BaseSingleCacheKernlUnitTest {
     }
 
     @Test
-    fun `WHEN fetch is invoked THEN the data source is initialized`() = runTest(UnconfinedTestDispatcher()) {
+    fun `WHEN fetch is invoked THEN the data source is initialized`() = runTest {
         val subject = makeSubject()
         val captor = slot<suspend () -> String>()
         coEvery { mockDataSource.initialize(true, capture(captor)) } returns Unit
@@ -58,7 +63,7 @@ class BaseSingleCacheKernlUnitTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked THEN the data source is refreshed`() = runTest(UnconfinedTestDispatcher()) {
+    fun `WHEN refresh is invoked THEN the data source is refreshed`() = runTest {
         val subject = makeSubject()
 
         subject.refresh()
@@ -69,7 +74,7 @@ class BaseSingleCacheKernlUnitTest {
     }
 
     @Test
-    fun `WHEN invalidate is invoked THEN the data source is invalidated`() = runTest(UnconfinedTestDispatcher()) {
+    fun `WHEN invalidate is invoked THEN the data source is invalidated`() = runTest {
         val subject = makeSubject()
 
         subject.invalidate()
@@ -79,8 +84,11 @@ class BaseSingleCacheKernlUnitTest {
         }
     }
 
-    private fun TestScope.makeSubject(): StubSingleCacheKernl {
-        return StubSingleCacheKernl(coroutineContext[CoroutineDispatcher]!!)
+    private fun CoroutineScope.makeSubject(): StubSingleCacheKernl {
+        return StubSingleCacheKernl(
+            dispatcher = coroutineContext[CoroutineDispatcher]!!,
+            kernlResourceManager = TestKernlResourceManager(this)
+        )
     }
 }
 

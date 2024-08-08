@@ -10,13 +10,19 @@ private val mutableGlobalEventStream = MutableSharedFlow<KernlEvent>(
     onBufferOverflow = BufferOverflow.DROP_OLDEST,
 )
 
-data object GlobalKernlEventStream: SharedFlow<KernlEvent> by mutableGlobalEventStream.asSharedFlow()
+data object GlobalKernlEventStream: SharedFlow<KernlEvent> by mutableGlobalEventStream
 
 object Kernl {
     val events: Flow<KernlEvent> = GlobalKernlEventStream
+        .onStart {
+            println("Collection started for global events!!")
+        }
+        .onEach {
+            println("Intercepted global KernlEvent! $it")
+        }
 
     suspend fun globalEvent(event: KernlEvent) {
+        println("emitting kernlevent: $event")
         mutableGlobalEventStream.emit(event)
-        println("derp")
     }
 }
