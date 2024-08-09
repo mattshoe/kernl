@@ -6,13 +6,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.mattshoe.shoebox.kernl.NEVER
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.time.Duration
 
-object DefaultKernlResourceManager: KernlResourceManager {
+internal object DefaultKernlResourceManager: KernlResourceManager {
     private var currentPollingJob: Job? = null
     private lateinit var coroutineScope: CoroutineScope
     private val activeKernlsMutex = Mutex()
@@ -103,7 +104,7 @@ object DefaultKernlResourceManager: KernlResourceManager {
 
     private fun monitorKernlsForDisposal(interval: Duration) {
         currentPollingJob = coroutineScope.launch {
-            if (interval != Duration.INFINITE) {
+            if (interval != NEVER && interval.isPositive()) {
                 while (isActive) {
                     delay(interval.inWholeMilliseconds)
                     activeKernlsMutex.withLock {

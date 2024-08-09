@@ -6,9 +6,6 @@ import com.google.common.truth.Truth
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import net.bytebuddy.agent.builder.AgentBuilder.CircularityLock.Global
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -17,11 +14,11 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-class BaseSingleCacheKernlIntegrationTest {
+class BaseSingleCacheInternalKernlIntegrationTest {
 
     @Before
     fun setUp() {
@@ -231,7 +228,7 @@ class BaseSingleCacheKernlIntegrationTest {
             println("fetch got")
 
             println("invalidating")
-            Kernl.globalEvent(KernlEvent.Invalidate())
+            kernl { globalInvalidate() }
             println("invalidated")
 
             println("awaiting invalidation")
@@ -249,7 +246,7 @@ class BaseSingleCacheKernlIntegrationTest {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Invalidate(42))
+            kernl { globalInvalidate(42)}
 
             Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -264,7 +261,7 @@ class BaseSingleCacheKernlIntegrationTest {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Invalidate(43))
+            kernl { globalInvalidate(43) }
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -278,7 +275,7 @@ class BaseSingleCacheKernlIntegrationTest {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Refresh())
+            kernl { globalRefresh()}
 
             Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -293,7 +290,7 @@ class BaseSingleCacheKernlIntegrationTest {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Refresh(42))
+            kernl { globalRefresh(42) }
 
             Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -308,7 +305,7 @@ class BaseSingleCacheKernlIntegrationTest {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Refresh(43))
+            kernl { globalRefresh(43) }
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }

@@ -1,12 +1,13 @@
 package org.mattshoe.shoebox.kernl
 
 import kotlinx.coroutines.flow.Flow
+import org.mattshoe.shoebox.kernl.internal.InternalGlobalKernlEventStream
 import kotlin.time.Duration
 
 object KernlPolicyDefaults {
     fun copy(
         retryStrategy: RetryStrategy? = null,
-        events: Flow<KernlEvent> = Kernl.events,
+        events: Flow<KernlEvent> = InternalGlobalKernlEventStream,
         cacheStrategy: CacheStrategy = CacheStrategy.NetworkFirst,
         invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE),
     ): KernlPolicy {

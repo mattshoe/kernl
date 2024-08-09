@@ -13,12 +13,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.mattshoe.shoebox.kernl.Kernl
 import org.mattshoe.shoebox.kernl.KernlEvent
-import kotlin.time.Duration
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class BaseAssociativeCacheKernlTest {
+class BaseAssociativeCacheInternalKernlTest {
     private lateinit var subject: StubBaseAssociativeCacheKernl
     private lateinit var testKernlPolicy: TestKernlPolicy
     private val dispatcher = UnconfinedTestDispatcher()
@@ -159,7 +158,7 @@ class BaseAssociativeCacheKernlTest {
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
             assertEmissionValues(42, 43, 44)
 
-            Kernl.globalEvent(KernlEvent.Refresh())
+            kernl { globalRefresh() }
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
@@ -181,7 +180,7 @@ class BaseAssociativeCacheKernlTest {
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
             assertEmissionValues(42, 43, 44)
 
-            Kernl.globalEvent(KernlEvent.Refresh(42))
+            kernl { globalRefresh(42) }
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             turbine2.expectNoEvents()
             turbine3.expectNoEvents()
@@ -201,7 +200,7 @@ class BaseAssociativeCacheKernlTest {
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
             assertEmissionValues(42, 43, 44)
 
-            testKernlPolicy.event(KernlEvent.Refresh())
+            kernl { globalRefresh() }
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
@@ -312,7 +311,7 @@ class BaseAssociativeCacheKernlTest {
             assertEmissionValues(42, 43, 44)
 
             println("posting Invalidation globally")
-            Kernl.globalEvent(KernlEvent.Invalidate())
+            kernl { globalInvalidate() }
 
             println("awaiting Item for turbine1")
             Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
@@ -345,7 +344,7 @@ class BaseAssociativeCacheKernlTest {
             assertEmissionValues(42, 43, 44)
 
             println("posting Invalidation for: 42")
-            Kernl.globalEvent(KernlEvent.Invalidate(42))
+            kernl { globalInvalidate(42) }
 
             println("awaiting Item for turbine1")
             Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()

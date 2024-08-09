@@ -21,7 +21,7 @@ import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import util.TestKernlResourceManager
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-class BaseSingleCacheKernlUnitTest {
+class BaseSingleCacheInternalKernlUnitTest {
     private val mockDataSource: DataSource<String> = mockk(relaxed = true)
     private val datasourceBuilderRequest: DataSourceBuilderRequest = mockk(relaxed = true)
     private val memoryCachedDataSourceBuilderRequest: MemoryCacheDataSourceBuilder<String> = mockk(relaxed = true)
