@@ -2,19 +2,19 @@ package singlememorycache.impl
 
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
-import kernl.org.mattshoe.shoebox.kernl.singlememorycache.SingleParamComplexReturn
+import kernl.org.mattshoe.shoebox.kernl.singlememorycache.SingleParamComplexReturnKernl
 import singlememorycache.SingleMemoryCacheScenariosTest
 
-class SingleParamComplexReturnTest : SingleMemoryCacheScenariosTest<SingleParamComplexReturn.Params, ServiceResponse>() {
-    override fun repository(): SingleCacheKernl<SingleParamComplexReturn.Params, ServiceResponse> {
-        return SingleParamComplexReturn.Factory { id ->
+class SingleParamComplexReturnTest : SingleMemoryCacheScenariosTest<SingleParamComplexReturnKernl.Params, ServiceResponse>() {
+    override fun repository(): SingleCacheKernl<SingleParamComplexReturnKernl.Params, ServiceResponse> {
+        return SingleParamComplexReturnKernl.Factory { id ->
             ServiceResponse(id.toInt())
         }
     }
 
     override val testData = mapOf(
-        SingleParamComplexReturn.Params("42") to ServiceResponse(42),
-        SingleParamComplexReturn.Params("96") to ServiceResponse(96),
-        SingleParamComplexReturn.Params("1") to ServiceResponse(1)
+        SingleParamComplexReturnKernl.Params("42") to ServiceResponse(42),
+        SingleParamComplexReturnKernl.Params("96") to ServiceResponse(96),
+        SingleParamComplexReturnKernl.Params("1") to ServiceResponse(1)
     )
 }

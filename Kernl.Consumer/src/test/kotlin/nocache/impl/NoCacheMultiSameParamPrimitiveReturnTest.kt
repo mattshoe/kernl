@@ -1,20 +1,20 @@
 package nocache.impl
 
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
-import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheMultiSameParamPrimitiveReturn
+import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheMultiSameParamPrimitiveReturnKernl
 import nocache.NoCacheScenariosTest
 
 // Multiple same primitive parameters, primitive return
-class NoCacheMultiSameParamPrimitiveReturnTest: NoCacheScenariosTest<NoCacheMultiSameParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): NoCacheKernl<NoCacheMultiSameParamPrimitiveReturn.Params, Int> {
-        return NoCacheMultiSameParamPrimitiveReturn.Factory { id, bar ->
+class NoCacheMultiSameParamPrimitiveReturnTest: NoCacheScenariosTest<NoCacheMultiSameParamPrimitiveReturnKernl.Params, Int>() {
+    override fun repository(): NoCacheKernl<NoCacheMultiSameParamPrimitiveReturnKernl.Params, Int> {
+        return NoCacheMultiSameParamPrimitiveReturnKernl.Factory { id, bar ->
             id.toInt() + bar.toInt()
         }
     }
 
     override val testData = mapOf(
-        NoCacheMultiSameParamPrimitiveReturn.Params("42", "1") to 43,
-        NoCacheMultiSameParamPrimitiveReturn.Params("96", "4") to 100,
-        NoCacheMultiSameParamPrimitiveReturn.Params("1", "1") to 2
+        NoCacheMultiSameParamPrimitiveReturnKernl.Params("42", "1") to 43,
+        NoCacheMultiSameParamPrimitiveReturnKernl.Params("96", "4") to 100,
+        NoCacheMultiSameParamPrimitiveReturnKernl.Params("1", "1") to 2
     )
 }

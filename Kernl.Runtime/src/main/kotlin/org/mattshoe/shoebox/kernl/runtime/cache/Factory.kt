@@ -39,7 +39,7 @@ fun <TParams: Any, TData: Any> SingleCacheKernl(
     }
 }
 
-fun <TParams: Any, TData: Any> multiSourceLiveRepository(
+fun <TParams: Any, TData: Any> multiSourceLiveKernl(
     clazz: KClass<TData>,
     fetchData: suspend (TParams) -> TData
 ): AssociativeMemoryCacheKernl<TParams, TData> {

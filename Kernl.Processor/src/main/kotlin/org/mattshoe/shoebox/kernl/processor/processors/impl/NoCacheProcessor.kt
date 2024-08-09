@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 
 class  NoCacheProcessor(
     logger: KSPLogger
-): RepositoryFunctionProcessor(logger) {
+): KernlFunctionProcessor(logger) {
 
     override val annotationClass = Kernl.NoCache::class
 

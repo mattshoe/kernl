@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.reflect.KClass
 
-abstract class RepositoryFunctionProcessor(
+abstract class KernlFunctionProcessor(
     protected val logger: KSPLogger
 ): AbstractProcessor<KSFunctionDeclaration>() {
     override val targetClass = KSFunctionDeclaration::class
@@ -28,7 +28,7 @@ abstract class RepositoryFunctionProcessor(
     override suspend fun process(node: KSFunctionDeclaration): Set<GeneratedFile> = withContext(Dispatchers.Default) {
         node.validateFunctionSignature()
 
-        val repositoryName = getRepositoryName(annotationClass, node)
+        val repositoryName = getKernlName(annotationClass, node)
         val packageDestination = getPackageDestination(node)
         val serviceReturnType = node.returnType?.resolve()
 
@@ -40,18 +40,19 @@ abstract class RepositoryFunctionProcessor(
         )
     }
 
-    protected fun getRepositoryName(
+    protected fun getKernlName(
         annotationClass: KClass<out Any>,
         function: KSFunctionDeclaration
     ): String {
         val annotation = function.annotations.find(annotationClass)
-        val repositoryName = annotation.argument<String>("name")?.replaceFirstChar { it.titlecase() }
+        val repositoryName = annotation.argument<String>("name")
+            ?.replaceFirstChar { it.titlecase() }
         if (repositoryName.isNullOrEmpty() || repositoryName.isBlank()) {
-            logger.error("You must provide a non-empty name for the Repository!", annotation)
+            logger.error("You must provide a non-empty name for the Kernl!", annotation)
         }
         requireNotNull(repositoryName)
 
-        return repositoryName
+        return "${repositoryName.removeSuffix("Kernl").removeSuffix("kernl")}Kernl"
     }
 
     protected fun KSFunctionDeclaration.validateFunctionSignature() {

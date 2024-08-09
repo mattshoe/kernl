@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
 
 /**
- * ### Repository that holds a single cached value in memory.
+ * ### Kernl that holds a single cached value in memory.
  *
  * Any updates to the cached value are broadcast immediately to all listeners.
  *
