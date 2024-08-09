@@ -31,12 +31,6 @@ data object InternalGlobalKernlEventStream: SharedFlow<KernlEvent> by mutableGlo
 @Suppress("DEPRECATION_ERROR")
 object InternalKernl {
     val events: Flow<KernlEvent> = InternalGlobalKernlEventStream
-        .onStart {
-            println("Collection started for global events!!")
-        }
-        .onEach {
-            println("Intercepted global KernlEvent! $it")
-        }
 
     fun globalEvent(event: KernlEvent) {
         println("emitting kernlevent: $event")

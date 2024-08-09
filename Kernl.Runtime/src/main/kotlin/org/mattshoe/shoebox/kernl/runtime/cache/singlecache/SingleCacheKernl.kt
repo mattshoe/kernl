@@ -22,10 +22,10 @@ interface SingleCacheKernl<TParams: Any, TData: Any> {
     val data: Flow<DataResult<TData>>
 
     /**
-     * ### Use this method to fetch the data for this repository.
+     * ### Use this method to fetch the data for this Kernl.
      *
      * This method has some very important characteristics:
-     * 1. Only the first call to `fetch` will be run. All subsequent invocations will be **_dropped_** unless the `forceRefresh` flag is true.
+     * 1. Only the first call to `fetch` will be run. All subsequent invocations will be **_dropped_**, regardless of params, unless the `forceRefresh` flag is true.
      * 2. Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `fetch` will be dropped until the operation completes.
      *
      * @param params The parameters required to fetch the data
