@@ -13,7 +13,7 @@ private val mutableGlobalEventStream = MutableSharedFlow<KernlEvent>(
 @Deprecated(
     "This API is internal to Kernl and is NOT safe to use! Please use `kernl { globalEventStream() }` instead.",
     ReplaceWith("kernl { globalEventStream() }"),
-    DeprecationLevel.WARNING
+    DeprecationLevel.ERROR
 )
 data object InternalGlobalKernlEventStream: SharedFlow<KernlEvent> by mutableGlobalEventStream
 
@@ -28,6 +28,7 @@ data object InternalGlobalKernlEventStream: SharedFlow<KernlEvent> by mutableGlo
 }"""),
     DeprecationLevel.ERROR
 )
+@Suppress("DEPRECATION_ERROR")
 object InternalKernl {
     val events: Flow<KernlEvent> = InternalGlobalKernlEventStream
         .onStart {

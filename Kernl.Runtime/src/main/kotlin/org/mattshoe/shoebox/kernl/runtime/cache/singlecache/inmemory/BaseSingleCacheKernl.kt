@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlEvent
 import org.mattshoe.shoebox.kernl.KernlPolicy
-import org.mattshoe.shoebox.kernl.internal.InternalGlobalKernlEventStream
+import org.mattshoe.shoebox.kernl.internal.*
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactory
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
@@ -41,6 +41,7 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
 
     protected abstract val dataType: KClass<TData>
 
+    @Suppress("DEPRECATION_ERROR")
     override val data: Flow<DataResult<TData>>
         get() = channelFlow {
             if (kernlPolicy.events !is InternalGlobalKernlEventStream) {
