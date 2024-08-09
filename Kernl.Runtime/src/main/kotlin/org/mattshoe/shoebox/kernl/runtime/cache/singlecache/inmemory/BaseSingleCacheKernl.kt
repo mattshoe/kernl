@@ -44,6 +44,7 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     @Suppress("DEPRECATION_ERROR")
     override val data: Flow<DataResult<TData>>
         get() = channelFlow {
+            // Need to make sure the KernlPolicy isn't using the global event stream already, wouldn't want dupes
             if (kernlPolicy.events !is InternalGlobalKernlEventStream) {
                 kernl { globalEventStream() }
                     .onEach {

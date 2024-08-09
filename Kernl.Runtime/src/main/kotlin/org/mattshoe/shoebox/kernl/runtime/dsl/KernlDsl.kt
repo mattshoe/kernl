@@ -11,11 +11,9 @@ import kotlin.time.Duration.Companion.seconds
 
 internal lateinit var currentResourceManager: KernlResourceManager
 
-class KernlSessionConfiguration(val sessionScope: CoroutineScope) {
-    var resourceMonitorInterval: Duration = 1.seconds
-    var kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager
+fun <T> kernl(configure: KernlMenu.() -> T): T {
+    return KernlMenu().configure()
 }
-
 
 @Suppress("DEPRECATION_ERROR")
 class KernlMenu {
@@ -48,6 +46,7 @@ class KernlMenu {
     }
 }
 
-fun <T> kernl(block: KernlMenu.() -> T): T {
-    return KernlMenu().block()
+class KernlSessionConfiguration(val sessionScope: CoroutineScope) {
+    var resourceMonitorInterval: Duration = 1.seconds
+    var kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager
 }
