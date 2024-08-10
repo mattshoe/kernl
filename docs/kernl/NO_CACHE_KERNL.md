@@ -1,5 +1,11 @@
 # `NoCacheKernl<TParams: Any, TData: Any>`
-Repository that does not cache values. Every call to fetch data will result in a fresh data retrieval operation.
+Repository that does not cache values. Every call to fetch data will result in a fresh data retrieval operation. All 
+generated implementations of `NoCacheKernl` will always accept an optional [`RetryStrategy`](RETRY_STRATEGY.md) in their 
+constructor to allow consumers to specify any retry policy if they need one. 
+
+In most cases where you need retry logic, the default [`ExponentialBackoff`](EXPONENTIAL_BACKOFF.md) algorithm will 
+suffice, however, you are free to provide your own implementations.
+
 
 ### `suspend fun fetch(params: TParams): DataResult<TData>`
 Use this method to fetch data. This method will always perform a fresh data retrieval operation. Any failures are 
