@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl
+package org.mattshoe.shoebox.kernl.runtime.dsl
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

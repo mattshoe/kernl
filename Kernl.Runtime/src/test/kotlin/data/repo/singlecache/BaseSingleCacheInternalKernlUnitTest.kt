@@ -37,6 +37,7 @@ class BaseSingleCacheInternalKernlUnitTest {
         @JvmStatic
         fun afterClass() {
             unmockkAll()
+            
         }
     }
 

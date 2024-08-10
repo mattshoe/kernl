@@ -3,19 +3,20 @@ package kernl.data.repo.associativecache
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
+import io.mockk.unmockkAll
 import kernl.data.TestKernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ext.unwrap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.KernlEvent
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import util.runKernlTest
+import kotlin.time.Duration
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BaseAssociativeCacheInternalKernlTest {
@@ -25,17 +26,18 @@ class BaseAssociativeCacheInternalKernlTest {
 
     @Before
     fun before() {
+        unmockkAll()
         testKernlPolicy = TestKernlPolicy()
         subject = StubBaseAssociativeCacheKernl(dispatcher, testKernlPolicy)
     }
 
     @Test
-    fun `WHEN latestValue() is invoked before first emission THEN returns null`() = runTest(dispatcher) {
+    fun `WHEN latestValue() is invoked before first emission THEN returns null`() = runKernlTest(dispatcher) {
         Truth.assertThat(subject.latestValue(42)).isNull()
     }
 
     @Test
-    fun `WHEN latestValue() is invoked after success THEN emission is returned`() = runTest(dispatcher) {
+    fun `WHEN latestValue() is invoked after success THEN emission is returned`() = runKernlTest(dispatcher) {
         subject.stream(42).test {
             Truth.assertThat(awaitItem().unwrap()).isEqualTo("42")
             assertEmissionValues(42)
@@ -44,7 +46,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN latestValue() is invoked after error THEN emission is returned`() = runTest(dispatcher) {
+    fun `WHEN latestValue() is invoked after error THEN emission is returned`() = runKernlTest(dispatcher) {
         subject.onFetch[42] = {
             throw RuntimeException()
         }
@@ -55,7 +57,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN latestValue() is invoked after invalidation THEN emission is returned`() = runTest(dispatcher) {
+    fun `WHEN latestValue() is invoked after invalidation THEN emission is returned`() = runKernlTest(dispatcher) {
         subject.stream(42).test {
             Truth.assertThat(awaitItem().unwrap()).isEqualTo("42")
             Truth.assertThat(subject.latestValue(42)?.unwrap()).isEqualTo("42")
@@ -68,7 +70,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN data emits THEN listener receives`() = runTest(dispatcher) {
+    fun `WHEN data emits THEN listener receives`() = runKernlTest(dispatcher) {
         subject.stream(42).test {
             Truth.assertThat(awaitItem().unwrap()).isEqualTo("42")
             assertEmissionValues(42)
@@ -76,7 +78,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN data is invalidated THEN listener receives`() = runTest(dispatcher) {
+    fun `WHEN data is invalidated THEN listener receives`() = runKernlTest(dispatcher) {
         subject.stream(42).test {
             Truth.assertThat(awaitItem().unwrap()).isEqualTo("42")
             assertEmissionValues(42)
@@ -88,7 +90,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN data is requested concurrently THEN only one call is made`() = runTest(dispatcher) {
+    fun `WHEN data is requested concurrently THEN only one call is made`() = runKernlTest(dispatcher) {
         turbineScope {
             subject.onFetch[42] = {
                 delay(500)
@@ -109,7 +111,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN data is refreshed THEN listener receives new emission`() = runTest(dispatcher) {
+    fun `WHEN data is refreshed THEN listener receives new emission`() = runKernlTest(dispatcher) {
         subject.stream(42).test {
             Truth.assertThat(awaitItem().unwrap()).isEqualTo("42")
             assertEmissionValues(42)
@@ -121,7 +123,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN data is requested multiple times, THEN only one fetch is made`() = runTest(dispatcher) {
+    fun `WHEN data is requested multiple times, THEN only one fetch is made`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -135,7 +137,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN different data is fetched, THEN other listener receives no emission`() = runTest(dispatcher) {
+    fun `WHEN different data is fetched, THEN other listener receives no emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -149,7 +151,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN global Kernl refresh all data is invoked, THEN all listeners receive new emission`() = runTest(dispatcher) {
+    fun `WHEN global Kernl refresh all data is invoked, THEN all listeners receive new emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -174,7 +176,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN global Kernl refresh specific data is invoked, THEN relevant listeners receive new emission`() = runTest(dispatcher) {
+    fun `WHEN global Kernl refresh specific data is invoked, THEN relevant listeners receive new emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -194,7 +196,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN TestKernlPolicy refresh all data is invoked, THEN all listeners receive new emission`() = runTest(dispatcher) {
+    fun `WHEN TestKernlPolicy refresh all data is invoked, THEN all listeners receive new emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -216,7 +218,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN TestKernlPolicy refresh specific data is invoked, THEN relevant listeners receive new emission`() = runTest(dispatcher) {
+    fun `WHEN TestKernlPolicy refresh specific data is invoked, THEN relevant listeners receive new emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -236,7 +238,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN different data is fetched, THEN other listener is not affected by refreshes`() = runTest(dispatcher) {
+    fun `WHEN different data is fetched, THEN other listener is not affected by refreshes`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -256,7 +258,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN different data is fetched, THEN other listener is not affected by invalidations`() = runTest(dispatcher) {
+    fun `WHEN different data is fetched, THEN other listener is not affected by invalidations`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -276,7 +278,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN invalidateAll() is invoked THEN all listeners receive emission`() = runTest(dispatcher) {
+    fun `WHEN invalidateAll() is invoked THEN all listeners receive emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -298,7 +300,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN global Kernl invalidateAll() is invoked THEN all listeners receive emission`() = runTest(dispatcher) {
+    fun `WHEN global Kernl invalidateAll() is invoked THEN all listeners receive emission`() = runKernlTest(dispatcher) {
         println("Global Invalidate Test Started")
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
@@ -331,7 +333,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN global Kernl invalidate(params) is invoked THEN relevant listeners receive emission`() = runTest(dispatcher) {
+    fun `WHEN global Kernl invalidate(params) is invoked THEN relevant listeners receive emission`() = runKernlTest(dispatcher) {
         println("Global Parameterized Invalidated Test Started")
         turbineScope {
             println("awaiting turbine1 - pre_invalidate")
@@ -364,7 +366,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN TestKernlPolicy invalidateAll() is invoked THEN all listeners receive emission`() = runTest(dispatcher) {
+    fun `WHEN TestKernlPolicy invalidateAll() is invoked THEN all listeners receive emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
@@ -386,7 +388,7 @@ class BaseAssociativeCacheInternalKernlTest {
     }
 
     @Test
-    fun `WHEN TestKernlPolicy invalidate(params) is invoked THEN relevant listeners receive emission`() = runTest(dispatcher) {
+    fun `WHEN TestKernlPolicy invalidate(params) is invoked THEN relevant listeners receive emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")

@@ -5,12 +5,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ext.selectivelyDistinct
+import util.runKernlTest
 import kotlin.test.Test
 
 class SelectivelyDistinctTests {
 
     @Test
-    fun `test emitting distinct Invalidated events only`() = runTest {
+    fun `test emitting distinct Invalidated events only`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Invalidated())
@@ -37,7 +38,7 @@ class SelectivelyDistinctTests {
     }
 
     @Test
-    fun `test all distinct events`() = runTest {
+    fun `test all distinct events`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Success("Data 1"))
@@ -65,7 +66,7 @@ class SelectivelyDistinctTests {
     }
 
     @Test
-    fun `test selectivelyDistinct plays nice with other operators`() = runTest {
+    fun `test selectivelyDistinct plays nice with other operators`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Success("Data 1"))
@@ -115,7 +116,7 @@ class SelectivelyDistinctTests {
     }
 
     @Test
-    fun `test initial Invalidated event`() = runTest {
+    fun `test initial Invalidated event`() = runKernlTest {
         val givenFlow = flow {
             emit(DataResult.Invalidated())
             emit(DataResult.Invalidated())
@@ -135,7 +136,7 @@ class SelectivelyDistinctTests {
     }
 
     @Test
-    fun `test no Invalidated event`() = runTest {
+    fun `test no Invalidated event`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Error(TestException("Error 1")))
@@ -154,7 +155,7 @@ class SelectivelyDistinctTests {
     }
 
     @Test
-    fun `test only Invalidated events`() = runTest {
+    fun `test only Invalidated events`() = runKernlTest {
         val flow = flow<DataResult<String>> {
             emit(DataResult.Invalidated())
             emit(DataResult.Invalidated())

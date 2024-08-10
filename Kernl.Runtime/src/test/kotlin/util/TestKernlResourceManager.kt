@@ -10,9 +10,6 @@ import java.util.*
 import kotlin.time.Duration
 
 class TestKernlResourceManager(private val coroutineScope: CoroutineScope): KernlResourceManager {
-    init {
-        startSession(coroutineScope)
-    }
 
     override fun startSession(sessionScope: CoroutineScope, disposalInterval: Duration) {
         DefaultKernlResourceManager.startSession(coroutineScope, Duration.INFINITE)

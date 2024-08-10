@@ -14,7 +14,8 @@ import org.junit.Test
 import org.mattshoe.shoebox.kernl.NEVER
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import util.runKernlTest
 import kotlin.time.Duration
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,12 +34,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND invalidated THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND invalidated THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.fetch(params, true)
@@ -53,12 +49,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND refreshed THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND refreshed THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.fetch(params, true)
@@ -73,12 +64,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally invalidated THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND globally invalidated THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.data.test {
@@ -96,12 +82,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally invalidated with specified params THEN emissions are correct`() = runTest(StandardTestDispatcher(), timeout = Duration.INFINITE) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND globally invalidated with specified params THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.data.test(Duration.INFINITE) {
@@ -114,12 +95,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally invalidated with irrelevant params THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND globally invalidated with irrelevant params THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.data.test {
@@ -133,12 +109,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally refreshed THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND globally refreshed THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.data.test {
@@ -152,12 +123,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally refreshed with specified params THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND globally refreshed with specified params THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.data.test {
@@ -171,12 +137,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally refreshed with irrelevant params THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
-        kernl {
-            startSession(this@runTest) {
-                resourceMonitorInterval = NEVER
-            }
-        }
+    fun `WHEN data is fetched AND globally refreshed with irrelevant params THEN emissions are correct`() = runKernlTest {
         testData.forEach { (params, response) ->
             subject = repository()
             subject.data.test {
