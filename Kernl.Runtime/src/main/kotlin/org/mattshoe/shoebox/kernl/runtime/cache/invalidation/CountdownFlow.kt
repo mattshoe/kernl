@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation
+package org.mattshoe.shoebox.kernl.runtime.cache.invalidation
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

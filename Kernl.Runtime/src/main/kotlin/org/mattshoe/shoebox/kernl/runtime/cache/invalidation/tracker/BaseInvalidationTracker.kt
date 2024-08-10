@@ -1,23 +1,24 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
+package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
+import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
 abstract class BaseInvalidationTracker(
-    protected val timeToLiveStopwatch: Stopwatch
+    protected val kernlResourceManager: KernlResourceManager
 ): InvalidationTracker {
-    val timeToLive = CountdownFlow("TimeToLiveCountdown")
+    protected val kernlRegistration by lazy {
+        kernlResourceManager.registerKernl(this)
+    }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    protected open val _invalidationStream: Flow<Unit> = timeToLive.events
     override val invalidationStream
-        get() = _invalidationStream
+        get() = kernlRegistration.timeToLiveStream
 
     protected open val _refreshStream: Flow<Unit> = MutableSharedFlow(replay = 0)
     override val refreshStream
@@ -28,7 +29,9 @@ abstract class BaseInvalidationTracker(
     }
 
     protected open suspend fun resetTimeToLive(duration: Duration) {
-        timeToLive.reset(duration)
-        timeToLiveStopwatch.reset()
+        kernlResourceManager.resetTimeToLive(
+            kernlRegistration.id,
+            duration
+        )
     }
 }

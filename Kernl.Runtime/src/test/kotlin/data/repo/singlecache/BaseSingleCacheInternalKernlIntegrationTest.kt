@@ -3,44 +3,49 @@ package data.repo.singlecache
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
-import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
-import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import io.mockk.clearAllMocks
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.*
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import kotlin.math.exp
+import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
+import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import kotlin.time.Duration
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-class BaseSingleCacheKernlIntegrationTest {
-    private val unconfinedTestDispatcher = UnconfinedTestDispatcher()
-    private val standardTestDispatcher = StandardTestDispatcher()
+class BaseSingleCacheInternalKernlIntegrationTest {
 
     @Before
     fun setUp() {
         clearAllMocks()
     }
 
+    @After
+    fun tearDown() {
+        DefaultKernlResourceManager.stopSession()
+    }
+
     @Test
-    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runRealTimeTest {
         val subject = makeSubject()
+        delay(100)
         subject.data.test {
+            println("fetching data")
             subject.fetch(42)
 
+            println("awaiting data")
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+            println("data received")
         }
     }
 
     @Test
-    fun `WHEN dataRetrieval fails THEN error is emitted`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN dataRetrieval fails THEN error is emitted`() = runRealTimeTest {
         val subject = makeSubject()
         subject.data.test {
             val expectedValue = RuntimeException("oops")
@@ -55,22 +60,19 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() = runTest(unconfinedTestDispatcher) {
+    fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() = runRealTimeTest {
         val subject = makeSubject()
         subject.data.test {
             subject.fetch(42)
-            advanceUntilIdle()
             subject.fetch(43)
-            advanceUntilIdle()
             subject.fetch(44)
-            advanceUntilIdle()
 
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
         }
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() = runRealTimeTest {
         val subject = makeSubject()
 
         subject.data.test {
@@ -91,14 +93,12 @@ class BaseSingleCacheKernlIntegrationTest {
                 subject.fetch(1)
             }
 
-            advanceUntilIdle()
-
             Truth.assertThat(awaitItem()).isEqualTo(Success("500"))
         }
     }
 
     @Test
-    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runRealTimeTest {
         var counter = 0
         val subject = makeSubject()
 
@@ -122,14 +122,12 @@ class BaseSingleCacheKernlIntegrationTest {
                 subject.refresh()
             }
 
-            advanceUntilIdle()
-
             Truth.assertThat(awaitItem()).isEqualTo(Success("1"))
         }
     }
 
     @Test
-    fun `WHEN refresh is invoked THEN new item is emitted`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN refresh is invoked THEN new item is emitted`() = runRealTimeTest {
         val subject = makeSubject()
         var counter = 0
         subject.data.test {
@@ -147,7 +145,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN multiple listeners THEN all receive updates`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN multiple listeners THEN all receive updates`() = runRealTimeTest {
         val subject = makeSubject()
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -173,7 +171,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runRealTimeTest {
         val subject = makeSubject()
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -191,12 +189,12 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runRealTimeTest {
         makeSubject().refresh()
     }
 
     @Test
-    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
         subject.invalidate()
         subject.data.test {
@@ -206,7 +204,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
         subject.data.test {
             subject.fetch(42)
@@ -219,15 +217,36 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN global invalidate is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
-        advanceUntilIdle()
 
         subject.data.test {
+            println("fetching")
+            subject.fetch(42)
+            println("awaiting fetch")
+            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
+            println("fetch got")
+
+            println("invalidating")
+            kernl { globalInvalidate() }
+            println("invalidated")
+
+            println("awaiting invalidation")
+            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
+            println("awaited")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `WHEN global invalidate is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runRealTimeTest {
+        val subject = makeSubject()
+
+        subject.data.test(Duration.INFINITE) {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Invalidate())
+            kernl { globalInvalidate(42)}
 
             Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -235,44 +254,28 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global invalidate is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN global invalidate is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Invalidate(42))
-
-            Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `WHEN global invalidate is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runTest(StandardTestDispatcher()) {
-        val subject = makeSubject()
-
-        subject.data.test(Duration.INFINITE) {
-            subject.fetch(42)
-            Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
-
-            Kernl.globalEvent(KernlEvent.Invalidate(43))
-            advanceUntilIdle()
+            kernl { globalInvalidate(43) }
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN global refresh is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN global refresh is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
 
         subject.data.test {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Refresh())
+            kernl { globalRefresh()}
 
             Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -280,14 +283,14 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global refresh is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN global refresh is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Refresh(42))
+            kernl { globalRefresh(42) }
 
             Truth.assertThat(awaitItem() is DataResult.Success).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -295,22 +298,21 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global refresh is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN global refresh is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runRealTimeTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
-            Kernl.globalEvent(KernlEvent.Refresh(43))
-            advanceUntilIdle()
+            kernl { globalRefresh(43) }
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN kernl policy invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy invalidate is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -328,7 +330,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy invalidate is invoked after fetch and params match THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy invalidate is invoked after fetch and params match THEN Invalidated emission occurs`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -346,7 +348,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy invalidate is invoked after fetch and params do not match THEN Invalidated emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy invalidate is invoked after fetch and params do not match THEN Invalidated emission occurs`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -357,7 +359,6 @@ class BaseSingleCacheKernlIntegrationTest {
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
             eventStream.emit(KernlEvent.Invalidate(43))
-            advanceUntilIdle()
             expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
@@ -365,7 +366,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy refresh is invoked after fetch THEN new emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy refresh is invoked after fetch THEN new emission occurs`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -383,7 +384,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy refresh is invoked after fetch and parameters match THEN new emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy refresh is invoked after fetch and parameters match THEN new emission occurs`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -401,7 +402,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy refresh is invoked after fetch and parameters do not match THEN no emission occurs`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy refresh is invoked after fetch and parameters do not match THEN no emission occurs`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -412,7 +413,6 @@ class BaseSingleCacheKernlIntegrationTest {
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
 
             eventStream.emit(KernlEvent.Refresh(43))
-            advanceUntilIdle()
             expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
@@ -420,7 +420,7 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy has no retry strategy THEN no retry is attempted`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy has no retry strategy THEN no retry is attempted`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -434,18 +434,17 @@ class BaseSingleCacheKernlIntegrationTest {
         subject.data.test {
             subject.fetch(42)
             Truth.assertThat(awaitItem() is DataResult.Error).isTrue()
-            advanceUntilIdle()
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream,
-            retryStrategy = ExponentialBackoff()
+            retryStrategy = ExponentialBackoff
         )
         val attempts = mutableListOf<Int>()
         val subject = makeSubject(kernlPolicy = policy)
@@ -460,7 +459,6 @@ class BaseSingleCacheKernlIntegrationTest {
         }
         subject.data.test {
             subject.fetch(42)
-            advanceUntilIdle()
             Truth.assertThat(awaitItem() is Success).isTrue()
             Truth.assertThat(attempts.size).isEqualTo(2)
             cancelAndIgnoreRemainingEvents()
@@ -468,11 +466,11 @@ class BaseSingleCacheKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runTest(StandardTestDispatcher()) {
+    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runRealTimeTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream,
-            retryStrategy = ExponentialBackoff()
+            retryStrategy = ExponentialBackoff
         )
         val attempts = mutableListOf<Int>()
         val subject = makeSubject(kernlPolicy = policy)
@@ -482,19 +480,17 @@ class BaseSingleCacheKernlIntegrationTest {
         }
         subject.data.test {
             subject.fetch(42)
-            advanceUntilIdle()
             Truth.assertThat(awaitItem() is Error).isTrue()
             Truth.assertThat(attempts.size).isEqualTo(3)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
-    private fun TestScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
+    private fun CoroutineScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
+        DefaultKernlResourceManager.startSession(this)
         return StubSingleCacheKernl(
             dispatcher ?: coroutineContext[CoroutineDispatcher]!!,
             kernlPolicy
-        ).also {
-            advanceUntilIdle()
-        }
+        )
     }
 }

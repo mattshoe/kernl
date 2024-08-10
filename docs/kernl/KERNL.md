@@ -1,6 +1,6 @@
 # `object Kernl`
 
-The `Kernl` object manages global configurations for the `Kernl` framework
+The `kernl` dsl manages global configurations for the `Kernl` framework
 
 ## Properties
 

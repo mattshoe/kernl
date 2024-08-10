@@ -1,25 +1,24 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl
+package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
 class PreemptiveRefreshInvalidationTracker(
     private val strategy: InvalidationStrategy.PreemptiveRefresh,
-    stopwatch: Stopwatch
-): BaseInvalidationTracker(stopwatch) {
+    kernlResourceManager: KernlResourceManager
+): BaseInvalidationTracker(kernlResourceManager) {
     private val preemptiveCountdown = CountdownFlow("PreemptiveCountdown")
     private val manualRefreshStream = MutableSharedFlow<Unit>()
 
-    override val _invalidationStream = MutableSharedFlow<Unit>()
-
     override val refreshStream: Flow<Unit> =
         channelFlow {
-            _invalidationStream
+            kernlRegistration.timeToLiveStream
                 .onEach {
                     println("invalidation forwarded to refresh!")
                     send(it)

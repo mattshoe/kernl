@@ -3,20 +3,20 @@ package associativememorycache.impl
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
-import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiMixedParamComplexReturn
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiMixedParamComplexReturnKernl
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
-class MultiMixedParamComplexReturnTest : AssociativeMemoryCacheScenariosTest<MultiMixedParamComplexReturn.Params, ServiceResponse>() {
-    override fun repository(): AssociativeMemoryCacheKernl<MultiMixedParamComplexReturn.Params, ServiceResponse> {
-        return MultiMixedParamComplexReturn.Factory { id, bar ->
-            onFetch(MultiMixedParamComplexReturn.Params(id, bar))
+class MultiMixedParamComplexReturnTest : AssociativeMemoryCacheScenariosTest<MultiMixedParamComplexReturnKernl.Params, ServiceResponse>() {
+    override fun repository(): AssociativeMemoryCacheKernl<MultiMixedParamComplexReturnKernl.Params, ServiceResponse> {
+        return MultiMixedParamComplexReturnKernl.Factory { id, bar ->
+            onFetch(MultiMixedParamComplexReturnKernl.Params(id, bar))
             ServiceResponse(id.toInt() + bar.data.toInt())
         }
     }
 
     override val testData = mapOf(
-        MultiMixedParamComplexReturn.Params("42", ServiceRequest("58")) to ServiceResponse(100),
-        MultiMixedParamComplexReturn.Params("96", ServiceRequest("4")) to ServiceResponse(100),
-        MultiMixedParamComplexReturn.Params("1", ServiceRequest("2")) to ServiceResponse(3)
+        MultiMixedParamComplexReturnKernl.Params("42", ServiceRequest("58")) to ServiceResponse(100),
+        MultiMixedParamComplexReturnKernl.Params("96", ServiceRequest("4")) to ServiceResponse(100),
+        MultiMixedParamComplexReturnKernl.Params("1", ServiceRequest("2")) to ServiceResponse(3)
     )
 }

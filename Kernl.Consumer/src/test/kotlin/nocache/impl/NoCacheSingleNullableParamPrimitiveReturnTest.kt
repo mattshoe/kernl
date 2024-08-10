@@ -1,20 +1,20 @@
 package nocache.impl
 
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
-import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheSingleNullableParamPrimitiveReturn
+import kernl.org.mattshoe.shoebox.kernl.nocache.NoCacheSingleNullableParamPrimitiveReturnKernl
 import nocache.NoCacheScenariosTest
 
 // Single nullable primitive parameter, primitive return
-class NoCacheSingleNullableParamPrimitiveReturnTest: NoCacheScenariosTest<NoCacheSingleNullableParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): NoCacheKernl<NoCacheSingleNullableParamPrimitiveReturn.Params, Int> {
-        return NoCacheSingleNullableParamPrimitiveReturn.Factory { id ->
+class NoCacheSingleNullableParamPrimitiveReturnTest: NoCacheScenariosTest<NoCacheSingleNullableParamPrimitiveReturnKernl.Params, Int>() {
+    override fun repository(): NoCacheKernl<NoCacheSingleNullableParamPrimitiveReturnKernl.Params, Int> {
+        return NoCacheSingleNullableParamPrimitiveReturnKernl.Factory { id ->
             id?.toInt() ?: 0
         }
     }
 
     override val testData = mapOf(
-        NoCacheSingleNullableParamPrimitiveReturn.Params("42") to 42,
-        NoCacheSingleNullableParamPrimitiveReturn.Params("96") to 96,
-        NoCacheSingleNullableParamPrimitiveReturn.Params(null) to 0
+        NoCacheSingleNullableParamPrimitiveReturnKernl.Params("42") to 42,
+        NoCacheSingleNullableParamPrimitiveReturnKernl.Params("96") to 96,
+        NoCacheSingleNullableParamPrimitiveReturnKernl.Params(null) to 0
     )
 }

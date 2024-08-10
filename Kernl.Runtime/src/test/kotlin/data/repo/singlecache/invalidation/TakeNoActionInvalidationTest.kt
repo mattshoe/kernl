@@ -5,6 +5,7 @@ import com.google.common.truth.Truth
 import data.repo.singlecache.StubSingleCacheKernl
 import data.repo.singlecache.TestStopwatch
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -12,7 +13,8 @@ import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.KernlPolicyDefaults
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
@@ -21,17 +23,17 @@ import kotlin.time.measureTime
 class TakeNoActionInvalidationTest: InvalidationStrategyTest() {
     override val invalidationStrategy = InvalidationStrategy.TakeNoAction()
 
-    override fun makeSubject(
+    override fun CoroutineScope.makeSubject(
         dispatcher: CoroutineDispatcher,
         invalidationStrategy: InvalidationStrategy,
-        stopwatch: Stopwatch
+        kernlResourceManager: KernlResourceManager
     ): StubSingleCacheKernl {
         return StubSingleCacheKernl(
             dispatcher,
             KernlPolicyDefaults.copy(
                 invalidationStrategy = invalidationStrategy
             ),
-            stopwatch
+            kernlResourceManager
         )
     }
 
@@ -40,7 +42,7 @@ class TakeNoActionInvalidationTest: InvalidationStrategyTest() {
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.TakeNoAction(1000.milliseconds),
             dispatcher = coroutineContext[CoroutineDispatcher]!!,
-            stopwatch = TestStopwatch(testScheduler)
+//            stopwatch = TestStopwatch(testScheduler)
         )
 
         subject.data.test {

@@ -5,21 +5,20 @@ import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
 import data.repo.singlecache.StubSingleCacheKernl
 import io.mockk.clearAllMocks
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
+import util.TestKernlResourceManager
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
 abstract class InvalidationStrategyTest {
-    protected val unconfinedTestDispatcher = UnconfinedTestDispatcher()
     protected val standardTestDispatcher = StandardTestDispatcher()
     
     protected abstract val invalidationStrategy: InvalidationStrategy
@@ -29,10 +28,10 @@ abstract class InvalidationStrategyTest {
         clearAllMocks()
     }
     
-    protected abstract fun makeSubject(
+    protected abstract fun CoroutineScope.makeSubject(
         dispatcher: CoroutineDispatcher,
         invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(),
-        stopwatch: Stopwatch = MonotonicStopwatch()
+        kernlResourceManager: KernlResourceManager = TestKernlResourceManager(this)
     ): StubSingleCacheKernl
 
     @Test
@@ -62,7 +61,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() =
-        runTest(unconfinedTestDispatcher) {
+        runTest(standardTestDispatcher) {
             val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
             subject.data.test {
                 subject.fetch(42)

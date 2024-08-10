@@ -11,86 +11,86 @@ interface SingleMemoryCacheScenarios {
     suspend fun singleParamPrimitiveReturn(id: String): Int
 
     // Multiple same primitive parameters, primitive return
-    @Kernl.NoCache("NoCacheMultiSameParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiSameParamPrimitiveReturnKernl")
     suspend fun multiSameParamPrimitiveReturn(id: String, bar: String): Int
 
     // Multiple different primitive parameters, primitive return
-    @Kernl.NoCache("NoCacheMultiParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiParamPrimitiveReturnKernl")
     suspend fun multiParamPrimitiveReturn(id: String, bar: Int): Int
 
     // Single primitive parameter, complex return
-    @Kernl.NoCache("NoCacheSingleParamComplexReturn")
+    @Kernl.NoCache("NoCacheSingleParamComplexReturnKernl")
     suspend fun singleParamComplexReturn(id: String): ServiceResponse
 
     // Multiple different primitive parameters, complex return
-    @Kernl.NoCache("NoCacheMultiParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiParamComplexReturnKernl")
     suspend fun multiParamComplexReturn(id: String, bar: Int): ServiceResponse
 
     // Multiple same complex parameters, complex return
-    @Kernl.NoCache("NoCacheMultiSameParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiSameParamComplexReturnKernl")
     suspend fun multiSameParamComplexReturn(id: String, bar: ServiceResponse): ServiceResponse
 
     // Multiple different complex parameters, complex return
-    @Kernl.NoCache("NoCacheMultiComplexParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiComplexParamComplexReturnKernl")
     suspend fun multiComplexParamComplexReturn(id: ServiceRequest, bar: ServiceResponse): ServiceResponse
 
     // Single nullable primitive parameter, primitive return
-    @Kernl.NoCache("NoCacheSingleNullableParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheSingleNullableParamPrimitiveReturnKernl")
     suspend fun singleNullableParamPrimitiveReturn(id: String?): Int
 
     // Multiple nullable same primitive parameters, primitive return
-    @Kernl.NoCache("NoCacheMultiNullableSameParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiNullableSameParamPrimitiveReturnKernl")
     suspend fun multiNullableSameParamPrimitiveReturn(id: String?, bar: String?): Int
 
     // Multiple nullable different primitive parameters, primitive return
-    @Kernl.NoCache("NoCacheMultiNullableParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiNullableParamPrimitiveReturnKernl")
     suspend fun multiNullableParamPrimitiveReturn(id: String?, bar: Int?): Int
 
     // Single nullable primitive parameter, complex return
-    @Kernl.NoCache("NoCacheSingleNullableParamComplexReturn")
+    @Kernl.NoCache("NoCacheSingleNullableParamComplexReturnKernl")
     suspend fun singleNullableParamComplexReturn(id: String?): ServiceResponse
 
     // Multiple nullable same complex parameters, complex return
-    @Kernl.NoCache("NoCacheMultiNullableSameParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiNullableSameParamComplexReturnKernl")
     suspend fun multiNullableSameParamComplexReturn(id: String?, bar: ServiceResponse?): ServiceResponse
 
     // Multiple nullable different complex parameters, complex return
-    @Kernl.NoCache("NoCacheMultiNullableComplexParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiNullableComplexParamComplexReturnKernl")
     suspend fun multiNullableComplexParamComplexReturn(id: ServiceRequest?, bar: ServiceResponse?): ServiceResponse
 
     // Single complex parameter, primitive return
-    @Kernl.NoCache("NoCacheSingleComplexParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheSingleComplexParamPrimitiveReturnKernl")
     suspend fun singleComplexParamPrimitiveReturn(id: ServiceRequest): Int
 
     // Single complex parameter, complex return
-    @Kernl.NoCache("NoCacheSingleComplexParamComplexReturn")
+    @Kernl.NoCache("NoCacheSingleComplexParamComplexReturnKernl")
     suspend fun singleComplexParamComplexReturn(id: ServiceRequest): ServiceResponse
 
     // Multiple different complex parameters, primitive return
-    @Kernl.NoCache("NoCacheMultiComplexParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiComplexParamPrimitiveReturnKernl")
     suspend fun multiComplexParamPrimitiveReturn(id: ServiceRequest, bar: ServiceResponse): Int
 
     // Single nullable complex parameter, primitive return
-    @Kernl.NoCache("NoCacheSingleNullableComplexParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheSingleNullableComplexParamPrimitiveReturnKernl")
     suspend fun singleNullableComplexParamPrimitiveReturn(id: ServiceRequest?): Int
 
     // Multiple nullable different complex parameters, primitive return
-    @Kernl.NoCache("NoCacheMultiNullableComplexParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiNullableComplexParamPrimitiveReturnKernl")
     suspend fun multiNullableComplexParamPrimitiveReturn(id: ServiceRequest?, bar: ServiceResponse?): Int
 
     // Multiple mixed parameters (primitive and complex), primitive return
-    @Kernl.NoCache("NoCacheMultiMixedParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiMixedParamPrimitiveReturnKernl")
     suspend fun multiMixedParamPrimitiveReturn(id: String, bar: ServiceRequest): Int
 
     // Multiple mixed parameters (primitive and complex), complex return
-    @Kernl.NoCache("NoCacheMultiMixedParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiMixedParamComplexReturnKernl")
     suspend fun multiMixedParamComplexReturn(id: String, bar: ServiceRequest): ServiceResponse
 
     // Multiple mixed nullable parameters (primitive and complex), primitive return
-    @Kernl.NoCache("NoCacheMultiNullableMixedParamPrimitiveReturn")
+    @Kernl.NoCache("NoCacheMultiNullableMixedParamPrimitiveReturnKernl")
     suspend fun multiNullableMixedParamPrimitiveReturn(id: String?, bar: ServiceRequest?): Int
 
     // Multiple mixed nullable parameters (primitive and complex), complex return
-    @Kernl.NoCache("NoCacheMultiNullableMixedParamComplexReturn")
+    @Kernl.NoCache("NoCacheMultiNullableMixedParamComplexReturnKernl")
     suspend fun multiNullableMixedParamComplexReturn(id: String?, bar: ServiceRequest?): ServiceResponse
 }

@@ -6,11 +6,12 @@ in-memory network caching to offline backups in poor network conditions to datab
 
 ## Features
 
-1. **Declarative APIs:** Define the rules and **Kernl** generates the code to execute it.
+1. **Declarative API:** Define the rules and **Kernl** generates the code to execute it.
 2. **Performance:** **Kernl** uses KSP to generate code rather than relying on reflection to build functionality.
 2. **Flexible Caching:** Use **Kernl**-provided policies or build your own custom policies to define your needs.
 4. **Flexible Integration**: Integrates easily with all major dependency injection frameworks.
-3. **Real-Time Data Sync:** Ensure your entire application stays in sync with **Kernl**'s managed streams.
+5. **Kotlin-First**: Kernl prioritizes Kotlin native functionality like Coroutines and Serialization.
+6. **Real-Time Data Sync:** Ensure your entire application stays in sync with **Kernl**'s managed streams.
 
 ## Quick Start
 
@@ -35,21 +36,26 @@ for a list of annotations to use.
 
 ```kotlin
 interface UserDataService {
-    @Kernl.SingleCache.InMemory("UserData")
+    @Kernl.SingleCache.InMemory("UserData") // Note that "Kernl" will be appended to the end of the name automatically
     suspend fun getUserData(id: String, someParam: Int, otherParam: Boolean): UserData
 }
 ```
 
-### 3. (Optional) Create Your Own [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
-Refer to [`KernlPolicy`](docs/kernl/KERNL_POLICY.md) for further customization options
+### 3. Configure Kernl to manage session-scoped data
 ```kotlin
-class UserDataKernlPolicy: KernlPolicy, Disposable {
-    override val timeToLive = 25.minutes
-    override val cacheStrategy = CacheStrategy.DiskFirst
-    override val invalidationStrategy = InvalidationStrategy.LazyRefresh
+class MyUserSessionManager: UserSessionManager() {
+    val sessionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    override fun onUserLoggedIn() {
+        kernl {
+            startSession(sessionScope)
+        }
+    }
     
-    // You could use this to expose public triggers to affect Kernls en-masse
-    override val events = MutableSharedFlow<KernlEvenet>()
+    override fun logUserOut() {
+        kernl {
+            stopSession()
+        }
+    }
 }
 ```
 
@@ -70,12 +76,21 @@ val useDataKernl = UserDataKernl.Factory { id, someParam, otherParam ->
 ```
 
 #### With Custom KernlPolicy
+Refer to [`KernlPolicy`](docs/kernl/KERNL_POLICY.md) for further customization options
+```kotlin
+// Just copy the defaults and provide your own values! Each parameter is optional to allow you to only override what you need.
+val myKernlPolicy = KernlPolicyDefaults.copy(
+    retryStrategy = ExponentialBackoff.copy(maxAttempts = 4),
+//    cacheStrategy = CacheStrategy.DiskFirst,
+//    invalidationStrategy = InvalidationStrategy.LazyRefresh(timeToLive = 25.minutes)
+)
+```
 ```kotlin
 // Option 1: Pass function pointer to the factory
-val useDataKernl = UserDataKernl.Factory(kernlPolicy, serviceImpl::getUserData)
+val useDataKernl = UserDataKernl.Factory(myKernlPolicy, serviceImpl::getUserData)
 
 // Option 2: Pass lambda to the factory
-val useDataKernl = UserDataKernl.Factory(kernlPolicy) { id, someParam, otherParam ->
+val useDataKernl = UserDataKernl.Factory(myKernlPolicy) { id, someParam, otherParam ->
     service.getUserData(id, someParam, otherParam)
 }
 ```
@@ -102,10 +117,9 @@ interface UserDataModule {
     companion object {
         @Provides
         fun provideUserDataKernl(
-            service: UserDataService,
-            kernlPolicy: UserDataKernlPolicy
+            service: UserDataService
         ): UserDataKernl {
-            return UserDataKernl.Factory(kernlPolicy, service::getUserData)
+            return UserDataKernl.Factory(myKernlPolicy, service::getUserData)
         }
     }
 }
@@ -188,7 +202,7 @@ class UserRepository(
     }
     
     private suspend fun handleInvalidation() {
-        userDataKernl.refresb(
+        userDataKernl.refresh(
             UserDataKernl.Params(id, someParam, otherParam)
         )
     }
@@ -212,9 +226,11 @@ class UserRepository(
 - [`Kernl`](docs/kernl/KERNL.md)
 - [`DefaultKernlPolicy`](docs/kernl/DEFAULT_KERNL_POLICY.md)
 - [`KernlPolicy`](docs/kernl/KERNL_POLICY.md)
+- [`RetryStrategy`](docs/kernl/RETRY_STRATEGY.md)
 - [`CacheStrategy`](docs/kernl/CACHE_STRATEGY.md)
 - [`InvalidationStrategy`](docs/kernl/INVALIDATION_STRATEGY.md)
 - [`KernlEvent`](docs/kernl/KERNL_EVENT.md)
+- [`ExponentialBackoff`](docs/kernl/EXPONENTIAL_BACKOFF.md)
 
 ### Extensions
 - [`valueOrNull()`](docs/extensions/VALUE_OR_NULL.md)

@@ -14,7 +14,7 @@ import kotlinx.coroutines.coroutineScope
 class AssociativeMemoryCacheProcessor(
     logger: KSPLogger,
     private val codeGenerator: MemoryCacheCodeGenerator
-): RepositoryFunctionProcessor(
+): KernlFunctionProcessor(
     logger
 ) {
     override val targetClass = KSFunctionDeclaration::class

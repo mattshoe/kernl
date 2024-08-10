@@ -1,8 +1,8 @@
 package org.mattshoe.shoebox.kernl.processors.impl
 
-import util.RepositoryProcessorTestHarness
+import util.KernlProcessorTestHarness
 
-class NoCacheProcessorTest: RepositoryProcessorTestHarness() {
+class NoCacheProcessorTest: KernlProcessorTestHarness() {
 
     override val annotationText = "@Kernl.NoCache"
 

@@ -1,32 +1,34 @@
 package org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import org.mattshoe.shoebox.kernl.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
+import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
+import org.mattshoe.shoebox.kernl.KernlEvent
+import org.mattshoe.shoebox.kernl.KernlPolicy
+import org.mattshoe.shoebox.kernl.internal.*
 import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactory
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactory
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KClass
 
 abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val kernlPolicy: KernlPolicy = DefaultKernlPolicy,
-    private val stopwatch: Stopwatch = MonotonicStopwatch(),
-    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(stopwatch)
+    private val kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager,
+    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(kernlResourceManager),
 ): SingleCacheKernl<TParams, TData> {
     private val lastParams = AtomicReference<TParams>()
-    private val coroutineScope by lazy {
-        CoroutineScope(
-            SupervisorJob()
-            + CoroutineName(this::class.qualifiedName.toString())
-            + dispatcher
-        )
-    }
     private val dataSource by lazy {
         DataSource.Builder
             .memoryCache(dataType)
@@ -39,29 +41,36 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
 
     protected abstract val dataType: KClass<TData>
 
+    @Suppress("DEPRECATION_ERROR")
     override val data: Flow<DataResult<TData>>
-        get() = dataSource.data
-
-    init {
-        if (kernlPolicy.events !is GlobalKernlEventStream) {
-            Kernl.events
+        get() = channelFlow {
+            // Need to make sure the KernlPolicy isn't using the global event stream already, wouldn't want dupes
+            if (kernlPolicy.events !is InternalGlobalKernlEventStream) {
+                kernl { globalEventStream() }
+                    .onEach {
+                        println("Global KernlEvent received: $it")
+                        handleKernlEvent(it)
+                    }.launchIn(this)
+            }
+            kernlPolicy.events
                 .onEach {
+                    println("Policy KernlEvent received: $it")
                     handleKernlEvent(it)
-                }.launchIn(coroutineScope)
+                }.launchIn(this)
+            invalidationTracker.invalidationStream
+                .onEach {
+                    println("InvalidationStream Event!")
+                    invalidate()
+                }.launchIn(this)
+            invalidationTracker.refreshStream
+                .onEach {
+                    println("RefreshStream event!")
+                    refresh()
+                }.launchIn(this)
+            dataSource.data.collect {
+                send(it)
+            }
         }
-        kernlPolicy.events
-            .onEach {
-                handleKernlEvent(it)
-            }.launchIn(coroutineScope)
-        invalidationTracker.invalidationStream
-            .onEach {
-                invalidate()
-            }.launchIn(coroutineScope)
-        invalidationTracker.refreshStream
-            .onEach {
-                refresh()
-            }.launchIn(coroutineScope)
-    }
 
     protected abstract suspend fun fetchData(params: TParams): TData
 
@@ -91,10 +100,6 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
             dataSource.invalidate()
             invalidationTracker.onInvalidated()
         }
-    }
-
-    override fun close() {
-        coroutineScope.cancel()
     }
 
     private suspend fun handleKernlEvent(event: KernlEvent) {

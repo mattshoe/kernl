@@ -1,19 +1,19 @@
 # `SingleCacheKernl<TParams: Any, TData: Any>`
-Repository that holds a single cached value in memory. <br>
+Kernl that holds a single cached value in memory. <br>
 Any updates to the cached value are broadcast immediately to all listeners.
 
 By default, only the very first call to the [fetch](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) method will be honored.<br>All subsequent invocations of `fetch` will
 be ignored unless the [forceRefresh](#suspend-fun-fetchdata-tparams-forcerefresh-boolean--false) value is passed as `true`.
 
-This repository will guarantee that only ONE data retrieval operation can ever be in flight at a given time.
+This kernl will guarantee that only ONE data retrieval operation can ever be in flight at a given time.
 
 ### `val data: Flow<DataResult<TData>>`
-Exposes the stream of values held in memory by this repository. Each time the underlying data changes anywhere in the
+Exposes the stream of values held in memory by this kernl. Each time the underlying data changes anywhere in the
 app, the new value will be emitted to all listeners. This ensures your data stays in sync across your application by holding a
 single source of truth. Details on the encapsulating `DataResult` [here](../DATA_RESULT.md).
 
 ### `suspend fun fetch(params: TParams, forceRefresh: Boolean = false)`
-Use this method to initialize the data for this repository. This method has some very important characteristics:
+Use this method to initialize the data for this kernl. This method has some very important characteristics:
 1. Only the first call to `fetch` will be run. All subsequent invocations will be **_dropped_** unless the `forceRefresh` flag is true.
 2. Guarantees that only one data operation will ever be in flight at any given time. If a data operation is in flight, then all invocations of `fetch` will be dropped until the operation completes.
 

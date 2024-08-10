@@ -8,20 +8,20 @@ import org.junit.Test
 import java.io.File
 
 @OptIn(ExperimentalCompilerApi::class)
-abstract class RepositoryProcessorTestHarness {
+abstract class KernlProcessorTestHarness {
     protected abstract val annotationText: String
 
     @Test
     fun `WHEN annotated function has no parameters THEN compilation error is thrown`() {
         assertOutput(
-            "NoParamRepository",
+            "NoParamKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "NoParamRepository")
+                    $annotationText(name = "NoParamKernl")
                     suspend fun fetchData(): String
                 }
                 
@@ -33,14 +33,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `WHEN annotated function has no return type THEN error is thrown`() {
         assertOutput(
-            "NoReturnRepository",
+            "NoReturnKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "NoReturnRepository")
+                    $annotationText(name = "NoReturnKernl")
                     suspend fun fetchData(string: String)
                 }
                 
@@ -52,14 +52,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `WHEN annotated function has Unit return type THEN error is thrown`() {
         assertOutput(
-            "UnitReturnRepository",
+            "UnitReturnKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "UnitReturnRepository")
+                    $annotationText(name = "UnitReturnKernl")
                     suspend fun fetchData(string: String): Unit
                 }
                 
@@ -71,14 +71,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `WHEN annotated function has no params and Unit return type THEN error is thrown`() {
         assertOutput(
-            "NoParamUnitReturnRepository",
+            "NoParamUnitReturnKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "NoParamUnitReturnRepository")
+                    $annotationText(name = "NoParamUnitReturnKernl")
                     suspend fun fetchData(): Unit
                 }
                 
@@ -90,14 +90,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `WHEN annotated function has no params and no return type THEN error is thrown`() {
         assertOutput(
-            "NoParamNoReturnRepository",
+            "NoParamNoReturnKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "NoParamNoReturnRepository")
+                    $annotationText(name = "NoParamNoReturnKernl")
                     suspend fun fetchData()
                 }
                 
@@ -109,14 +109,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `test processor generates expected files`() {
         assertOutput(
-            fileName = "MyTestRepository",
+            fileName = "MyTestKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "MyTestRepository")
+                    $annotationText(name = "MyTestKernl")
                     suspend fun fetchData(param: String): String
                 }
                 
@@ -129,24 +129,24 @@ abstract class RepositoryProcessorTestHarness {
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
-                public interface MyTestRepository : SingleCacheKernl<MyTestRepository.Params, String> {
+                public interface MyTestKernl : SingleCacheKernl<MyTestKernl.Params, String> {
                   public data class Params(
                     public val `param`: String,
                   )
                 
                   public companion object {
-                    public fun Factory(call: suspend (String) -> String): MyTestRepository =
-                        MyTestRepositoryImpl(call)
+                    public fun Factory(call: suspend (String) -> String): MyTestKernl =
+                        MyTestKernlImpl(call)
                   }
                 }
                 
-                private class MyTestRepositoryImpl(
+                private class MyTestKernlImpl(
                   private val call: suspend (String) -> String,
-                ) : BaseSingleCacheKernl<MyTestRepository.Params, String>(),
-                    MyTestRepository {
+                ) : BaseSingleCacheKernl<MyTestKernl.Params, String>(),
+                    MyTestKernl {
                   override val dataType: KClass<String> = String::class
                 
-                  override suspend fun fetchData(params: MyTestRepository.Params): String = call(params.param)
+                  override suspend fun fetchData(params: MyTestKernl.Params): String = call(params.param)
                 }
             """.trimIndent()
         )
@@ -155,14 +155,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `test processor with multiple parameters`() {
         assertOutput(
-            fileName = "MultiParamRepository",
+            fileName = "MultiParamKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "MultiParamRepository")
+                    $annotationText(name = "MultiParamKernl")
                     suspend fun fetchData(param1: String, param2: Int): String
                 }
             """.trimIndent(),
@@ -175,26 +175,26 @@ abstract class RepositoryProcessorTestHarness {
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
-                public interface MultiParamRepository :
-                    SingleCacheKernl<MultiParamRepository.Params, String> {
+                public interface MultiParamKernl :
+                    SingleCacheKernl<MultiParamKernl.Params, String> {
                   public data class Params(
                     public val param1: String,
                     public val param2: Int,
                   )
                 
                   public companion object {
-                    public fun Factory(call: suspend (String, Int) -> String): MultiParamRepository =
-                        MultiParamRepositoryImpl(call)
+                    public fun Factory(call: suspend (String, Int) -> String): MultiParamKernl =
+                        MultiParamKernlImpl(call)
                   }
                 }
                 
-                private class MultiParamRepositoryImpl(
+                private class MultiParamKernlImpl(
                   private val call: suspend (String, Int) -> String,
-                ) : BaseSingleCacheKernl<MultiParamRepository.Params, String>(),
-                    MultiParamRepository {
+                ) : BaseSingleCacheKernl<MultiParamKernl.Params, String>(),
+                    MultiParamKernl {
                   override val dataType: KClass<String> = String::class
                 
-                  override suspend fun fetchData(params: MultiParamRepository.Params): String =
+                  override suspend fun fetchData(params: MultiParamKernl.Params): String =
                       call(params.param1, params.param2)
                 }
             """.trimIndent()
@@ -204,14 +204,14 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `test processor with different return type`() {
         assertOutput(
-            fileName = "DifferentReturnTypeRepository",
+            fileName = "DifferentReturnTypeKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
                 import org.mattshoe.shoebox.kernl.annotations.Kernl
     
                 interface SomeInterface {
-                    $annotationText(name = "DifferentReturnTypeRepository")
+                    $annotationText(name = "DifferentReturnTypeKernl")
                     suspend fun fetchData(param: String): Int
                 }
             """.trimIndent(),
@@ -224,25 +224,25 @@ abstract class RepositoryProcessorTestHarness {
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
-                public interface DifferentReturnTypeRepository :
-                    SingleCacheKernl<DifferentReturnTypeRepository.Params, Int> {
+                public interface DifferentReturnTypeKernl :
+                    SingleCacheKernl<DifferentReturnTypeKernl.Params, Int> {
                   public data class Params(
                     public val `param`: String,
                   )
                 
                   public companion object {
-                    public fun Factory(call: suspend (String) -> Int): DifferentReturnTypeRepository =
-                        DifferentReturnTypeRepositoryImpl(call)
+                    public fun Factory(call: suspend (String) -> Int): DifferentReturnTypeKernl =
+                        DifferentReturnTypeKernlImpl(call)
                   }
                 }
                 
-                private class DifferentReturnTypeRepositoryImpl(
+                private class DifferentReturnTypeKernlImpl(
                   private val call: suspend (String) -> Int,
-                ) : BaseSingleCacheKernl<DifferentReturnTypeRepository.Params, Int>(),
-                    DifferentReturnTypeRepository {
+                ) : BaseSingleCacheKernl<DifferentReturnTypeKernl.Params, Int>(),
+                    DifferentReturnTypeKernl {
                   override val dataType: KClass<Int> = Int::class
                 
-                  override suspend fun fetchData(params: DifferentReturnTypeRepository.Params): Int =
+                  override suspend fun fetchData(params: DifferentReturnTypeKernl.Params): Int =
                       call(params.param)
                 }
             """.trimIndent()
@@ -252,7 +252,7 @@ abstract class RepositoryProcessorTestHarness {
     @Test
     fun `test processor with complex return type`() {
         assertOutput(
-            fileName = "ComplexReturnTypeRepository",
+            fileName = "ComplexReturnTypeKernl",
             sourceContent =  """
                 package org.mattshoe.test
     
@@ -261,7 +261,7 @@ abstract class RepositoryProcessorTestHarness {
                 data class ComplexType(val data: String, val number: Int)
     
                 interface SomeInterface {
-                    $annotationText(name = "ComplexReturnTypeRepository")
+                    $annotationText(name = "ComplexReturnTypeKernl")
                     suspend fun fetchData(param: String): ComplexType
                 }
             """.trimIndent(),
@@ -274,25 +274,25 @@ abstract class RepositoryProcessorTestHarness {
                 import kotlin.String
                 import kotlin.reflect.KClass
                 
-                public interface ComplexReturnTypeRepository :
-                    SingleCacheKernl<ComplexReturnTypeRepository.Params, ComplexType> {
+                public interface ComplexReturnTypeKernl :
+                    SingleCacheKernl<ComplexReturnTypeKernl.Params, ComplexType> {
                   public data class Params(
                     public val `param`: String,
                   )
                 
                   public companion object {
-                    public fun Factory(call: suspend (String) -> ComplexType): ComplexReturnTypeRepository =
-                        ComplexReturnTypeRepositoryImpl(call)
+                    public fun Factory(call: suspend (String) -> ComplexType): ComplexReturnTypeKernl =
+                        ComplexReturnTypeKernlImpl(call)
                   }
                 }
                 
-                private class ComplexReturnTypeRepositoryImpl(
+                private class ComplexReturnTypeKernlImpl(
                   private val call: suspend (String) -> ComplexType,
-                ) : BaseSingleCacheKernl<ComplexReturnTypeRepository.Params, ComplexType>(),
-                    ComplexReturnTypeRepository {
+                ) : BaseSingleCacheKernl<ComplexReturnTypeKernl.Params, ComplexType>(),
+                    ComplexReturnTypeKernl {
                   override val dataType: KClass<ComplexType> = ComplexType::class
                 
-                  override suspend fun fetchData(params: ComplexReturnTypeRepository.Params): ComplexType =
+                  override suspend fun fetchData(params: ComplexReturnTypeKernl.Params): ComplexType =
                       call(params.param)
                 }
             """.trimIndent()
