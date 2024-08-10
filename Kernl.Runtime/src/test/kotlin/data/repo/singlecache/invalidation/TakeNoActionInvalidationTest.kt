@@ -15,6 +15,7 @@ import org.mattshoe.shoebox.kernl.KernlPolicyDefaults
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
+import util.runKernlTest
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
@@ -38,7 +39,7 @@ class TakeNoActionInvalidationTest: InvalidationStrategyTest() {
     }
 
     @Test
-    fun `WHEN timeToLive expires THEN data is invalidated`() = runTest(standardTestDispatcher) {
+    fun `WHEN timeToLive expires THEN data is invalidated`() = runKernlTest(standardTestDispatcher) {
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.TakeNoAction(1000.milliseconds),
             dispatcher = coroutineContext[CoroutineDispatcher]!!,

@@ -7,6 +7,7 @@ import data.repo.singlecache.StubSingleCacheKernl
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
@@ -16,6 +17,7 @@ import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import util.TestKernlResourceManager
+import util.runKernlTest
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
 abstract class InvalidationStrategyTest {
@@ -27,6 +29,7 @@ abstract class InvalidationStrategyTest {
     fun setUp() {
         clearAllMocks()
     }
+
     
     protected abstract fun CoroutineScope.makeSubject(
         dispatcher: CoroutineDispatcher,
@@ -35,7 +38,7 @@ abstract class InvalidationStrategyTest {
     ): StubSingleCacheKernl
 
     @Test
-    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runTest {
+    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.data.test {
             subject.fetch(42)
@@ -45,7 +48,7 @@ abstract class InvalidationStrategyTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval fails THEN error is emitted`() = runTest {
+    fun `WHEN dataRetrieval fails THEN error is emitted`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.data.test {
             val expectedValue = RuntimeException("oops")
@@ -137,7 +140,7 @@ abstract class InvalidationStrategyTest {
         }
 
     @Test
-    fun `WHEN refresh is invoked THEN new item is emitted`() = runTest {
+    fun `WHEN refresh is invoked THEN new item is emitted`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         var counter = 0
         subject.data.test {
@@ -155,7 +158,7 @@ abstract class InvalidationStrategyTest {
     }
 
     @Test
-    fun `WHEN multiple listeners THEN all receive updates`() = runTest {
+    fun `WHEN multiple listeners THEN all receive updates`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -177,7 +180,7 @@ abstract class InvalidationStrategyTest {
     }
 
     @Test
-    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runTest {
+    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -194,12 +197,12 @@ abstract class InvalidationStrategyTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runTest {
+    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runKernlTest {
         makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!).refresh()
     }
 
     @Test
-    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runTest {
+    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.invalidate()
         subject.data.test {
@@ -208,7 +211,7 @@ abstract class InvalidationStrategyTest {
     }
 
     @Test
-    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runTest {
+    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
         subject.data.test {
             subject.fetch(42)

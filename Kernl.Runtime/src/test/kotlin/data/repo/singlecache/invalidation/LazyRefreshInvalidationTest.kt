@@ -13,6 +13,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
+import util.runKernlTest
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.measureTime
 
@@ -40,7 +41,7 @@ class LazyRefreshInvalidationTest: InvalidationStrategyTest() {
     }
 
     @Test
-    fun `WHEN timeToLive expires THEN data is invalidated THEN data is refreshed only AFTER a new request`() = runTest {
+    fun `WHEN timeToLive expires THEN data is invalidated THEN data is refreshed only AFTER a new request`() = runKernlTest {
 
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.LazyRefresh(1000.milliseconds),
@@ -69,7 +70,7 @@ class LazyRefreshInvalidationTest: InvalidationStrategyTest() {
     }
 
     @Test
-    fun `WHEN timeToLive has not expired AND data is manually invalidated THEN data is refreshed only AFTER a new request`() = runTest {
+    fun `WHEN timeToLive has not expired AND data is manually invalidated THEN data is refreshed only AFTER a new request`() = runKernlTest {
 
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.LazyRefresh(1000.milliseconds),

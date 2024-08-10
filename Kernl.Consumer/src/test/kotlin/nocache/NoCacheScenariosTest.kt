@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.runtime.DataResult
+import util.runKernlTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class NoCacheScenariosTest<TParams: Any, TResponse: Any> {
@@ -23,7 +24,7 @@ abstract class NoCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun test() = runTest(StandardTestDispatcher()) {
+    fun test() = runKernlTest {
         testData.forEach { (params, response) ->
             val actualResponse = subject.fetch(params)
             Truth.assertThat(actualResponse).isEqualTo(DataResult.Success(response))

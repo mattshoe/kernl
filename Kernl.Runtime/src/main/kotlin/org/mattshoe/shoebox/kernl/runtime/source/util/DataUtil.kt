@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.util
+package org.mattshoe.shoebox.kernl.runtime.source.util
 
 import kotlinx.coroutines.delay
 import org.mattshoe.shoebox.kernl.RetryStrategy

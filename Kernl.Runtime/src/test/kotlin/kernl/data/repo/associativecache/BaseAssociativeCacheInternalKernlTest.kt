@@ -3,6 +3,7 @@ package kernl.data.repo.associativecache
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
+import io.mockk.unmockkAll
 import kernl.data.TestKernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ext.unwrap
@@ -13,7 +14,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.KernlEvent
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import util.runKernlTest
 import kotlin.time.Duration
 
@@ -25,6 +26,7 @@ class BaseAssociativeCacheInternalKernlTest {
 
     @Before
     fun before() {
+        unmockkAll()
         testKernlPolicy = TestKernlPolicy()
         subject = StubBaseAssociativeCacheKernl(dispatcher, testKernlPolicy)
     }

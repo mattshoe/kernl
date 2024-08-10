@@ -14,7 +14,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import kotlin.time.Duration
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)

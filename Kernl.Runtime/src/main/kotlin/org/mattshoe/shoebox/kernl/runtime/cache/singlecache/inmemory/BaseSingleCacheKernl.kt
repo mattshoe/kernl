@@ -18,7 +18,7 @@ import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KClass
 

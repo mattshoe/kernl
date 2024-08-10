@@ -15,7 +15,7 @@ import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import kotlin.reflect.KClass
 
 abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
