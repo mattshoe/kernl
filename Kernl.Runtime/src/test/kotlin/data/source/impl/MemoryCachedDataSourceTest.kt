@@ -168,7 +168,7 @@ class MemoryCachedDataSourceTest {
 
     @Test
     fun `WHEN ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runTest(standardTestDispatcher) {
-        val subject = makeSubject(standardTestDispatcher, ExponentialBackoff())
+        val subject = makeSubject(standardTestDispatcher, ExponentialBackoff)
         subject.data.test {
             val attempts = mutableListOf<String>()
 
@@ -187,7 +187,7 @@ class MemoryCachedDataSourceTest {
 
     @Test
     fun `WHEN ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runTest(standardTestDispatcher) {
-        val subject = makeSubject(standardTestDispatcher, ExponentialBackoff())
+        val subject = makeSubject(standardTestDispatcher, ExponentialBackoff)
         subject.data.test {
             val attempts = mutableListOf<String>()
 

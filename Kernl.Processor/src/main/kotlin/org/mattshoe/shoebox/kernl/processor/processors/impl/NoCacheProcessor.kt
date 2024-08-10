@@ -12,10 +12,12 @@ import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import org.mattshoe.shoebox.util.className
 import kotlinx.coroutines.*
+import org.mattshoe.shoebox.kernl.ExponentialBackoff
+import org.mattshoe.shoebox.kernl.RetryStrategy
 
 class  NoCacheProcessor(
     logger: KSPLogger
-): RepositoryFunctionProcessor(logger) {
+): KernlFunctionProcessor(logger) {
 
     override val annotationClass = Kernl.NoCache::class
 
@@ -106,13 +108,21 @@ class  NoCacheProcessor(
                 TypeSpec.companionObjectBuilder()
                     .addFunction(
                         FunSpec.builder("Factory")
+                            .addParameter(
+                                ParameterSpec.builder(
+                                    "retryStrategy",
+                                    ClassName(RetryStrategy::class.java.packageName, RetryStrategy::class.simpleName!!).copy(nullable = true)
+                                )
+                                    .defaultValue("null")
+                                    .build()
+                            )
                             .addParameter("call", LambdaTypeName.get(
                                 parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
                                 returnType = dataType.className
                             ).copy(suspending = true))
                             .returns(ClassName(packageName, repositoryName))
                             .addCode("""
-                                return ${repositoryName}Impl(call)
+                                return ${repositoryName}Impl(retryStrategy,·call)
                             """.trimIndent())
                             .build()
                     )
@@ -131,6 +141,12 @@ class  NoCacheProcessor(
             .addModifiers(KModifier.PRIVATE)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
+                    .addParameter(
+                        ParameterSpec.builder(
+                            "retryStrategy",
+                            ClassName(RetryStrategy::class.java.packageName, RetryStrategy::class.simpleName!!).copy(nullable = true)
+                        ).build()
+                    )
                     .addParameter("call", LambdaTypeName.get(
                         parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
                         returnType = dataType.className
@@ -147,6 +163,7 @@ class  NoCacheProcessor(
                     dataType.className
                 )
             )
+            .addSuperclassConstructorParameter("%N·=·%N", "retryStrategy", "retryStrategy")
             .addProperty(
                 PropertySpec.builder("call", LambdaTypeName.get(
                     parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },

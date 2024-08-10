@@ -3,6 +3,7 @@ package nocache
 import com.google.common.truth.Truth
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -22,7 +23,7 @@ abstract class NoCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun test() = runTest(UnconfinedTestDispatcher()) {
+    fun test() = runTest(StandardTestDispatcher()) {
         testData.forEach { (params, response) ->
             val actualResponse = subject.fetch(params)
             Truth.assertThat(actualResponse).isEqualTo(DataResult.Success(response))

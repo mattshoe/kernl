@@ -1,12 +1,15 @@
 package org.mattshoe.shoebox.kernl
 
 import kotlinx.coroutines.flow.Flow
+import org.mattshoe.shoebox.kernl.internal.*
 import kotlin.time.Duration
 
+
+@Suppress("DEPRECATION_ERROR")
 object KernlPolicyDefaults {
     fun copy(
         retryStrategy: RetryStrategy? = null,
-        events: Flow<KernlEvent> = Kernl.events,
+        events: Flow<KernlEvent> = InternalKernl.events,
         cacheStrategy: CacheStrategy = CacheStrategy.NetworkFirst,
         invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE),
     ): KernlPolicy {

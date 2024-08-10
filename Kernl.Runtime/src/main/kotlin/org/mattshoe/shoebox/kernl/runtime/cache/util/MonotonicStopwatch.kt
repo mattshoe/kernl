@@ -10,6 +10,10 @@ class MonotonicStopwatch: Stopwatch {
         startTime = now()
     }
 
+    override fun stop() {
+        startTime = null
+    }
+
     override fun elapsed(): Duration {
         return startTime?.let {
             now().minus(it)

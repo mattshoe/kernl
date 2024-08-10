@@ -66,25 +66,16 @@ class MyViewModel @Inject constructor(
     private val _state = MutableStateFlow<YourState>(YourState.Loading)
     val state: StateFlow<YourState> = _state
 
-    init {
-        loadData(
-            someId,
-            someParam,
-            otherParam
-        )
-    }
-
     fun loadData(id: String, someParam: Int, otherParam: Boolean) {
         viewModelScope.launch {
-            try {
-                val result = myNoCacheKernl.fetch(
-                    MyNoCacheKernl.Params(id, someParam, otherParam)
-                )
-                _state.udpate { YourState.Success(result.data) }
-            } catch (e: Throwable) {
-                ensureActive()
-                _state.update { YourState.Error }
-            }            
+            val result = myNoCacheKernl.fetch(
+                MyNoCacheKernl.Params(id, someParam, otherParam)
+            )
+            when (result) {
+                is DataResult.Success -> _state.update { YourState.Success(result.value) }
+                is DataResult.Error -> _state.update { YourState.Error(it.error) }
+            }
+            
         }
     }
 }

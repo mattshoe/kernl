@@ -6,13 +6,14 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.mattshoe.shoebox.kernl.Kernl
 import org.mattshoe.shoebox.kernl.KernlEvent
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
@@ -34,7 +35,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
     }
 
     @Test
-    fun `multiple streamers all receive updates then all receive invalidated`() = runTest(UnconfinedTestDispatcher()) {
+    fun `multiple streamers all receive updates then all receive invalidated`() = runTest(StandardTestDispatcher()) {
         println("Associative Direct Parameterized Invalidation")
         testData.forEach {(params, response) ->
             println("params: $params")
@@ -79,7 +80,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
     }
 
     @Test
-    fun `multiple streamers all receive updates on global invalidation`() = runTest(UnconfinedTestDispatcher()) {
+    fun `multiple streamers all receive updates on global invalidation`() = runTest(StandardTestDispatcher()) {
         println("Associative Global Invalidation")
         testData.forEach {(params, response) ->
             println("Starting params: $params")
@@ -104,7 +105,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
                 advanceUntilIdle()
 
                 println("invalidating")
-                Kernl.globalEvent(KernlEvent.Invalidate())
+                kernl { globalInvalidate() }
 
                 advanceUntilIdle()
 
@@ -125,7 +126,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
     }
 
     @Test
-    fun `multiple streamers all receive updates on global invalidation with specific params`() = runTest(UnconfinedTestDispatcher()) {
+    fun `multiple streamers all receive updates on global invalidation with specific params`() = runTest(StandardTestDispatcher()) {
         println("Associative Global Parameterized Invalidation")
         testData.forEach {(params, response) ->
             println("Params: $params")
@@ -150,7 +151,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
                 advanceUntilIdle()
 
                 println("invalidating")
-                Kernl.globalEvent(KernlEvent.Invalidate(params))
+                kernl { globalInvalidate(params)}
 
                 advanceUntilIdle()
 

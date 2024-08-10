@@ -6,11 +6,12 @@ import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
 class EagerRefreshInvalidationTracker(
     private val strategy: InvalidationStrategy.EagerRefresh,
-    stopwatch: Stopwatch
-): BaseInvalidationTracker(stopwatch) {
+    kernlResourceManager: KernlResourceManager
+): BaseInvalidationTracker(kernlResourceManager) {
 
     private val manualRefreshStream = MutableSharedFlow<Unit>()
 
@@ -18,7 +19,7 @@ class EagerRefreshInvalidationTracker(
 
     override val refreshStream: Flow<Unit>
         get() = channelFlow {
-            timeToLive.events
+            kernlRegistration.timeToLiveStream
                 .onEach {
                     send(it)
                 }.launchIn(this)

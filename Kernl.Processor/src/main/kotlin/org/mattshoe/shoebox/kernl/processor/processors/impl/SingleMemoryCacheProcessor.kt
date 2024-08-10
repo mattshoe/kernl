@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
 class SingleMemoryCacheProcessor(
     logger: KSPLogger,
     private val codeGenerator: MemoryCacheCodeGenerator
-): RepositoryFunctionProcessor(
+): KernlFunctionProcessor(
     logger
 ) {
 

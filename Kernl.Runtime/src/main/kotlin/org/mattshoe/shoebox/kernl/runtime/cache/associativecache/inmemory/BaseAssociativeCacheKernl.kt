@@ -1,18 +1,21 @@
 package org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
-import org.mattshoe.shoebox.kernl.Kernl
 import org.mattshoe.shoebox.kernl.KernlEvent
 import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.source.DataSource
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import kotlin.reflect.KClass
 
 abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
@@ -157,7 +160,7 @@ abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
     }
 
     private suspend fun ProducerScope<DataResult<TData>>.collectGlobalEvents(params: TParams) {
-        Kernl.events
+        kernl { globalEventStream() }
             .onEach { event ->
                 handleKernlEvent(event, params)
             }

@@ -4,19 +4,19 @@ The `DefaultKernlPolicy` object implements the [`KernlPolicy`](KERNL_POLICY.md) 
 
 ```kotlin
 object DefaultKernlPolicy: KernlPolicy {
-    override val timeToLive = Duration.INFINITE
+    override val retryStrategy: RetryStrategy? = null
     override val events: Flow<KernlEvent> = Kernl.events
     override val cacheStrategy = CacheStrategy.NetworkFirst
-    override val invalidationStrategy = InvalidationStrategy.TakeNoAction
+    override val invalidationStrategy = InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE)
 }
 ```
 
 ## Properties
 
-### `timeToLive`
-- **Type:** `Duration`
-- **Value:** `Duration.INFINITE`
-- **Description:** Specifies that cached data never expires by default.
+### `retryStrategy`
+- **Type:** `RetryStrategy?`
+- **Value:** `null`
+- **Description:** Specifies that to employ upon a failed data retrieval.
 
 ### `events`
 - **Type:** [`Flow<KernlEvent>`](KERNL_EVENT.md)
@@ -30,8 +30,8 @@ object DefaultKernlPolicy: KernlPolicy {
 
 ### `invalidationStrategy`
 - **Type:** [`InvalidationStrategy`](INVALIDATION_STRATEGY.md)
-- **Value:** `InvalidationStrategy.TakeNoAction`
-- **Description:** No action is taken upon cache invalidation by default.
+- **Value:** `InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE),`
+- **Description:** By default, no invalidation will ever occur unless manually triggered.
 
 ## Summary
 

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.ext.selectivelyDistinct
+import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -78,29 +79,6 @@ internal open class MemoryCachedDataSource<T: Any>(
     }
 
     private fun noOtherServiceCallsAreInFlight() = dataMutex.tryLock()
-
-    private suspend fun <T> fetchWithRetryStrategy(
-        strategy: RetryStrategy?,
-        block: suspend () -> T
-    ): T {
-        if (strategy == null) {
-            return block()
-        } else {
-            var nextDelay = strategy.initialDelay
-            repeat(strategy.maxAttempts) { attempt ->
-                try {
-                    return block()
-                } catch (e: Throwable) {
-                    if (attempt == strategy.maxAttempts - 1) {
-                        throw e
-                    }
-                }
-                delay(nextDelay)
-                nextDelay = (nextDelay.inWholeMilliseconds * strategy.backoffFactor).milliseconds
-            }
-        }
-        throw IllegalStateException("Unable to fetch data for ${this::class.qualifiedName}")
-    }
 
 }
 

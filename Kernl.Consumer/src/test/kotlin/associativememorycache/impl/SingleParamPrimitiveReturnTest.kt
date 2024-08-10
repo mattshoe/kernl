@@ -1,20 +1,20 @@
 package associativememorycache.impl
 
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
-import kernl.org.mattshoe.shoebox.kernl.associativememorycache.SingleParamPrimitiveReturn
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.SingleParamPrimitiveReturnKernl
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
-class SingleParamPrimitiveReturnTest: AssociativeMemoryCacheScenariosTest<SingleParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): AssociativeMemoryCacheKernl<SingleParamPrimitiveReturn.Params, Int> {
-        return SingleParamPrimitiveReturn.Factory { id ->
-            onFetch(SingleParamPrimitiveReturn.Params(id))
+class SingleParamPrimitiveReturnTest: AssociativeMemoryCacheScenariosTest<SingleParamPrimitiveReturnKernl.Params, Int>() {
+    override fun repository(): AssociativeMemoryCacheKernl<SingleParamPrimitiveReturnKernl.Params, Int> {
+        return SingleParamPrimitiveReturnKernl.Factory { id ->
+            onFetch(SingleParamPrimitiveReturnKernl.Params(id))
             id.toInt()
         }
     }
 
     override val testData = mapOf(
-        SingleParamPrimitiveReturn.Params("42") to 42,
-        SingleParamPrimitiveReturn.Params("96") to 96,
-        SingleParamPrimitiveReturn.Params("1") to 1
+        SingleParamPrimitiveReturnKernl.Params("42") to 42,
+        SingleParamPrimitiveReturnKernl.Params("96") to 96,
+        SingleParamPrimitiveReturnKernl.Params("1") to 1
     )
 }

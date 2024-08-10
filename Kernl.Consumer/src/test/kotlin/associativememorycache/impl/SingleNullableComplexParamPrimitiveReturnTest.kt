@@ -2,20 +2,20 @@ package associativememorycache.impl
 
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
-import kernl.org.mattshoe.shoebox.kernl.associativememorycache.SingleNullableComplexParamPrimitiveReturn
+import kernl.org.mattshoe.shoebox.kernl.associativememorycache.SingleNullableComplexParamPrimitiveReturnKernl
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
-class SingleNullableComplexParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<SingleNullableComplexParamPrimitiveReturn.Params, Int>() {
-    override fun repository(): AssociativeMemoryCacheKernl<SingleNullableComplexParamPrimitiveReturn.Params, Int> {
-        return SingleNullableComplexParamPrimitiveReturn.Factory { id ->
-            onFetch(SingleNullableComplexParamPrimitiveReturn.Params(id))
+class SingleNullableComplexParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<SingleNullableComplexParamPrimitiveReturnKernl.Params, Int>() {
+    override fun repository(): AssociativeMemoryCacheKernl<SingleNullableComplexParamPrimitiveReturnKernl.Params, Int> {
+        return SingleNullableComplexParamPrimitiveReturnKernl.Factory { id ->
+            onFetch(SingleNullableComplexParamPrimitiveReturnKernl.Params(id))
             id?.data?.toInt() ?: 0
         }
     }
 
     override val testData = mapOf(
-        SingleNullableComplexParamPrimitiveReturn.Params(ServiceRequest("42")) to 42,
-        SingleNullableComplexParamPrimitiveReturn.Params(null) to 0,
-        SingleNullableComplexParamPrimitiveReturn.Params(ServiceRequest("1")) to 1
+        SingleNullableComplexParamPrimitiveReturnKernl.Params(ServiceRequest("42")) to 42,
+        SingleNullableComplexParamPrimitiveReturnKernl.Params(null) to 0,
+        SingleNullableComplexParamPrimitiveReturnKernl.Params(ServiceRequest("1")) to 1
     )
 }
