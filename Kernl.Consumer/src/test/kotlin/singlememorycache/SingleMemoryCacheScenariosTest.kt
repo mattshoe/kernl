@@ -33,7 +33,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND invalidated THEN emissions are correct`() = runTest(UnconfinedTestDispatcher()) {
+    fun `WHEN data is fetched AND invalidated THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
         kernl {
             startSession(this@runTest) {
                 resourceMonitorInterval = NEVER
@@ -53,7 +53,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND refreshed THEN emissions are correct`() = runTest(UnconfinedTestDispatcher()) {
+    fun `WHEN data is fetched AND refreshed THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
         kernl {
             startSession(this@runTest) {
                 resourceMonitorInterval = NEVER
@@ -96,7 +96,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally invalidated with specified params THEN emissions are correct`() = runTest(UnconfinedTestDispatcher(), timeout = Duration.INFINITE) {
+    fun `WHEN data is fetched AND globally invalidated with specified params THEN emissions are correct`() = runTest(StandardTestDispatcher(), timeout = Duration.INFINITE) {
         kernl {
             startSession(this@runTest) {
                 resourceMonitorInterval = NEVER
@@ -114,7 +114,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     }
 
     @Test
-    fun `WHEN data is fetched AND globally invalidated with irrelevant params THEN emissions are correct`() = runTest(UnconfinedTestDispatcher()) {
+    fun `WHEN data is fetched AND globally invalidated with irrelevant params THEN emissions are correct`() = runTest(StandardTestDispatcher()) {
         kernl {
             startSession(this@runTest) {
                 resourceMonitorInterval = NEVER

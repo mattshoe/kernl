@@ -19,7 +19,6 @@ import util.TestKernlResourceManager
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
 abstract class InvalidationStrategyTest {
-    protected val unconfinedTestDispatcher = UnconfinedTestDispatcher()
     protected val standardTestDispatcher = StandardTestDispatcher()
     
     protected abstract val invalidationStrategy: InvalidationStrategy
@@ -62,7 +61,7 @@ abstract class InvalidationStrategyTest {
 
     @Test
     fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() =
-        runTest(unconfinedTestDispatcher) {
+        runTest(standardTestDispatcher) {
             val subject = makeSubject(invalidationStrategy = invalidationStrategy, dispatcher = coroutineContext[CoroutineDispatcher]!!)
             subject.data.test {
                 subject.fetch(42)

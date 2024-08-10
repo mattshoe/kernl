@@ -8,6 +8,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ext.unwrap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -20,7 +21,7 @@ import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 class BaseAssociativeCacheInternalKernlTest {
     private lateinit var subject: StubBaseAssociativeCacheKernl
     private lateinit var testKernlPolicy: TestKernlPolicy
-    private val dispatcher = UnconfinedTestDispatcher()
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun before() {
@@ -156,6 +157,9 @@ class BaseAssociativeCacheInternalKernlTest {
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
+
+            advanceUntilIdle()
+
             assertEmissionValues(42, 43, 44)
 
             kernl { globalRefresh() }

@@ -6,6 +6,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -34,7 +35,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
     }
 
     @Test
-    fun `multiple streamers all receive updates then all receive invalidated`() = runTest(UnconfinedTestDispatcher()) {
+    fun `multiple streamers all receive updates then all receive invalidated`() = runTest(StandardTestDispatcher()) {
         println("Associative Direct Parameterized Invalidation")
         testData.forEach {(params, response) ->
             println("params: $params")
@@ -79,7 +80,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
     }
 
     @Test
-    fun `multiple streamers all receive updates on global invalidation`() = runTest(UnconfinedTestDispatcher()) {
+    fun `multiple streamers all receive updates on global invalidation`() = runTest(StandardTestDispatcher()) {
         println("Associative Global Invalidation")
         testData.forEach {(params, response) ->
             println("Starting params: $params")
@@ -125,7 +126,7 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
     }
 
     @Test
-    fun `multiple streamers all receive updates on global invalidation with specific params`() = runTest(UnconfinedTestDispatcher()) {
+    fun `multiple streamers all receive updates on global invalidation with specific params`() = runTest(StandardTestDispatcher()) {
         println("Associative Global Parameterized Invalidation")
         testData.forEach {(params, response) ->
             println("Params: $params")
