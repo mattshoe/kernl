@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlPolicy
+import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory.BaseAssociativeCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.BaseNoCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.nocache.NoCacheKernl
@@ -15,9 +16,10 @@ import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.reflect.KClass
 
 fun <TParams: Any, TData: Any> NoCacheKernl(
+    retryStrategy: RetryStrategy? = null,
     fetchData: suspend (TParams) -> TData
 ): NoCacheKernl<TParams, TData> {
-    return object : BaseNoCacheKernl<TParams, TData>() {
+    return object : BaseNoCacheKernl<TParams, TData>(retryStrategy) {
         override suspend fun fetchData(params: TParams): TData = fetchData(params)
     }
 }
