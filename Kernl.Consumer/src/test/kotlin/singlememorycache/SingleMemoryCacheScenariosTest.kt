@@ -183,7 +183,7 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
                 subject.fetch(params, true)
                 Truth.assertThat((awaitItem() as DataResult.Success).data).isEqualTo(response)
                 kernl { globalRefresh(params) }
-                expectNoEvents()
+                Truth.assertThat((awaitItem() as DataResult.Success).data).isEqualTo(response)
                 cancelAndIgnoreRemainingEvents()
             }
         }
