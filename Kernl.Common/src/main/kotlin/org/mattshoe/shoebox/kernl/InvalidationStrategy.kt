@@ -8,6 +8,15 @@ import kotlin.time.Duration
  * performance, freshness, and resource usage.
  */
 sealed interface InvalidationStrategy {
+
+    /**
+     * The duration for which the cached data remains valid.
+     *
+     * This property defines the Time-To-Live (TTL) of a cache entry, determining how long the data is considered
+     * fresh before it becomes stale and requires a refresh or invalidation.
+     *
+     * @return The duration for which the cached data is considered valid.
+     */
     val timeToLive: Duration
 
     /**
@@ -18,7 +27,9 @@ sealed interface InvalidationStrategy {
      *
      * @property timeToLive The length of time before which a fetched piece of data becomes Invalid.
      */
-    data class TakeNoAction(override val timeToLive: Duration = Duration.INFINITE): InvalidationStrategy
+    data class TakeNoAction(
+        override val timeToLive: Duration = Duration.INFINITE
+    ): InvalidationStrategy
 
     /**
      * A strategy where data is refreshed only when it is next requested.

@@ -8,13 +8,12 @@ See [DefaultKernlPolicy](DEFAULT_KERNL_POLICY.md) for details on default values.
 
 ## Properties
 
-### `val timeToLive: Duration`
-The duration for which the cached data remains valid. After this duration, the data is considered stale and will be invalidated until it is refreshed.
+### `val retryStrategy: RetryStrategy?`
+The strategy to employ when a data retrieval operation fails.
 
-This value is used to determine the TTL (Time-To-Live) of the cache entries. For example, if the TTL is set to 5 minutes, the data will be considered valid for 5 minutes from the time it was cached.
+Allows you to define how many attempts to make for each failure, along with the amount of time between subsequent requests.
 
-**Returns:**  
-The duration for which the cached data is considered valid.
+See: [`RetryStrategy`](RETRY_STRATEGY.md)
 
 ### `val events: Flow<KernlEvent>`
 A flow of events that affect the cache, such as invalidation and refresh events. This flow can be used to listen for, react to, and trigger changes in the cache state.
@@ -51,15 +50,18 @@ The [`InvalidationStrategy`](INVALIDATION_STRATEGY.md) to be used for handling c
 Here is an example of how you might implement and use the `KernlPolicy` interface:
 
 ```kotlin
-class CustomKernlPolicy: KernlPolicy, Disposable {
+class CustomKernlPolicy : KernlPolicy, Closeable {
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _events = MutableSharedFlow<KernlEvent>()
 
     override val events = _events
+
     // Data is only valid for 25 minutes
     override val timeToLive = 25.minutes
-    // Load data from disk first, then fall back to network
-    override val cacheStrategy = CacheStrategy.DiskFirst
+
+    // Use the default exponential backoff implementation to make 3 attempts with a delay of 100 milliseconds after each failed attempt.
+    override val retryStrategy = ExponentialBackoff
+
     // Pre-emptively refresh data when it is about to expire
     override val invalidationStrategy = InvalidationStrategy.Preemptive(leadTime = 30.seconds, retries = 3)
 
@@ -85,7 +87,7 @@ class CustomKernlPolicy: KernlPolicy, Disposable {
         _events.emit(KernlEvent.Invalidate())
     }
 
-    override fun dispose() {
+    override fun close() {
         coroutineScope.cancel()
     }
 }

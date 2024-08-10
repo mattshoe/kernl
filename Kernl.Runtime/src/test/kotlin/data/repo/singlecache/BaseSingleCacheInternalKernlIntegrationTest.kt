@@ -444,7 +444,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream,
-            retryStrategy = ExponentialBackoff()
+            retryStrategy = ExponentialBackoff
         )
         val attempts = mutableListOf<Int>()
         val subject = makeSubject(kernlPolicy = policy)
@@ -470,7 +470,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream,
-            retryStrategy = ExponentialBackoff()
+            retryStrategy = ExponentialBackoff
         )
         val attempts = mutableListOf<Int>()
         val subject = makeSubject(kernlPolicy = policy)

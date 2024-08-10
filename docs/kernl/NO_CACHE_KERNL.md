@@ -7,11 +7,14 @@ In most cases where you need retry logic, the default [`ExponentialBackoff`](EXP
 suffice, however, you are free to provide your own implementations.
 
 
-### `suspend fun fetch(params: TParams): DataResult<TData>`
+### `suspend fun fetch(params: TParams): ValidDataResult<TData>`
 Use this method to fetch data. This method will always perform a fresh data retrieval operation. Any failures are 
 encapsulated and returned as [`DataResult.Error`](../DATA_RESULT.md).
 
+The return type of this method is guaranteed to be either [`DataResult.Success`](../DATA_RESULT.md) or
+[`DataResult.Error`](../DATA_RESULT.md). It can never be [`DataResult.Invalidated`](../DATA_RESULT.md)
 
+See: [`ValidDataResult`](../VALID_DATA_RESULT.md)
 
 ## Example Usage
 See [@Kernl.NoCache](../annotations/NO_CACHE.md) for examples of usage.
