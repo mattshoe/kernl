@@ -34,7 +34,7 @@ abstract class InvalidationStrategyTest {
     protected abstract fun CoroutineScope.makeSubject(
         dispatcher: CoroutineDispatcher,
         invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(),
-        kernlResourceManager: KernlResourceManager = TestKernlResourceManager(this)
+        kernlResourceManager: KernlResourceManager = TestKernlResourceManager()
     ): StubSingleCacheKernl
 
     @Test

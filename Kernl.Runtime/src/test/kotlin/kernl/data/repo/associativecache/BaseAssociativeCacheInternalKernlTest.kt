@@ -154,21 +154,31 @@ class BaseAssociativeCacheInternalKernlTest {
     fun `WHEN global Kernl refresh all data is invoked, THEN all listeners receive new emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
+            println("Awaiting first emission")
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             val turbine2 = subject.stream(43).testIn(backgroundScope)
+            println("Awaiting second emission")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
+            println("Awaiting third emission")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
+            println("advancing to ide")
             advanceUntilIdle()
 
+            println("asserting emission values")
             assertEmissionValues(42, 43, 44)
 
+            println("globalRefresh()")
             kernl { globalRefresh() }
+            println("awaiting first")
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
+            println("awaiting second")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
+            println("awaiting third")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
+            println("asserting fetch invocations")
             Truth.assertThat(subject.fetchInvocations.count { it == 42 } == 2).isTrue()
             Truth.assertThat(subject.fetchInvocations.count { it == 43 } == 2).isTrue()
             Truth.assertThat(subject.fetchInvocations.count { it == 44 } == 2).isTrue()

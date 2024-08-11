@@ -88,7 +88,7 @@ class BaseSingleCacheInternalKernlUnitTest {
     private fun CoroutineScope.makeSubject(): StubSingleCacheKernl {
         return StubSingleCacheKernl(
             dispatcher = coroutineContext[CoroutineDispatcher]!!,
-            kernlResourceManager = TestKernlResourceManager(this)
+            kernlResourceManager = TestKernlResourceManager()
         )
     }
 }

@@ -14,16 +14,16 @@ import java.util.*
 import kotlin.time.Duration
 
 internal object DefaultKernlResourceManager: KernlResourceManager {
+    internal lateinit var coroutineScope: CoroutineScope
     private var currentPollingJob: Job? = null
-    private lateinit var coroutineScope: CoroutineScope
     private val activeKernlsMutex = Mutex()
     private val activeKernls = mutableMapOf<UUID, KernlResource>()
 
-    override fun startSession(sessionScope: CoroutineScope, disposalInterval: Duration) {
+    override fun startSession(dispatcher: CoroutineDispatcher, resourceMonitorInterval: Duration) {
         stopSession()
-        coroutineScope = sessionScope
-        sessionScope.launch {
-            monitorKernlsForDisposal(disposalInterval)
+        coroutineScope = buildCoroutineScope(dispatcher)
+        coroutineScope.launch {
+            monitorKernlsForDisposal(resourceMonitorInterval)
         }
         println("session started")
     }
@@ -126,4 +126,10 @@ internal object DefaultKernlResourceManager: KernlResourceManager {
             }
         }
     }
+
+    private fun buildCoroutineScope(dispatcher: CoroutineDispatcher) = CoroutineScope(
+        SupervisorJob()
+                + dispatcher
+                + CoroutineName(this::class.simpleName!!)
+    )
 }
