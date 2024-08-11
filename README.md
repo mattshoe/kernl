@@ -222,22 +222,18 @@ class UserRepository(
             .onSuccess {
                 _userData.emit(it)
             }.onInvalidation {
-                handleInvalidation()
+                cleanup()
             }.onError {
                 _errors.emit(it.error)
             }.launchIn(viewModelScope)
     }
 
     suspend fun loadUser(id: String, someParam: Int, otherParam: Boolean) {
-        userDataKernl.fetch(
-            UserDataKernl.Params(id, someParam, otherParam)
-        )
+        userDataKernl.fetch(id, someParam, otherParam)
     }
-
-    private suspend fun handleInvalidation() {
-        userDataKernl.refresh(
-            UserDataKernl.Params(id, someParam, otherParam)
-        )
+    
+    suspend fun cleanup() {
+        // logic to remove any invalidated data (if necessary)
     }
 }
 ```
