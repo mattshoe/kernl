@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 import org.junit.Assert.*
+import util.runKernlTest
 
 class FlowExtensionsKtTest {
 
@@ -126,7 +127,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `catchDataResult should emit data when DataResult is Success`() = runTest {
+    fun `catchDataResult should emit data when DataResult is Success`() = runKernlTest {
         val flow = flowOf(DataResult.Success("test data"))
 
         flow.catchDataResult {
@@ -138,7 +139,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `catchDataResult should emit default value on error`() = runTest {
+    fun `catchDataResult should emit default value on error`() = runKernlTest {
         val expected = Throwable("error")
         val flow = flowOf(DataResult.Error<String>(expected))
 
@@ -152,7 +153,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `catchDataResult should emit default value on invalidation`() = runTest {
+    fun `catchDataResult should emit default value on invalidation`() = runKernlTest {
         val flow = flowOf(DataResult.Invalidated<String>())
 
         flow.catchDataResult {
@@ -165,7 +166,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `catchDataResult should not cancel flow on error or invalidation`() = runTest {
+    fun `catchDataResult should not cancel flow on error or invalidation`() = runKernlTest {
         val flow = flowOf(
             DataResult.Success("valid data"),
             DataResult.Error(Throwable("error")),
@@ -185,7 +186,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onSuccess should invoke action on DataResult Success`() = runTest {
+    fun `onSuccess should invoke action on DataResult Success`() = runKernlTest {
         var actionInvoked = false
         val flow = flowOf(DataResult.Success("test data"))
 
@@ -201,7 +202,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onSuccess should not invoke action on DataResult Error`() = runTest {
+    fun `onSuccess should not invoke action on DataResult Error`() = runKernlTest {
         var actionInvoked = false
         val flow = flowOf(DataResult.Error<String>(Throwable("error")))
 
@@ -216,7 +217,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onSuccess should not invoke action on DataResult Invalidated`() = runTest {
+    fun `onSuccess should not invoke action on DataResult Invalidated`() = runKernlTest {
         var actionInvoked = false
         val flow = flowOf(DataResult.Invalidated<String>())
 
@@ -231,7 +232,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onSuccess should continue flow emissions unchanged`() = runTest {
+    fun `onSuccess should continue flow emissions unchanged`() = runKernlTest {
         val flow = flowOf(
             DataResult.Success("data 1"),
             DataResult.Error<String>(Throwable("error")),
@@ -261,7 +262,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onInvalidation emits success and error results`() = runTest {
+    fun `onInvalidation emits success and error results`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Error(Exception("Error 1")))
@@ -278,7 +279,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onInvalidation supports simplified when expression without Invalidated`() = runTest {
+    fun `onInvalidation supports simplified when expression without Invalidated`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
         }
@@ -295,7 +296,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onInvalidation triggers custom action on invalidation`() = runTest {
+    fun `onInvalidation triggers custom action on invalidation`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Invalidated())
@@ -315,7 +316,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onInvalidation triggers multiple actions for multiple invalidations`() = runTest {
+    fun `onInvalidation triggers multiple actions for multiple invalidations`() = runKernlTest {
         val flow = flow<DataResult<String>> {
             emit(DataResult.Invalidated())
             emit(DataResult.Invalidated())
@@ -333,7 +334,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onInvalidation does not trigger action without invalidation`() = runTest {
+    fun `onInvalidation does not trigger action without invalidation`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Error(Exception("Error 1")))
@@ -350,7 +351,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onInvalidation triggers action correctly for mixed results`() = runTest {
+    fun `onInvalidation triggers action correctly for mixed results`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Invalidated())
@@ -375,7 +376,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError passes through success results`() = runTest {
+    fun `onError passes through success results`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
         }
@@ -389,7 +390,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError triggers action on error result`() = runTest {
+    fun `onError triggers action on error result`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Error<String>(Exception("Error 1")))
         }
@@ -406,7 +407,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError emits new value on error`() = runTest {
+    fun `onError emits new value on error`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Error<String>(Exception("Error 1")))
         }
@@ -420,7 +421,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError does not ignore subsequent success results after error`() = runTest {
+    fun `onError does not ignore subsequent success results after error`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Error<String>(Exception("Error 1")))
             emit(DataResult.Success("Data 2"))
@@ -439,7 +440,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError handles mixed results`() = runTest {
+    fun `onError handles mixed results`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Error<String>(Exception("Error 1")))
@@ -460,7 +461,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError handles multiple errors`() = runTest {
+    fun `onError handles multiple errors`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Success("Data 1"))
             emit(DataResult.Error<String>(Exception("Error 1")))
@@ -481,7 +482,7 @@ class FlowExtensionsKtTest {
     }
 
     @Test
-    fun `onError emits new values for multiple errors`() = runTest {
+    fun `onError emits new values for multiple errors`() = runKernlTest {
         val flow = flow {
             emit(DataResult.Error<String>(Exception("Error 1")))
             emit(DataResult.Error<String>(Exception("Error 2")))

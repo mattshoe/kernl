@@ -1,15 +1,16 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl
+package org.mattshoe.shoebox.kernl.runtime.dsl
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import org.mattshoe.shoebox.kernl.KernlEvent
 import org.mattshoe.shoebox.kernl.internal.*
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-
-internal lateinit var currentResourceManager: KernlResourceManager
 
 fun <T> kernl(configure: KernlMenu.() -> T): T {
     return KernlMenu().configure()
@@ -19,26 +20,37 @@ fun <T> kernl(configure: KernlMenu.() -> T): T {
 class KernlMenu {
 
     fun globalEvent(event: KernlEvent) {
-        InternalKernl.globalEvent(event)
+        DefaultKernlResourceManager.coroutineScope.launch {
+            InternalKernl.globalEvent(event)
+        }
     }
     fun globalInvalidate(params: Any? = null) {
-        InternalKernl.globalEvent(KernlEvent.Invalidate(params))
+        DefaultKernlResourceManager.coroutineScope.launch {
+            InternalKernl.globalEvent(KernlEvent.Invalidate(params))
+        }
     }
 
     fun globalRefresh(params: Any? = null) {
-        InternalKernl.globalEvent(KernlEvent.Refresh(params))
+        DefaultKernlResourceManager.coroutineScope.launch {
+            InternalKernl.globalEvent(KernlEvent.Refresh(params))
+        }
     }
 
-    fun startSession(sessionScope: CoroutineScope, configuration: KernlSessionConfiguration.() -> Unit = { }) {
-        KernlSessionConfiguration(sessionScope).apply {
+    fun startSession(
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
+        configuration: KernlSessionConfiguration.() -> Unit = { }
+    ) {
+        KernlSessionConfiguration(dispatcher).apply {
             configuration()
-            kernlResourceManager.startSession(sessionScope, resourceMonitorInterval)
-            currentResourceManager = kernlResourceManager
+            DefaultKernlResourceManager.startSession(dispatcher, resourceMonitorInterval)
         }
     }
 
     fun stopSession() {
-        currentResourceManager.stopSession()
+        DefaultKernlResourceManager.coroutineScope.launch {
+            InternalKernl.globalEvent(KernlEvent.Invalidate())
+            DefaultKernlResourceManager.stopSession()
+        }
     }
 
     fun globalEventStream(): Flow<KernlEvent> {
@@ -46,7 +58,6 @@ class KernlMenu {
     }
 }
 
-class KernlSessionConfiguration(val sessionScope: CoroutineScope) {
+class KernlSessionConfiguration(val dispatcher: CoroutineDispatcher) {
     var resourceMonitorInterval: Duration = 1.seconds
-    var kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager
 }

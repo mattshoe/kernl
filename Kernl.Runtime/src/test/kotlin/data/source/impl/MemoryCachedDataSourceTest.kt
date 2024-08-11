@@ -20,6 +20,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import org.mattshoe.shoebox.kernl.runtime.source.impl.MemoryCachedDataSource
+import util.runKernlTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MemoryCachedDataSourceTest {
@@ -32,7 +33,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runTest(standardTestDispatcher) {
+    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runKernlTest(standardTestDispatcher) {
         subject.data.test {
             val expectedValue = "yew dun did it now"
 
@@ -43,7 +44,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN data retrieval fails THEN error is emitted`() = runTest(standardTestDispatcher) {
+    fun `WHEN data retrieval fails THEN error is emitted`() = runKernlTest(standardTestDispatcher) {
         subject.data.test {
             val expectedValue = RuntimeException("oops")
 
@@ -54,7 +55,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is honored`() = runTest(standardTestDispatcher) {
+    fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is honored`() = runKernlTest(standardTestDispatcher) {
         subject.data.test {
             val expectedValue = "first"
 
@@ -69,7 +70,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is made`() = runTest(standardTestDispatcher) {
+    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is made`() = runKernlTest(standardTestDispatcher) {
         subject = MemoryCachedDataSource(standardTestDispatcher)
 
         subject.data.test {
@@ -101,7 +102,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runTest(standardTestDispatcher) {
+    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runKernlTest(standardTestDispatcher) {
         var counter = 0
         subject = MemoryCachedDataSource(standardTestDispatcher)
 
@@ -131,7 +132,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked THEN new item is emitted`() = runTest(standardTestDispatcher) {
+    fun `WHEN refresh is invoked THEN new item is emitted`() = runKernlTest(standardTestDispatcher) {
         var counter = 0
         subject.data.test {
             subject.initialize {
@@ -147,12 +148,12 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `WHEN refresh is invoked before initialize THEN exception is thrown`() = runTest(standardTestDispatcher) {
+    fun `WHEN refresh is invoked before initialize THEN exception is thrown`() = runKernlTest(standardTestDispatcher) {
         subject.refresh()
     }
 
     @Test
-    fun `WHEN no retry strategy THEN no retry is attempted`() = runTest(standardTestDispatcher) {
+    fun `WHEN no retry strategy THEN no retry is attempted`() = runKernlTest(standardTestDispatcher) {
         subject.data.test {
             val attempts = mutableListOf<String>()
 
@@ -167,7 +168,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runTest(standardTestDispatcher) {
+    fun `WHEN ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runKernlTest(standardTestDispatcher) {
         val subject = makeSubject(standardTestDispatcher, ExponentialBackoff)
         subject.data.test {
             val attempts = mutableListOf<String>()
@@ -186,7 +187,7 @@ class MemoryCachedDataSourceTest {
     }
 
     @Test
-    fun `WHEN ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runTest(standardTestDispatcher) {
+    fun `WHEN ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runKernlTest(standardTestDispatcher) {
         val subject = makeSubject(standardTestDispatcher, ExponentialBackoff)
         subject.data.test {
             val attempts = mutableListOf<String>()

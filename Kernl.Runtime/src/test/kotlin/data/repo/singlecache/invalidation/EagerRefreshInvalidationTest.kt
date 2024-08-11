@@ -13,7 +13,10 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ext.sampleOrElse
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 
@@ -41,12 +44,18 @@ class EagerRefreshInvalidationTest: InvalidationStrategyTest() {
 
     @Test
     fun `WHEN timeToLive expires THEN data is refreshed continuously`() = runBlocking {
+        val dispatcher = coroutineContext[CoroutineDispatcher]!!
+        kernl {
+            startSession(dispatcher) {
+                resourceMonitorInterval = Duration.INFINITE
+            }
+        }
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.EagerRefresh(1000.milliseconds),
-            dispatcher = coroutineContext[CoroutineDispatcher]!!
+            dispatcher = dispatcher
         )
 
-        subject.data.test {
+        subject.data.test(timeout = 5.seconds) {
             subject.fetch(42)
             Truth.assertThat(awaitItem()).isEqualTo(DataResult.Success("42"))
             var elapsedTime = measureTime {
@@ -63,6 +72,11 @@ class EagerRefreshInvalidationTest: InvalidationStrategyTest() {
 
     @Test
     fun `WHEN manually invalidated before expiry THEN data is refreshed`() = runBlocking {
+        kernl {
+            startSession(coroutineContext[CoroutineDispatcher]!!) {
+                resourceMonitorInterval = Duration.INFINITE
+            }
+        }
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.EagerRefresh(1000.milliseconds),
             dispatcher = coroutineContext[CoroutineDispatcher]!!

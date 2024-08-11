@@ -5,7 +5,7 @@ import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
+import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 
 abstract class BaseNoCacheKernl<TParams: Any, TData: Any>(
     private val retryStrategy: RetryStrategy? = null

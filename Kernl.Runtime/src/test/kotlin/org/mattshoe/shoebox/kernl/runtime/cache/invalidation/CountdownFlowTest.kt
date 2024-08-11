@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
+import util.runKernlTest
 import kotlin.math.exp
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -13,7 +14,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class CountdownFlowTest {
 
     @Test
-    fun `WHEN reset is called AND delay is 500ms THEN timer emits after 500ms`() = runTest {
+    fun `WHEN reset is called AND delay is 500ms THEN timer emits after 500ms`() = runKernlTest {
         val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
@@ -29,7 +30,7 @@ class CountdownFlowTest {
     }
 
     @Test
-    fun `WHEN reset is called multiple times THEN timer respects the latest interval`() = runTest {
+    fun `WHEN reset is called multiple times THEN timer respects the latest interval`() = runKernlTest {
         val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
@@ -50,7 +51,7 @@ class CountdownFlowTest {
     }
 
     @Test
-    fun `WHEN reset is called concurrently THEN timer handles concurrent resets correctly`() = runTest {
+    fun `WHEN reset is called concurrently THEN timer handles concurrent resets correctly`() = runKernlTest {
         val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {
@@ -68,7 +69,7 @@ class CountdownFlowTest {
     }
 
     @Test
-    fun `WHEN timer initialized THEN timer does not emit before first reset`() = runTest {
+    fun `WHEN timer initialized THEN timer does not emit before first reset`() = runKernlTest {
         val countdownTimer = CountdownFlow("test timer")
 
         countdownTimer.events.test {

@@ -7,7 +7,7 @@ import org.mattshoe.shoebox.kernl.KernlEvent
 private val mutableGlobalEventStream = MutableSharedFlow<KernlEvent>(
     replay = 0,
     extraBufferCapacity = 1,
-    onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    onBufferOverflow = BufferOverflow.SUSPEND,
 )
 
 @Deprecated(
@@ -32,9 +32,9 @@ data object InternalGlobalKernlEventStream: SharedFlow<KernlEvent> by mutableGlo
 object InternalKernl {
     val events: Flow<KernlEvent> = InternalGlobalKernlEventStream
 
-    fun globalEvent(event: KernlEvent) {
+    suspend fun globalEvent(event: KernlEvent) {
         println("emitting kernlevent: $event")
-        // tryEmit here will never fail because mutableGlobalEventStream has no replay and does not suspend
-        mutableGlobalEventStream.tryEmit(event)
+        mutableGlobalEventStream.emit(event)
+        println("kernlevent emitted! $event")
     }
 }

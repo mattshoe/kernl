@@ -14,7 +14,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import kotlin.time.Duration
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
@@ -487,7 +487,9 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     private fun CoroutineScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
-        DefaultKernlResourceManager.startSession(this)
+        kernl {
+            startSession(coroutineContext[CoroutineDispatcher]!!)
+        }
         return StubSingleCacheKernl(
             dispatcher ?: coroutineContext[CoroutineDispatcher]!!,
             kernlPolicy
