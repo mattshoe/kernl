@@ -2,10 +2,8 @@ package org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlEvent
@@ -19,6 +17,7 @@ import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KClass
 
@@ -43,7 +42,7 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
 
     @Suppress("DEPRECATION_ERROR")
     override val data: Flow<DataResult<TData>>
-        get() = channelFlow {
+        get() = conflatedChannelFlow {
             // Need to make sure the KernlPolicy isn't using the global event stream already, wouldn't want dupes
             if (kernlPolicy.events !is InternalGlobalKernlEventStream) {
                 kernl { globalEventStream() }
