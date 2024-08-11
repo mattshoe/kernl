@@ -487,7 +487,9 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     private fun CoroutineScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
-        DefaultKernlResourceManager.startSession(this)
+        kernl {
+            startSession(coroutineContext[CoroutineDispatcher]!!)
+        }
         return StubSingleCacheKernl(
             dispatcher ?: coroutineContext[CoroutineDispatcher]!!,
             kernlPolicy

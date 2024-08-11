@@ -41,22 +41,29 @@ interface UserDataService {
 }
 ```
 
-### 3. Configure Kernl to manage session-scoped data
+### 3. Configure the Scope of your Kernl data
+With Kernl, you define the lifespan of a given set of cached data. When that lifespan is ended, all memory caches will
+be immediately invalidated, ensuring no data is can be used beyond its scope. Disk=cached data will not be invalidated 
+upon scope termination.
 ```kotlin
+// Scope your data to a single login session, invalidating all data on logout
 class MyUserSessionManager: UserSessionManager() {
-    val sessionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     override fun onUserLoggedIn() {
-        kernl {
-            startSession(sessionScope)
-        }
+        kernl { startSession() }
     }
     
-    override fun logUserOut() {
-        kernl {
-            stopSession()
-        }
+    override fun onUserLoggedOut() {
+        kernl { stopSession() }
     }
 }
+
+// Alternatively, scope your data to the lifetime of an Android application
+class MyApplication: Application() {
+    override fun onCreate() {
+        kernl { startSession() }
+    }
+}
+
 ```
 
 ### 4. Bind Your **Kernl**

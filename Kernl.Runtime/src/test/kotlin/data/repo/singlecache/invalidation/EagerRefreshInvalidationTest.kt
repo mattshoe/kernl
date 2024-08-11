@@ -44,14 +44,15 @@ class EagerRefreshInvalidationTest: InvalidationStrategyTest() {
 
     @Test
     fun `WHEN timeToLive expires THEN data is refreshed continuously`() = runBlocking {
+        val dispatcher = coroutineContext[CoroutineDispatcher]!!
         kernl {
-            startSession(this@runBlocking) {
+            startSession(dispatcher) {
                 resourceMonitorInterval = Duration.INFINITE
             }
         }
         val subject = makeSubject(
             invalidationStrategy = InvalidationStrategy.EagerRefresh(1000.milliseconds),
-            dispatcher = coroutineContext[CoroutineDispatcher]!!
+            dispatcher = dispatcher
         )
 
         subject.data.test(timeout = 5.seconds) {
@@ -72,7 +73,7 @@ class EagerRefreshInvalidationTest: InvalidationStrategyTest() {
     @Test
     fun `WHEN manually invalidated before expiry THEN data is refreshed`() = runBlocking {
         kernl {
-            startSession(this@runBlocking) {
+            startSession(coroutineContext[CoroutineDispatcher]!!) {
                 resourceMonitorInterval = Duration.INFINITE
             }
         }
