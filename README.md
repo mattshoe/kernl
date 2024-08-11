@@ -1,7 +1,9 @@
 # **Kernl**
 
-**Kernl** is a Kotlin library built to simplify the majority of data management scenarios. **Kernl** provides a flexible and declarative 
-approach to defining your data management strategies. **Kernl** gives you granular control over all aspects of caching, from 
+**Kernl** is a Kotlin library built to simplify the majority of data management scenarios. **Kernl** provides a flexible
+and declarative
+approach to defining your data management strategies. **Kernl** gives you granular control over all aspects of caching,
+from
 in-memory network caching to offline backups in poor network conditions to database persistence to Key-Value storage.
 
 ## Features
@@ -16,8 +18,11 @@ in-memory network caching to offline backups in poor network conditions to datab
 ## Quick Start
 
 ### 1. Add dependencies to your build.gradle.kts
-You'll notice there are 3 distinct libraries. This is to keep your final `jar`/`aar` files as compact as possible by only
+
+You'll notice there are 3 distinct libraries. This is to keep your final `jar`/`aar` files as compact as possible by
+only
 including the minimum runtime dependencies. Things like annotations are only needed at compile time.
+
 ```kotlin
 dependencies {
     ksp("org.mattshoe.shoebox:Kernl.Processor:1.0.0")
@@ -26,13 +31,49 @@ dependencies {
 }
 ```
 
-### 2. Annotate
+### 2. Configure the Scope of your Kernl data
 
-Annotate any method and give it a name to indicate that a `Kernl` should be generated for that method. This annotation 
+With Kernl, you define the lifespan of your memory-cached data. Once that lifespan is ended, all memory caches will
+be immediately invalidated, ensuring no data can be used beyond its scope. Disk-cached data will not be invalidated
+upon scope termination, only in-memory caches.
+
+Please note that your application is required to invoke `kernl { startSession() }` at some point before loading your
+Kernls.
+This is typically done in either the Application, in your app's post-login logic, or the main() function in a pure
+kotlin
+library.
+
+```kotlin
+// Scope your data to a single login session, invalidating all data on logout
+class MyUserSessionManager : UserSessionManager() {
+    override fun onUserLoggedIn() {
+        kernl { startSession() }
+    }
+
+    override fun onUserLoggedOut() {
+        kernl { stopSession() }
+    }
+}
+
+// Alternatively, scope your data to the lifetime of an Android application
+class MyApplication : Application() {
+    override fun onCreate() {
+        kernl { startSession() }
+    }
+}
+
+```
+
+### 3. Annotate
+
+Annotate any method and give it a name to indicate that a `Kernl` should be generated for that method. This annotation
 will typically be on a Retrofit service method.
 
+The suffix "Kernl" will be appended to whatever name you choose, and a `Kernl` will be generated to automate access. The
+example below will generate a `UserDataKernl`.
+
 See [Annotations](#annotations)
-for a list of annotations to use.
+for a list of available annotations.
 
 ```kotlin
 interface UserDataService {
@@ -41,42 +82,13 @@ interface UserDataService {
 }
 ```
 
-### 3. Configure the Scope of your Kernl data
-With Kernl, you define the lifespan of your memory-cached data. Once that lifespan is ended, all memory caches will
-be immediately invalidated, ensuring no data can be used beyond its scope. Disk-cached data will not be invalidated 
-upon scope termination, only in-memory caches.
-
-Please note that your application is required to invoke `kernl { startSession() }` at some point before loading your Kernls.
-This is typically done in either the Application, in your app's post-login logic, or the main() function in a pure kotlin
-library.
-
-```kotlin
-// Scope your data to a single login session, invalidating all data on logout
-class MyUserSessionManager: UserSessionManager() {
-    override fun onUserLoggedIn() {
-        kernl { startSession() }
-    }
-    
-    override fun onUserLoggedOut() {
-        kernl { stopSession() }
-    }
-}
-
-// Alternatively, scope your data to the lifetime of an Android application
-class MyApplication: Application() {
-    override fun onCreate() {
-        kernl { startSession() }
-    }
-}
-
-```
-
 ### 4. Bind Your **Kernl**
 
-**Kernl** was designed with flexibility in mind, so it is trivial to create an instance of the generated repository 
-via its associated Factory. This allows you to use **Kernl** with any dependency injection framework. Examples included below.
+**Kernl** provides you with a simple Factory for each generated `Kernl`. This allows you to use **Kernl** with any
+dependency injection framework. Examples included below.
 
 #### With DefaultKernlPolicy
+
 ```kotlin
 // Option 1: Pass function pointer to the factory
 val useDataKernl = UserDataKernl.Factory(serviceImpl::getUserData)
@@ -88,15 +100,18 @@ val useDataKernl = UserDataKernl.Factory { id, someParam, otherParam ->
 ```
 
 #### With Custom KernlPolicy
+
 Refer to [`KernlPolicy`](docs/kernl/KERNL_POLICY.md) for further customization options
+
 ```kotlin
 // Just copy the defaults and provide your own values! Each parameter is optional to allow you to only override what you need.
 val myKernlPolicy = KernlPolicyDefaults.copy(
     retryStrategy = ExponentialBackoff.copy(maxAttempts = 4),
-//    cacheStrategy = CacheStrategy.DiskFirst,
-//    invalidationStrategy = InvalidationStrategy.LazyRefresh(timeToLive = 25.minutes)
+    //cacheStrategy = CacheStrategy.DiskFirst,
+    //invalidationStrategy = InvalidationStrategy.LazyRefresh(timeToLive = 25.minutes)
 )
 ```
+
 ```kotlin
 // Option 1: Pass function pointer to the factory
 val useDataKernl = UserDataKernl.Factory(myKernlPolicy, serviceImpl::getUserData)
@@ -108,6 +123,7 @@ val useDataKernl = UserDataKernl.Factory(myKernlPolicy) { id, someParam, otherPa
 ```
 
 #### Dagger Sample with DefaultKernlPolicy
+
 ```kotlin
 @Module
 interface UserDataModule {
@@ -123,6 +139,7 @@ interface UserDataModule {
 ```
 
 #### Dagger Sample with Custom KernlPolicy
+
 ```kotlin
 @Module
 interface UserDataModule {
@@ -141,11 +158,12 @@ interface UserDataModule {
     <summary><b>Other Popular Dependency Injection Examples</b></summary>
 
 #### Hilt Sample
+
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
 object UserDateModule {
-    
+
     @Singleton
     @Provides
     fun provideUserDataKernl(
@@ -157,6 +175,7 @@ object UserDateModule {
 ```
 
 #### Koin Sample
+
 ```kotlin
 val userDataKernl = module {
     single<UserDataKernl> {
@@ -166,6 +185,7 @@ val userDataKernl = module {
 ```
 
 #### Spring Sample
+
 ```kotlin
 @Configuration
 class UserDataConfiguration {
@@ -179,11 +199,12 @@ class UserDataConfiguration {
 
 </details>
 
-
 ### 5. Use Your **Kernl**!
 
-Now you can just inject your **Kernl** and use it wherever you see fit. This will typically be injected into your repository
-layer to interface with the rest of your app, but every architecture is unique, so use it where it suits your architecture
+Now you can just inject your **Kernl** and use it wherever you see fit. This will typically be injected into your
+repository
+layer to interface with the rest of your app, but every architecture is unique, so use it where it suits your
+architecture
 best.
 
 ```kotlin
@@ -192,10 +213,10 @@ class UserRepository(
 ) {
     private val _userData = MutableSharedFlow<UserData>()
     private val _errors = MutableSharedFlow<Error>()
-    
+
     val userData: Flow<UserData> = _userData
     val errors: Flow<Error> = _errors
-    
+
     init {
         userDataKernl.data
             .onSuccess {
@@ -206,13 +227,13 @@ class UserRepository(
                 _errors.emit(it.error)
             }.launchIn(viewModelScope)
     }
-    
+
     suspend fun loadUser(id: String, someParam: Int, otherParam: Boolean) {
         userDataKernl.fetch(
             UserDataKernl.Params(id, someParam, otherParam)
         )
     }
-    
+
     private suspend fun handleInvalidation() {
         userDataKernl.refresh(
             UserDataKernl.Params(id, someParam, otherParam)
@@ -221,14 +242,16 @@ class UserRepository(
 }
 ```
 
-# API Documentation 
+# API Documentation
 
 ### Annotations
+
 - [`@Kernl.NoCache`](docs/annotations/NO_CACHE.md)
 - [`@Kernl.SingleCache.InMemory`](docs/annotations/SINGLE_MEMORY_CACHE.md)
 - [`@Kernl.AssociativeCache.InMemory`](docs/annotations/ASSOCIATIVE_MEMORY_CACHE.md)
 
 ### Kernl
+
 - [`NoCacheKernl`](docs/kernl/NO_CACHE_KERNL.md)
 - [`SingleCacheKernl`](docs/kernl/SINGLE_CACHE_KERNL.md)
 - [`AssociativeCacheKernl`](docs/kernl/ASSOCIATIVE_MEMORY_CACHE_KERNL.md)
@@ -245,6 +268,7 @@ class UserRepository(
 - [`ExponentialBackoff`](docs/kernl/EXPONENTIAL_BACKOFF.md)
 
 ### Extensions
+
 - [`valueOrNull()`](docs/extensions/VALUE_OR_NULL.md)
 - [`unwrap()`](docs/extensions/UNWRAP.md)
 - [`unwrap { ... }`](docs/extensions/UNWRAP_WITH_ERROR_HANDLING.md)
@@ -256,7 +280,8 @@ class UserRepository(
 - [`cacheDataResult { ... }`](docs/extensions/CATCH_DATA_RESULT.md)
 
 # Contributing
-Contributors are absolutely welcome! This is a relatively ambitious project, so the help is always greatly appreciated. 
+
+Contributors are absolutely welcome! This is a relatively ambitious project, so the help is always greatly appreciated.
 Bonus points if you have domain expertise in caching in general, or serialization methods such as KotlinX, ProtoBuf,
 Gson, Moshi, etc, etc. Expertise is not a requirement by any means though!
 
