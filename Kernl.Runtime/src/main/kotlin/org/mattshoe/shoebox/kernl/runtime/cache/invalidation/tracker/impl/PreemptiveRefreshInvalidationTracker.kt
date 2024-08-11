@@ -7,6 +7,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
 class PreemptiveRefreshInvalidationTracker(
@@ -17,7 +18,7 @@ class PreemptiveRefreshInvalidationTracker(
     private val manualRefreshStream = MutableSharedFlow<Unit>()
 
     override val refreshStream: Flow<Unit> =
-        channelFlow {
+        conflatedChannelFlow {
             kernlRegistration.timeToLiveStream
                 .onEach {
                     println("invalidation forwarded to refresh!")

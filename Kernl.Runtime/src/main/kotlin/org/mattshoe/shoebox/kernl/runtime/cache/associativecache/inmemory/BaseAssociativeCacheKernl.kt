@@ -16,6 +16,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
 import kotlin.reflect.KClass
 
 abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
@@ -65,7 +66,7 @@ abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
     }
 
     private fun initializeNewStream(params: TParams, forceFetch: Boolean): Flow<DataResult<TData>> {
-        return channelFlow {
+        return conflatedChannelFlow {
             withContext(Dispatchers.IO) {
                 loadDataIntoCache(params, forceFetch)
                 launch {
