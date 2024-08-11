@@ -3,6 +3,7 @@ package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.conflate
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
 import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
@@ -22,7 +23,7 @@ abstract class BaseInvalidationTracker(
 
     protected open val _refreshStream: Flow<Unit> = MutableSharedFlow(replay = 0)
     override val refreshStream
-        get() = _refreshStream
+        get() = _refreshStream.conflate()
 
     protected fun now(): TimeSource.Monotonic.ValueTimeMark {
         return TimeSource.Monotonic.markNow()
