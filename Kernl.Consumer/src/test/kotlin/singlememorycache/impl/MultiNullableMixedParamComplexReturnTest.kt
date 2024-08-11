@@ -13,6 +13,14 @@ class MultiNullableMixedParamComplexReturnTest : SingleMemoryCacheScenariosTest<
         }
     }
 
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<MultiNullableMixedParamComplexReturnKernl.Params, ServiceResponse>,
+        params: MultiNullableMixedParamComplexReturnKernl.Params,
+        response: ServiceResponse
+    ) {
+        (subject as MultiNullableMixedParamComplexReturnKernl).fetch(params.id, params.bar)
+    }
+
     override val testData = mapOf(
         MultiNullableMixedParamComplexReturnKernl.Params("42", ServiceRequest("58")) to ServiceResponse(100),
         MultiNullableMixedParamComplexReturnKernl.Params(null, ServiceRequest("58")) to ServiceResponse(58),

@@ -13,6 +13,14 @@ class MultiComplexParamComplexReturnTest : SingleMemoryCacheScenariosTest<MultiC
         }
     }
 
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<MultiComplexParamComplexReturnKernl.Params, ServiceResponse>,
+        params: MultiComplexParamComplexReturnKernl.Params,
+        response: ServiceResponse
+    ) {
+        (repository as MultiComplexParamComplexReturnKernl).fetch(params.id, params.bar)
+    }
+
     override val testData = mapOf(
         MultiComplexParamComplexReturnKernl.Params(ServiceRequest("42"), ServiceResponse(58)) to ServiceResponse(100),
         MultiComplexParamComplexReturnKernl.Params(ServiceRequest("96"), ServiceResponse(4)) to ServiceResponse(100),

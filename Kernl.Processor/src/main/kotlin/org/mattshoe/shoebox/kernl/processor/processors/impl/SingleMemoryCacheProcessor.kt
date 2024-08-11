@@ -47,8 +47,11 @@ class SingleMemoryCacheProcessor(
                             ParameterSpec(parameter.name, parameter.type)
                         )
                     }
+                    builder.addParameter(
+                        ParameterSpec.builder("forceRefresh", BOOLEAN).defaultValue("false").build()
+                    )
                     builder.addModifiers(KModifier.SUSPEND)
-                    builder.addStatement("fetch(Params(${params.joinToString { it.name }}))")
+                    builder.addStatement("fetch(Params(${params.joinToString { it.name }}), forceRefresh)")
 
                     addFunction(builder.build())
                 }

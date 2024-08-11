@@ -37,7 +37,7 @@ class EagerRefreshInvalidationTracker(
     }
 
     override suspend fun onInvalidated() {
-//        manualRefreshStream.emit(Unit)
+        manualRefreshStream.emit(Unit)
     }
 
 }

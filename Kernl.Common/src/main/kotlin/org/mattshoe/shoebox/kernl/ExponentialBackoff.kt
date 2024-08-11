@@ -39,6 +39,15 @@ data object ExponentialBackoff: RetryStrategy {
             initialDelay: Duration = defaultDelay,
             backoffFactor: Double = defaultBackoff
         ): RetryStrategy {
+            if (maxAttempts < 1) {
+                throw IllegalStateException("RetryStrategy.maxAttempts must be greater than 0.")
+            }
+            if (!(initialDelay.isPositive() || initialDelay == Duration.ZERO)) {
+                throw IllegalStateException("RetryStrategy.initialDelay must be greater than or equal to 0.")
+            }
+            if (!(backoffFactor > 0)) {
+                throw IllegalStateException("RetryStrategy.backoffFactor must be greater than 0.")
+            }
             return ExponentialBackoffImpl(
                 maxAttempts,
                 initialDelay,

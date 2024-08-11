@@ -1,17 +1,11 @@
 package singlememorycache
 
 import app.cash.turbine.test
-import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Before
 import org.junit.Test
-import org.mattshoe.shoebox.kernl.NEVER
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
@@ -25,11 +19,24 @@ abstract class SingleMemoryCacheScenariosTest<TParams: Any, TResponse: Any> {
     protected abstract fun repository(): SingleCacheKernl<TParams, TResponse>
 
     protected abstract val testData: Map<TParams, TResponse>
+    abstract suspend fun fetchUnwrapped(repository: SingleCacheKernl<TParams, TResponse>, params: TParams, response: TResponse)
 
     @After
     fun after() {
         kernl {
             stopSession()
+        }
+    }
+
+    @Test
+    fun `test unwrapped fetch`() = runKernlTest {
+        testData.forEach { (params, response) ->
+            subject = repository()
+            fetchUnwrapped(subject, params, response)
+            subject.data.test {
+                Truth.assertThat((awaitItem() as DataResult.Success).data).isEqualTo(response)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
     }
 

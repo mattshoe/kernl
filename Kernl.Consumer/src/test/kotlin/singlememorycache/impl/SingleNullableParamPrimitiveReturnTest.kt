@@ -11,6 +11,14 @@ class SingleNullableParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<Si
         }
     }
 
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<SingleNullableParamPrimitiveReturnKernl.Params, Int>,
+        params: SingleNullableParamPrimitiveReturnKernl.Params,
+        response: Int
+    ) {
+        (subject as SingleNullableParamPrimitiveReturnKernl).fetch(params.id)
+    }
+
     override val testData = mapOf(
         SingleNullableParamPrimitiveReturnKernl.Params("42") to 42,
         SingleNullableParamPrimitiveReturnKernl.Params(null) to 0,
