@@ -10,6 +10,7 @@ import org.mattshoe.shoebox.util.className
 import org.mattshoe.shoebox.util.simpleName
 import kotlinx.coroutines.*
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
+import java.sql.Types
 import kotlin.reflect.KClass
 
 class MemoryCacheCodeGenerator {
@@ -19,7 +20,8 @@ class MemoryCacheCodeGenerator {
         declaration: KSFunctionDeclaration,
         repositoryName: String,
         packageDestination: String,
-        serviceReturnType: KSType
+        serviceReturnType: KSType,
+        interfaceAdditions: TypeSpec.Builder.(List<KernlParameter>, TypeSpec) -> TypeSpec.Builder = { _, _ -> this }
     ): GeneratedFile {
         return generateInterfaceFileData(
                 baseInterface,
@@ -27,7 +29,8 @@ class MemoryCacheCodeGenerator {
                 declaration,
                 repositoryName,
                 packageDestination,
-                serviceReturnType
+                serviceReturnType,
+                interfaceAdditions
             )
     }
 
@@ -38,7 +41,9 @@ class MemoryCacheCodeGenerator {
         repositoryName: String,
         packageDestination: String,
         dataType: KSType,
+        interfaceAdditions: TypeSpec.Builder.(List<KernlParameter>, TypeSpec) -> TypeSpec.Builder
     ) = withContext(Dispatchers.Default) {
+
         GeneratedFile(
             fileName = repositoryName,
             packageName = packageDestination,
@@ -48,7 +53,8 @@ class MemoryCacheCodeGenerator {
                 packageDestination,
                 repositoryName,
                 dataType,
-                buildParamsDataClass(function)
+                extractParameters(function),
+                interfaceAdditions
             )
         )
     }
@@ -59,29 +65,47 @@ class MemoryCacheCodeGenerator {
         packageName: String,
         repositoryName: String,
         dataType: KSType,
-        parametersDataClass: TypeSpec
+        annotatedFunctionParams: List<KernlParameter>,
+        interfaceAdditions: TypeSpec.Builder.(List<KernlParameter>, TypeSpec) -> TypeSpec.Builder
     ): String {
+        val paramsDataClass = buildParamsDataClass(annotatedFunctionParams)
+
         return FileSpec.builder(packageName, repositoryName)
             .addType(
-                buildInterface(baseInterface, packageName, repositoryName, dataType, parametersDataClass)
+                buildInterface(
+                    baseInterface,
+                    packageName,
+                    repositoryName,
+                    dataType,
+                    annotatedFunctionParams,
+                    paramsDataClass,
+                    interfaceAdditions
+                )
             )
             .addType(
-                buildImpl(baseClass, packageName, repositoryName, dataType, parametersDataClass)
+                buildImpl(baseClass, packageName, repositoryName, dataType, paramsDataClass)
             )
             .build()
             .toString()
     }
 
-    private fun buildParamsDataClass(function: KSFunctionDeclaration): TypeSpec {
+    private fun extractParameters(function: KSFunctionDeclaration): List<KernlParameter> {
+        return function.parameters.map { parameter ->
+            KernlParameter(
+                name =  parameter.name?.asString() ?: "",
+                parameter.type.resolve().toTypeName()
+            )
+        }
+    }
+
+    private fun buildParamsDataClass(annotatedFunctionParams: List<KernlParameter>): TypeSpec {
         val classBuilder = TypeSpec.classBuilder("Params").addModifiers(KModifier.DATA)
         val constructorBuilder = FunSpec.constructorBuilder()
 
-        function.parameters.forEach { parameter ->
-            val name = parameter.name?.asString() ?: return@forEach
-            val type = parameter.type.resolve().toTypeName()
-            val propertySpec = PropertySpec.Companion.builder(name, type).initializer(name).build()
+        annotatedFunctionParams.forEach { parameter ->
+            val propertySpec = PropertySpec.builder(parameter.name, parameter.type).initializer(parameter.name).build()
             classBuilder.addProperty(propertySpec)
-            constructorBuilder.addParameter(name, type)
+            constructorBuilder.addParameter(parameter.name, parameter.type)
         }
 
         classBuilder.primaryConstructor(constructorBuilder.build())
@@ -93,7 +117,9 @@ class MemoryCacheCodeGenerator {
         packageName: String,
         repositoryName: String,
         dataType: KSType,
-        parametersDataClass: TypeSpec
+        parameters: List<KernlParameter>,
+        parametersDataClass: TypeSpec,
+        interfaceAdditions: TypeSpec.Builder.(List<KernlParameter>, TypeSpec) -> TypeSpec.Builder
     ): TypeSpec {
         return TypeSpec.interfaceBuilder(repositoryName)
             .addSuperinterface(
@@ -106,6 +132,7 @@ class MemoryCacheCodeGenerator {
                 )
             )
             .addType(parametersDataClass)
+            .interfaceAdditions(parameters, parametersDataClass)
             .addType(
                 TypeSpec.companionObjectBuilder()
                     .addFunction(
@@ -208,3 +235,8 @@ class MemoryCacheCodeGenerator {
             .build()
     }
 }
+
+data class KernlParameter(
+    val name: String,
+    val type: TypeName
+)

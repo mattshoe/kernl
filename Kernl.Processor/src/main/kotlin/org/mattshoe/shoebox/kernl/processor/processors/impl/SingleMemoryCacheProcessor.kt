@@ -40,7 +40,18 @@ class SingleMemoryCacheProcessor(
                     repositoryName,
                     packageDestination,
                     serviceReturnType
-                )
+                ) { params, _ ->
+                    val builder = FunSpec.builder("fetch")
+                    params.forEach { parameter ->
+                        builder.addParameter(
+                            ParameterSpec(parameter.name, parameter.type)
+                        )
+                    }
+                    builder.addModifiers(KModifier.SUSPEND)
+                    builder.addStatement("fetch(Params(${params.joinToString { it.name }}))")
+
+                    addFunction(builder.build())
+                }
             }
         ).awaitAll().filterNotNullTo(mutableSetOf())
     }
