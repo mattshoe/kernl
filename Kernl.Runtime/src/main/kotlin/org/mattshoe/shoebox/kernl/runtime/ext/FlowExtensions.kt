@@ -24,6 +24,10 @@ fun <T: Any> Flow<T>.selectivelyDistinct(predicate: suspend (T) -> Boolean): Flo
     }
 }
 
+/**
+ * This simply creates a [channelFlow] and applies the [conflate] operator to the [channelFlow]
+ * automatically.
+ */
 @OptIn(ExperimentalTypeInference::class)
 fun <T> conflatedChannelFlow(@BuilderInference block: suspend ProducerScope<T>.() -> Unit): Flow<T>
     = channelFlow(block).conflate()
