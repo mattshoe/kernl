@@ -42,9 +42,14 @@ interface UserDataService {
 ```
 
 ### 3. Configure the Scope of your Kernl data
-With Kernl, you define the lifespan of a given set of cached data. When that lifespan is ended, all memory caches will
-be immediately invalidated, ensuring no data is can be used beyond its scope. Disk=cached data will not be invalidated 
-upon scope termination.
+With Kernl, you define the lifespan of your memory-cached data. Once that lifespan is ended, all memory caches will
+be immediately invalidated, ensuring no data can be used beyond its scope. Disk-cached data will not be invalidated 
+upon scope termination, only in-memory caches.
+
+Please note that your application is required to invoke `kernl { startSession() }` at some point before loading your Kernls.
+This is typically done in either the Application, in your app's post-login logic, or the main() function in a pure kotlin
+library.
+
 ```kotlin
 // Scope your data to a single login session, invalidating all data on logout
 class MyUserSessionManager: UserSessionManager() {
