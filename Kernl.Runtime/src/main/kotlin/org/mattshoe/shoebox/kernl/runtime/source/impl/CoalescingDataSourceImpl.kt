@@ -1,29 +1,23 @@
-package org.mattshoe.shoebox.kernl.runtime.cache.nocache
+package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.impl
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
-import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.impl.CoalescingDataSourceImpl
+import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 
-abstract class BaseNoCacheKernl<TParams: Any, TData: Any>(
-    private val retryStrategy: RetryStrategy? = null
-): NoCacheKernl<TParams, TData> {
-    protected abstract suspend fun fetchData(params: TParams): TData
-    private val ongoingRequests = mutableMapOf<TParams, Deferred<ValidDataResult<TData>>>()
-    private val mutex = Mutex()
+class CoalescingDataSourceImpl<T: Any>(private val retryStrategy: RetryStrategy? = null): CoalescingDataSource<T> {
 
-    override suspend fun fetch(params: TParams): ValidDataResult<TData> = coroutineScope {
-        var currentRequest: Deferred<ValidDataResult<TData>>? = null
+    private val requestMutex = Mutex()
+    private var ongoingRequest: Deferred<ValidDataResult<T>>? = null
 
-        mutex.withLock {
+    override suspend fun coalesce(action: suspend () -> T): ValidDataResult<T> = coroutineScope {
+        var currentRequest: Deferred<ValidDataResult<T>>? = null
+
+        requestMutex.withLock {
             /*
                 Why completable deferred here:
 
@@ -37,29 +31,27 @@ abstract class BaseNoCacheKernl<TParams: Any, TData: Any>(
                 clients inside this block, which eliminates the risk of deadlock from the completable deferred.
              */
             var currentRequestIsInitialized: CompletableDeferred<Unit>? = null
-            if (ongoingRequests[params] == null) {
+            if (ongoingRequest == null) {
                 currentRequestIsInitialized = CompletableDeferred()
-                ongoingRequests[params] = async {
+                ongoingRequest = async {
                     try {
                         DataResult.Success(
-                            fetchWithRetryStrategy(retryStrategy) { fetchData(params) }
+                            fetchWithRetryStrategy(retryStrategy, action)
                         )
                     } catch (e: Throwable) {
+                        yield()
                         DataResult.Error(e)
                     } finally {
                         currentRequestIsInitialized.await()
-                        ongoingRequests.remove(params)
+                        ongoingRequest = null
                     }
                 }
-
             }
-            currentRequest = ongoingRequests[params]
+            currentRequest = ongoingRequest
             currentRequestIsInitialized?.complete(Unit)
         }
 
         return@coroutineScope currentRequest?.await()
             ?: throw IllegalStateException("Request was not initialized!")
     }
-
-    private fun getDataSource(): CoalescingDataSource<TData> = CoalescingDataSourceImpl()
 }

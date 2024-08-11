@@ -1,12 +1,16 @@
 # `@Kernl.NoCache`
-The Kernl.NoCache annotation generates a repository that does not cache values. 
+
+The Kernl.NoCache annotation generates a repository that does not cache values.
 Every call to fetch data will result in a fresh data retrieval operation.
 
 ## Annotation Parameters
+
 ### `name: String`
+
 This will be the name of the generated repository. This value is not optional.
 
 ## Generated Repository
+
 Your generated repository will always be an implementation of the [NoCacheKernl](../kernl/NO_CACHE_KERNL.md) interface.
 
 Let's imagine you have a Retrofit service such as the following:
@@ -24,6 +28,7 @@ interface MyService {
 ```
 
 ### Obtaining an Instance
+
 Kernl provides factories to obtain transient instances of your repositories. They are transient meaning a new instance
 is created every time you invoke the `Factory` method.
 
@@ -38,6 +43,7 @@ val myRepo = MyNoCacheKernl.Factory { id, someParam, otherParam ->
 ```
 
 ### Dependency Injection
+
 Kernl is designed to work well with any arbitrary dependency injection framework. I will demonstrate with Dagger, but
 the pattern should be similar for any dependency injection framework
 
@@ -56,26 +62,24 @@ interface MyServiceModule {
 ```
 
 ### Use Your Repository
-The example below uses Android ViewModels for demonstration, but you can adapt your use-case to your architectural patterns.
-The `Kernl` library is in no way tied to the Android SDK.
+
+The example below uses Android ViewModels for demonstration, but you can adapt your use-case to your architectural
+patterns. The `Kernl` library is in no way tied to the Android SDK.
 
 ```kotlin
 class MyViewModel @Inject constructor(
     private val myNoCacheKernl: MyNoCacheKernl
-): ViewModel() {
+) : ViewModel() {
     private val _state = MutableStateFlow<YourState>(YourState.Loading)
     val state: StateFlow<YourState> = _state
 
     fun loadData(id: String, someParam: Int, otherParam: Boolean) {
         viewModelScope.launch {
-            val result = myNoCacheKernl.fetch(
-                MyNoCacheKernl.Params(id, someParam, otherParam)
-            )
+            val result = myNoCacheKernl.fetch(id, someParam, otherParam)
             when (result) {
                 is DataResult.Success -> _state.update { YourState.Success(result.value) }
                 is DataResult.Error -> _state.update { YourState.Error(it.error) }
             }
-            
         }
     }
 }

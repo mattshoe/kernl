@@ -14,6 +14,9 @@ import org.mattshoe.shoebox.util.className
 import kotlinx.coroutines.*
 import org.mattshoe.shoebox.kernl.ExponentialBackoff
 import org.mattshoe.shoebox.kernl.RetryStrategy
+import org.mattshoe.shoebox.kernl.processor.processors.KernlParameter
+import org.mattshoe.shoebox.kernl.runtime.DataResult
+import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
 
 class  NoCacheProcessor(
     logger: KSPLogger
@@ -28,7 +31,7 @@ class  NoCacheProcessor(
         serviceReturnType: KSType
     ): Set<GeneratedFile> {
         return buildSet {
-            generateInterfaceFileData(declaration, repositoryName, packageDestination, serviceReturnType)
+            generateInterfaceFileData(declaration, repositoryName, packageDestination, serviceReturnType, serviceReturnType)
         }.awaitAll().filterNotNullTo(mutableSetOf())
     }
 
@@ -37,6 +40,7 @@ class  NoCacheProcessor(
         repositoryName: String,
         packageDestination: String,
         dataType: KSType,
+        serviceReturnType: KSType
     ) = withContext(Dispatchers.Default) {
         this@generateInterfaceFileData.add(
             async {
@@ -47,7 +51,8 @@ class  NoCacheProcessor(
                         packageDestination,
                         repositoryName,
                         dataType,
-                        buildParamsDataClass(function)
+                        extractParameters(function),
+                        serviceReturnType
                     )
                 )
             }
@@ -58,11 +63,13 @@ class  NoCacheProcessor(
         packageName: String,
         repositoryName: String,
         dataType: KSType,
-        parametersDataClass: TypeSpec
+        params: List<KernlParameter>,
+        serviceReturnType: KSType,
     ): String {
+        val parametersDataClass = buildParamsDataClass(params)
         return FileSpec.builder(packageName, repositoryName)
             .addType(
-                buildInterface(packageName, repositoryName, dataType, parametersDataClass)
+                buildInterface(packageName, repositoryName, dataType, params, parametersDataClass, serviceReturnType)
             )
             .addType(
                 buildImpl(packageName, repositoryName, dataType, parametersDataClass)
@@ -71,16 +78,14 @@ class  NoCacheProcessor(
             .toString()
     }
 
-    private fun buildParamsDataClass(function: KSFunctionDeclaration): TypeSpec {
+    private fun buildParamsDataClass(params: List<KernlParameter>): TypeSpec {
         val classBuilder = TypeSpec.classBuilder("Params").addModifiers(KModifier.DATA)
         val constructorBuilder = FunSpec.constructorBuilder()
 
-        function.parameters.forEach { parameter ->
-            val name = parameter.name?.asString() ?: return@forEach
-            val type = parameter.type.resolve().toTypeName()
-            val propertySpec = PropertySpec.builder(name, type).initializer(name).build()
+        params.forEach {
+            val propertySpec = PropertySpec.builder(it.name, it.type).initializer(it.name).build()
             classBuilder.addProperty(propertySpec)
-            constructorBuilder.addParameter(name, type)
+            constructorBuilder.addParameter(it.name, it.type)
         }
 
         classBuilder.primaryConstructor(constructorBuilder.build())
@@ -91,7 +96,9 @@ class  NoCacheProcessor(
         packageName: String,
         repositoryName: String,
         dataType: KSType,
-        parametersDataClass: TypeSpec
+        params: List<KernlParameter>,
+        parametersDataClass: TypeSpec,
+        serviceReturnType: KSType
     ): TypeSpec {
         return TypeSpec.interfaceBuilder(repositoryName)
             .addSuperinterface(
@@ -104,6 +111,7 @@ class  NoCacheProcessor(
                 )
             )
             .addType(parametersDataClass)
+            .buildUnwrappedFetchFunction(params, serviceReturnType)
             .addType(
                 TypeSpec.companionObjectBuilder()
                     .addFunction(
@@ -186,4 +194,29 @@ class  NoCacheProcessor(
             .build()
     }
 
+    private fun extractParameters(function: KSFunctionDeclaration): List<KernlParameter> {
+        return function.parameters.map { parameter ->
+            KernlParameter(
+                name =  parameter.name?.asString() ?: "",
+                parameter.type.resolve().toTypeName()
+            )
+        }
+    }
+
+    private fun TypeSpec.Builder.buildUnwrappedFetchFunction(params: List<KernlParameter>, serviceReturnType: KSType): TypeSpec.Builder {
+        val builder = FunSpec.builder("fetch")
+        params.forEach { parameter ->
+            builder.addParameter(
+                ParameterSpec(parameter.name, parameter.type)
+            )
+        }
+        builder.addModifiers(KModifier.SUSPEND)
+        builder.returns(
+            ValidDataResult::class.asTypeName()
+            .parameterizedBy(serviceReturnType.className)
+        )
+        builder.addStatement("return fetch(Params(${params.joinToString { it.name }}))")
+
+        return addFunction(builder.build())
+    }
 }

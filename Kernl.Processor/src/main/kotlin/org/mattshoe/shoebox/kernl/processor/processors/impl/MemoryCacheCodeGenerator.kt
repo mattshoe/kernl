@@ -6,12 +6,14 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
-import org.mattshoe.shoebox.util.className
-import org.mattshoe.shoebox.util.simpleName
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlPolicy
-import java.sql.Types
+import org.mattshoe.shoebox.kernl.processor.processors.KernlParameter
+import org.mattshoe.shoebox.util.className
+import org.mattshoe.shoebox.util.simpleName
 import kotlin.reflect.KClass
 
 class MemoryCacheCodeGenerator {
@@ -251,7 +253,3 @@ class MemoryCacheCodeGenerator {
     }
 }
 
-data class KernlParameter(
-    val name: String,
-    val type: TypeName
-)

@@ -31,3 +31,4 @@ internal suspend fun <T> Any.fetchWithRetryStrategy(
     }
     throw IllegalStateException("Unable to fetch data for ${this::class.qualifiedName}")
 }
+

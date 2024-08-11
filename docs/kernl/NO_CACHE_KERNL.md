@@ -1,15 +1,18 @@
 # `NoCacheKernl<TParams: Any, TData: Any>`
-Repository that does not cache values. Every call to fetch data will result in a fresh data retrieval operation. All 
-generated implementations of `NoCacheKernl` will always accept an optional [`RetryStrategy`](RETRY_STRATEGY.md) in their 
-constructor to allow consumers to specify any retry policy if they need one. 
 
-In most cases where you need retry logic, the default [`ExponentialBackoff`](EXPONENTIAL_BACKOFF.md) algorithm will 
-suffice, however, you are free to provide your own implementations.
-
+The `NoCacheKernl` interface provides a mechanism for fetching data without using any in-memory or persistent caching.
+It is designed to efficiently manage and coalesce multiple concurrent requests for the same parameters, ensuring that
+only one fetch operation is executed and that the result is shared among all callers. This approach helps to avoid
+redundant operations and optimize resource usage.
 
 ### `suspend fun fetch(params: TParams): ValidDataResult<TData>`
-Use this method to fetch data. This method will always perform a fresh data retrieval operation. Any failures are 
-encapsulated and returned as [`DataResult.Error`](../DATA_RESULT.md).
+
+This method initiates a data retrieval operation using the specified parameters. Despite the absence of caching, it
+ensures that if multiple coroutines request data with the same parameters concurrently, only one fetch operation is
+performed. The result of this operation is then shared among all concurrent callers.
+
+If this method receives concurrent requests with differing parameters, then both requests will be sent concurrently.
+Only concurrent requests received while a call for the same parameters is already in flight, will be coalesced.
 
 The return type of this method is guaranteed to be either [`DataResult.Success`](../DATA_RESULT.md) or
 [`DataResult.Error`](../DATA_RESULT.md). It can never be [`DataResult.Invalidated`](../DATA_RESULT.md)
@@ -17,4 +20,5 @@ The return type of this method is guaranteed to be either [`DataResult.Success`]
 See: [`ValidDataResult`](../VALID_DATA_RESULT.md)
 
 ## Example Usage
+
 See [@Kernl.NoCache](../annotations/NO_CACHE.md) for examples of usage.

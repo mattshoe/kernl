@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kernl.org.mattshoe.shoebox.kernl.singlememorycache.SingleMemoryCacheIntegrationTesterKernl
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.currentTime
