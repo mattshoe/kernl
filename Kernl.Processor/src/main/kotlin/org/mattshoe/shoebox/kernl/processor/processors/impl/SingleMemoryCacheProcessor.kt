@@ -40,7 +40,7 @@ class SingleMemoryCacheProcessor(
                     repositoryName,
                     packageDestination,
                     serviceReturnType
-                ) { params, paramsWrapper ->
+                ) { params, _ ->
                     val builder = FunSpec.builder("fetch")
                     params.forEach { parameter ->
                         builder.addParameter(
