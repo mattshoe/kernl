@@ -14,12 +14,17 @@ internal suspend fun <T> Any.fetchWithRetryStrategy(
         var nextDelay = strategy.initialDelay
         repeat(strategy.maxAttempts) { attempt ->
             try {
-                return block()
+                println("Making fetch attempt $attempt")
+                return block().also {
+                    println("Fetch attempt $attempt succeeded")
+                }
             } catch (e: Throwable) {
+                println("Fetch attempt failed")
                 if (attempt == strategy.maxAttempts - 1) {
                     throw e
                 }
             }
+            println("Delaying ${nextDelay.inWholeMilliseconds}ms before next attempt....")
             delay(nextDelay)
             nextDelay = (nextDelay.inWholeMilliseconds * strategy.backoffFactor).milliseconds
         }

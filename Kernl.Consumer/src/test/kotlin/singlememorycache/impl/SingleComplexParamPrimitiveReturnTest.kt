@@ -1,5 +1,6 @@
 package singlememorycache.impl
 
+import io.mockk.core.ValueClassSupport.boxedValue
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import kernl.org.mattshoe.shoebox.kernl.singlememorycache.SingleComplexParamPrimitiveReturnKernl
@@ -10,6 +11,14 @@ class SingleComplexParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<Sin
         return SingleComplexParamPrimitiveReturnKernl.Factory { id ->
             id.data.toInt()
         }
+    }
+
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<SingleComplexParamPrimitiveReturnKernl.Params, Int>,
+        params: SingleComplexParamPrimitiveReturnKernl.Params,
+        response: Int
+    ) {
+        (subject as SingleComplexParamPrimitiveReturnKernl).fetch(params.id)
     }
 
     override val testData = mapOf(

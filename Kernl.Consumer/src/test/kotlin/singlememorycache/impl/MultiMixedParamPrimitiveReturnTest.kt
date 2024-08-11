@@ -12,6 +12,14 @@ class MultiMixedParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<MultiM
         }
     }
 
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<MultiMixedParamPrimitiveReturnKernl.Params, Int>,
+        params: MultiMixedParamPrimitiveReturnKernl.Params,
+        response: Int
+    ) {
+        (subject as MultiMixedParamPrimitiveReturnKernl).fetch(params.id, params.bar)
+    }
+
     override val testData = mapOf(
         MultiMixedParamPrimitiveReturnKernl.Params("42", ServiceRequest("58")) to 100,
         MultiMixedParamPrimitiveReturnKernl.Params("96", ServiceRequest("4")) to 100,

@@ -1,0 +1,5 @@
+package associativememorycache
+
+class AssociativeMemoryCacheFullIntegrationTest {
+
+}

@@ -1,5 +1,6 @@
 package singlememorycache.impl
 
+import kernl.org.mattshoe.shoebox.kernl.singlememorycache.MultiComplexParamComplexReturnKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.singlecache.SingleCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
@@ -11,6 +12,14 @@ class MultiComplexParamPrimitiveReturnTest : SingleMemoryCacheScenariosTest<Mult
         return MultiComplexParamPrimitiveReturnKernl.Factory { id, bar ->
             id.data.toInt() + bar.code
         }
+    }
+
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<MultiComplexParamPrimitiveReturnKernl.Params, Int>,
+        params: MultiComplexParamPrimitiveReturnKernl.Params,
+        response: Int
+    ) {
+        (subject as MultiComplexParamPrimitiveReturnKernl).fetch(params.id, params.bar)
     }
 
     override val testData = mapOf(

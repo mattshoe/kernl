@@ -57,6 +57,9 @@ class AssociativeMemoryCacheProcessor(
                 ParameterSpec(parameter.name, parameter.type)
             )
         }
+        builder.addParameter(
+            ParameterSpec.builder("forceRefresh", BOOLEAN).defaultValue("false").build()
+        )
         builder.returns(
             Flow::class.asTypeName()
                 .parameterizedBy(
@@ -64,7 +67,7 @@ class AssociativeMemoryCacheProcessor(
                         .parameterizedBy(serviceReturnType.className)
                 )
         )
-        builder.addStatement("return stream(Params(${params.joinToString { it.name }}))")
+        builder.addStatement("return stream(Params(${params.joinToString { it.name }}), forceRefresh)")
 
         return addFunction(builder.build())
     }

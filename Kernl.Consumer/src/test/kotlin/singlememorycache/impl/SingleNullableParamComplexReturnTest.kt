@@ -12,6 +12,14 @@ class SingleNullableParamComplexReturnTest : SingleMemoryCacheScenariosTest<Sing
         }
     }
 
+    override suspend fun fetchUnwrapped(
+        repository: SingleCacheKernl<SingleNullableParamComplexReturnKernl.Params, ServiceResponse>,
+        params: SingleNullableParamComplexReturnKernl.Params,
+        response: ServiceResponse
+    ) {
+        (subject as SingleNullableParamComplexReturnKernl).fetch(params.id)
+    }
+
     override val testData = mapOf(
         SingleNullableParamComplexReturnKernl.Params("42") to ServiceResponse(42),
         SingleNullableParamComplexReturnKernl.Params(null) to ServiceResponse(0),

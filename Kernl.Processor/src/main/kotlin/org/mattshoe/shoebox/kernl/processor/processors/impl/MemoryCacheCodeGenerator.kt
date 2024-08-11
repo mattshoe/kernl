@@ -10,6 +10,7 @@ import org.mattshoe.shoebox.util.className
 import org.mattshoe.shoebox.util.simpleName
 import kotlinx.coroutines.*
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
+import org.mattshoe.shoebox.kernl.KernlPolicy
 import java.sql.Types
 import kotlin.reflect.KClass
 
@@ -138,7 +139,7 @@ class MemoryCacheCodeGenerator {
                     .addFunction(
                         FunSpec.builder("Factory")
                             .addParameter(
-                                ParameterSpec.builder("kernlPolicy", DefaultKernlPolicy::class)
+                                ParameterSpec.builder("kernlPolicy", KernlPolicy::class)
                                     .defaultValue(
                                         "%T",
                                         ClassName(
@@ -149,6 +150,14 @@ class MemoryCacheCodeGenerator {
                                     .build()
                             )
                             .addParameter(
+                                ParameterSpec.builder(
+                                    "dispatcher",
+                                    CoroutineDispatcher::class
+                                ).defaultValue(
+                                    "%T.IO", Dispatchers::class.asTypeName()
+                                ).build()
+                            )
+                            .addParameter(
                                 "call",
                                 LambdaTypeName.get(
                                     parameters = parametersDataClass.propertySpecs.map { ParameterSpec.unnamed(it.type) },
@@ -157,7 +166,7 @@ class MemoryCacheCodeGenerator {
                             )
                             .returns(ClassName(packageName, repositoryName))
                             .addCode("""
-                                return ${repositoryName}Impl(kernlPolicy,·call)
+                                return ${repositoryName}Impl(kernlPolicy,·dispatcher,·call)
                             """.trimIndent())
                             .build()
                     )
@@ -179,8 +188,14 @@ class MemoryCacheCodeGenerator {
                 FunSpec.constructorBuilder()
                     .addParameter(
                         ParameterSpec
-                            .builder("kernlPolicy", DefaultKernlPolicy::class)
+                            .builder("kernlPolicy", KernlPolicy::class)
                             .build()
+                    )
+                    .addParameter(
+                        ParameterSpec.builder(
+                            "dispatcher",
+                            CoroutineDispatcher::class
+                        ).build()
                     )
                     .addParameter(
                         "call",
@@ -201,7 +216,7 @@ class MemoryCacheCodeGenerator {
                     dataType.className
                 )
             )
-            .addSuperclassConstructorParameter("%N·=·%N", "kernlPolicy", "kernlPolicy")
+            .addSuperclassConstructorParameter("%N·=·%N,·%N·=·%N", "kernlPolicy", "kernlPolicy", "dispatcher", "dispatcher")
             .addProperty(
                 PropertySpec.builder(
                     "call", LambdaTypeName.get(
