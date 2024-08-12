@@ -25,14 +25,14 @@ object KernlPolicyDefaults {
      * @param cacheStrategy The strategy used to determine the source of data when fetching from the cache. Defaults to
      *     `NetworkFirst`.
      * @param invalidationStrategy The strategy used to determine how cache invalidation should be handled. Defaults to
-     *     `TakeNoAction` with an infinite time-to-live.
+     *     `TimeToLive` with an infinite time-to-live.
      * @return A `KernlPolicy` instance configured with the specified options.
      */
     fun copy(
         retryStrategy: RetryStrategy? = null,
         events: Flow<KernlEvent> = InternalKernl.events,
         cacheStrategy: CacheStrategy = CacheStrategy.NetworkFirst,
-        invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE),
+        invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TimeToLive(timeToLive = Duration.INFINITE),
     ): KernlPolicy {
         return KernlPolicyImpl(
             retryStrategy,

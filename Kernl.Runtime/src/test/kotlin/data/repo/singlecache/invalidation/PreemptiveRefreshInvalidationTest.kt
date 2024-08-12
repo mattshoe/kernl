@@ -7,6 +7,7 @@ import data.repo.singlecache.TestStopwatch
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.Test
+import org.mattshoe.shoebox.kernl.FOREVER
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.KernlPolicyDefaults
 import org.mattshoe.shoebox.kernl.runtime.DataResult
@@ -18,7 +19,10 @@ import kotlin.time.measureTime
 
 @OptIn(ExperimentalStdlibApi::class)
 class PreemptiveRefreshInvalidationTest: InvalidationStrategyTest() {
-    override val invalidationStrategy = InvalidationStrategy.PreemptiveRefresh(leadTime = 200.milliseconds)
+    override val invalidationStrategy = InvalidationStrategy.PreemptiveRefresh(
+        timeToLive = FOREVER,
+        leadTime = 200.milliseconds
+    )
 
     private val scheduler = TestCoroutineScheduler()
     private val dispatcher = StandardTestDispatcher(scheduler)

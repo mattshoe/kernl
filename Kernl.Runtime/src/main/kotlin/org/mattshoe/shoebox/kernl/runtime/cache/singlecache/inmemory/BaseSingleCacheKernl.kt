@@ -56,7 +56,7 @@ abstract class BaseSingleCacheKernl<TParams : Any, TData : Any>(
             .build()
     }
 
-    private val invalidationTracker = invalidationTrackerFactory.getTracker(kernlPolicy.invalidationStrategy)
+    private val invalidationTracker = invalidationTrackerFactory.getExecutor(kernlPolicy.invalidationStrategy)
 
     protected abstract val dataType: KClass<TData>
 

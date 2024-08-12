@@ -1,11 +1,9 @@
 package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 
-interface InvalidationTracker {
+interface InvalidationExecutor {
     val invalidationStream: Flow<Unit>
     val refreshStream: Flow<Unit>
 

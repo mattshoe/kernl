@@ -7,14 +7,10 @@ import data.repo.singlecache.StubSingleCacheKernl
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
-import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import util.TestKernlResourceManager
 import util.runKernlTest
@@ -33,7 +29,7 @@ abstract class InvalidationStrategyTest {
     
     protected abstract fun CoroutineScope.makeSubject(
         dispatcher: CoroutineDispatcher,
-        invalidationStrategy: InvalidationStrategy = InvalidationStrategy.TakeNoAction(),
+        invalidationStrategy: InvalidationStrategy = InvalidationStrategy.Manual,
         kernlResourceManager: KernlResourceManager = TestKernlResourceManager()
     ): StubSingleCacheKernl
 

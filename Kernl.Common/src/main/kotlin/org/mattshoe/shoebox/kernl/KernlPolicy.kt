@@ -52,7 +52,7 @@ interface KernlPolicy {
      * performance, freshness, and resource usage.
      *
      * Common strategies include:
-     * - `TakeNoAction`: No action is taken upon invalidation, leaving the cache as is.
+     * - `TimeToLive`: No action is taken upon invalidation, leaving the cache as is.
      * - `LazyRefresh`: Data is refreshed only when it is next requested.
      * - `EagerRefresh`: Data is immediately refreshed upon invalidation.
      * - `PreemptiveRefresh`: Data is refreshed preemptively with a specified lead time before it becomes stale.

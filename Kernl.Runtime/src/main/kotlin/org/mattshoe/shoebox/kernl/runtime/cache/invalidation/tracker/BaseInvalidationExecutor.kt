@@ -1,19 +1,15 @@
 package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.conflate
-import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
-import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
-abstract class BaseInvalidationTracker(
+abstract class BaseInvalidationExecutor(
     protected val kernlResourceManager: KernlResourceManager
-): InvalidationTracker {
+): InvalidationExecutor {
     protected val kernlRegistration by lazy {
         kernlResourceManager.registerKernl(this)
     }

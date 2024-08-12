@@ -8,16 +8,22 @@ import kotlinx.coroutines.sync.withLock
 import org.mattshoe.shoebox.kernl.NEVER
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
+import org.mattshoe.shoebox.kernl.runtime.dsl.DEFAULT_RESOURCE_MONITOR_INTERVAL
 import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 internal object DefaultKernlResourceManager: KernlResourceManager {
     internal lateinit var coroutineScope: CoroutineScope
     private var currentPollingJob: Job? = null
     private val activeKernlsMutex = Mutex()
     private val activeKernls = mutableMapOf<UUID, KernlResource>()
+
+    init {
+        startSession(Dispatchers.Default, DEFAULT_RESOURCE_MONITOR_INTERVAL)
+    }
 
     override fun startSession(dispatcher: CoroutineDispatcher, resourceMonitorInterval: Duration) {
         stopSession()
@@ -42,7 +48,7 @@ internal object DefaultKernlResourceManager: KernlResourceManager {
     override fun registerKernl(kernl: Any): KernlRegistration {
         val uuid = UUID.randomUUID()
         val internalTimeToLiveCountdownFlow = CountdownFlow("CountdownFlow:${kernl::class.simpleName}:${System.identityHashCode(kernl).toString(16)}")
-        // We need a COLD flow that will run endlessly upon subscription but just consumes events from the "global" ttl countdown flow
+        // We need a COLD flow that will consume events from the "global" ttl countdown flow
         val publicTimeToLiveFlow = conflatingChannelFlow {
             internalTimeToLiveCountdownFlow.events
                 .onEach {

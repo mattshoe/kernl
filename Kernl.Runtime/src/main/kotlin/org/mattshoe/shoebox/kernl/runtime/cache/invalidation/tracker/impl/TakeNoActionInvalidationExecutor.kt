@@ -2,14 +2,13 @@ package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl
 
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
-import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationExecutor
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
-class TakeNoActionInvalidationTracker(
-    private val strategy: InvalidationStrategy.TakeNoAction,
+class TimeToLiveInvalidationExecutor(
+    private val strategy: InvalidationStrategy.TimeToLive,
     kernlResourceManager: KernlResourceManager
-): BaseInvalidationTracker(kernlResourceManager) {
+): BaseInvalidationExecutor(kernlResourceManager) {
 
     override suspend fun shouldForceFetch(currentState: DataResult<*>?) = false
 

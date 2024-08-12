@@ -4,6 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+internal val DEFAULT_RESOURCE_MONITOR_INTERVAL = 1.seconds
+
 /**
  * A configuration class for setting up and managing a session within the Kernl library.
  *
@@ -52,5 +54,5 @@ class KernlSessionConfiguration {
      *
      * @return The interval as a [Duration] at which resources are monitored.
      */
-    var resourceMonitorInterval: Duration = 1.seconds
+    var resourceMonitorInterval: Duration = DEFAULT_RESOURCE_MONITOR_INTERVAL
 }
