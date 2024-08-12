@@ -72,7 +72,6 @@ subprojects {
                                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
 
                                 credentials {
-
                                     username = providers.environmentVariable("OSSRH_USERNAME").get()
                                     password = providers.environmentVariable("OSSRH_PASSWORD").get()
                                 }

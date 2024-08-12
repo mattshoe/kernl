@@ -94,10 +94,10 @@ jobs:
 
       - name: Publish to Nexus OSSRH for Maven Central
         id: publish_kernl
-        run: ./gradlew publish
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
+        run: ./gradlew publish
 
