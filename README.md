@@ -25,9 +25,9 @@ including the minimum runtime dependencies. Things like annotations are only nee
 
 ```kotlin
 dependencies {
-    ksp("org.mattshoe.shoebox:Kernl.Processor:1.0.0")
-    compileOnly("org.mattshoe.shoebox:Kernl.Annotations:1.0.0")
-    implementation("org.mattshoe.shoebox:Kernl.Runtime:1.0.0")
+    ksp("org.mattshoe.shoebox:Kernl.Processor:0.0.1-beta4")
+    compileOnly("org.mattshoe.shoebox:Kernl.Annotations:0.0.1-beta4")
+    implementation("org.mattshoe.shoebox:Kernl.Runtime:0.0.1-beta4")
 }
 ```
 
