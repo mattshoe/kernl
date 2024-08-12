@@ -13,9 +13,28 @@ import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.impl.CoalescingDataSourceImpl
 
-abstract class BaseNoCacheKernl<TParams: Any, TData: Any>(
+/**
+ * An abstract base class that provides a framework for implementing a non-caching data kernel with request coalescing.
+ *
+ * The `BaseNoCacheKernl` class manages data retrieval operations without caching the results. It ensures that multiple
+ * concurrent requests for the same parameters are coalesced into a single operation, and the result is shared among all
+ * callers. This helps to prevent redundant operations and optimize resource usage.
+ *
+ * @param TParams The type of the parameters used to identify and retrieve data.
+ * @param TData The type of data that this kernel retrieves.
+ * @param retryStrategy An optional `RetryStrategy` for retrying failed operations. If `null`, no retries will be
+ *     performed.
+ */
+abstract class BaseNoCacheKernl<TParams : Any, TData : Any>(
     private val retryStrategy: RetryStrategy? = null
-): NoCacheKernl<TParams, TData> {
+) : NoCacheKernl<TParams, TData> {
+    /**
+     * Implement this method to perform the logic for retrieving data. It will be called whenever a data fetch is
+     * required to be made, and will obey request coalescence.
+     *
+     * @param params The parameters used to identify and retrieve data.
+     * @return The data retrieved based on the provided parameters.
+     */
     protected abstract suspend fun fetchData(params: TParams): TData
     private val ongoingRequests = mutableMapOf<TParams, Deferred<ValidDataResult<TData>>>()
     private val mutex = Mutex()

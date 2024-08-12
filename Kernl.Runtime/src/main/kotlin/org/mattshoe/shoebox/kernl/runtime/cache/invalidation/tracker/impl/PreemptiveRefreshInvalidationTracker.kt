@@ -1,13 +1,11 @@
 package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
-import org.mattshoe.shoebox.kernl.runtime.cache.util.Stopwatch
-import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
 class PreemptiveRefreshInvalidationTracker(
@@ -18,7 +16,7 @@ class PreemptiveRefreshInvalidationTracker(
     private val manualRefreshStream = MutableSharedFlow<Unit>()
 
     override val refreshStream: Flow<Unit> =
-        conflatedChannelFlow {
+        conflatingChannelFlow {
             kernlRegistration.timeToLiveStream
                 .onEach {
                     println("invalidation forwarded to refresh!")

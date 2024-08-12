@@ -1,11 +1,11 @@
 package associativememorycache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeCacheKernl
 import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiSameParamPrimitiveReturnKernl
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
 class MultiSameParamPrimitiveReturnTest : AssociativeMemoryCacheScenariosTest<MultiSameParamPrimitiveReturnKernl.Params, Int>() {
-    override fun repository(): AssociativeMemoryCacheKernl<MultiSameParamPrimitiveReturnKernl.Params, Int> {
+    override fun repository(): AssociativeCacheKernl<MultiSameParamPrimitiveReturnKernl.Params, Int> {
         return MultiSameParamPrimitiveReturnKernl.Factory { id, bar ->
             onFetch(MultiSameParamPrimitiveReturnKernl.Params(id, bar))
             id.toInt() + bar.toInt()

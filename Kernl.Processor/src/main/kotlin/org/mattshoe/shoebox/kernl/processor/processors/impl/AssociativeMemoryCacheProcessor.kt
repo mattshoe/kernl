@@ -6,7 +6,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.mattshoe.shoebox.kernl.annotations.Kernl
-import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory.BaseAssociativeCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import kotlinx.coroutines.async
@@ -17,7 +17,7 @@ import org.mattshoe.shoebox.kernl.processor.processors.KernlParameter
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.util.className
 
-class AssociativeMemoryCacheProcessor(
+internal class AssociativeMemoryCacheProcessor(
     logger: KSPLogger,
     private val codeGenerator: MemoryCacheCodeGenerator
 ): KernlFunctionProcessor(
@@ -35,7 +35,7 @@ class AssociativeMemoryCacheProcessor(
         listOf(
             async {
                 codeGenerator.generate(
-                    AssociativeMemoryCacheKernl::class,
+                    AssociativeCacheKernl::class,
                     BaseAssociativeCacheKernl::class,
                     declaration,
                     repositoryName,
@@ -102,7 +102,7 @@ class AssociativeMemoryCacheProcessor(
         return addFunction(builder.build())
     }
 
-    fun getUnwrappedFunSpec(name: String, params: List<KernlParameter>): FunSpec.Builder {
+    private fun getUnwrappedFunSpec(name: String, params: List<KernlParameter>): FunSpec.Builder {
         return FunSpec.builder(name).apply {
             params.forEach { parameter ->
                 addParameter(
