@@ -2,7 +2,6 @@ package org.mattshoe.shoebox.kernl.runtime.cache.singlecache.inmemory
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
@@ -17,16 +16,37 @@ import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
-import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KClass
 
-abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
+/**
+ * An abstract base class that provides a framework for managing a single instance of cached data, with support for
+ * automatic invalidation and refreshing based on defined policies and global events.
+ *
+ * The `BaseSingleCacheKernl` class is designed to handle the lifecycle of a single cached data instance, allowing for
+ * operations such as data retrieval, refreshing, and invalidation. It uses a defined `KernlPolicy` to manage caching
+ * strategies and integrates with a global event stream for handling system-wide events. The class also leverages an
+ * `InvalidationTracker` to monitor and respond to changes in the data's validity.
+ *
+ * @param TParams The type of the parameters used to identify and retrieve data.
+ * @param TData The type of data that this kernel manages and retrieves.
+ * @param dispatcher The `CoroutineDispatcher` used to execute data operations. Defaults to `Dispatchers.IO`.
+ * @param kernlPolicy The policy that governs the caching, refreshing, and invalidation behavior of the kernel. Defaults
+ *     to `DefaultKernlPolicy`.
+ * @param kernlResourceManager The resource manager used to manage kernel resources. Defaults to
+ *     `DefaultKernlResourceManager`.
+ * @param invalidationTrackerFactory The factory used to create an `InvalidationTracker` based on the specified policy.
+ *     Defaults to `InvalidationTrackerFactoryImpl`.
+ */
+abstract class BaseSingleCacheKernl<TParams : Any, TData : Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val kernlPolicy: KernlPolicy = DefaultKernlPolicy,
     private val kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager,
-    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(kernlResourceManager),
-): SingleCacheKernl<TParams, TData> {
+    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(
+        kernlResourceManager
+    ),
+) : SingleCacheKernl<TParams, TData> {
     private val lastParams = AtomicReference<TParams>()
     private val dataSource by lazy {
         DataSource.Builder
@@ -42,7 +62,7 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
 
     @Suppress("DEPRECATION_ERROR")
     override val data: Flow<DataResult<TData>>
-        get() = conflatedChannelFlow {
+        get() = conflatingChannelFlow {
             // Need to make sure the KernlPolicy isn't using the global event stream already, wouldn't want dupes
             if (kernlPolicy.events !is InternalGlobalKernlEventStream) {
                 kernl { globalEventStream() }
@@ -71,6 +91,12 @@ abstract class BaseSingleCacheKernl<TParams: Any, TData: Any>(
             }
         }
 
+    /**
+     * Implement this method only to perform the data retrieval logic for this Kernl. It will only be called when a new
+     * piece of data is required based on the [KernlPolicy].
+     *
+     * @param params The parameters used to identify and retrieve data.
+     */
     protected abstract suspend fun fetchData(params: TParams): TData
 
     override suspend fun fetch(params: TParams, forceRefresh: Boolean) {

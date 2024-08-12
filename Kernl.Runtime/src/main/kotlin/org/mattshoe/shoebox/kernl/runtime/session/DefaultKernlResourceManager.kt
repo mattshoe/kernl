@@ -1,8 +1,6 @@
 package org.mattshoe.shoebox.kernl.runtime.session
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
@@ -10,7 +8,7 @@ import kotlinx.coroutines.sync.withLock
 import org.mattshoe.shoebox.kernl.NEVER
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
-import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.time.Duration
@@ -45,7 +43,7 @@ internal object DefaultKernlResourceManager: KernlResourceManager {
         val uuid = UUID.randomUUID()
         val internalTimeToLiveCountdownFlow = CountdownFlow("CountdownFlow:${kernl::class.simpleName}:${System.identityHashCode(kernl).toString(16)}")
         // We need a COLD flow that will run endlessly upon subscription but just consumes events from the "global" ttl countdown flow
-        val publicTimeToLiveFlow = conflatedChannelFlow {
+        val publicTimeToLiveFlow = conflatingChannelFlow {
             internalTimeToLiveCountdownFlow.events
                 .onEach {
                     send(it)

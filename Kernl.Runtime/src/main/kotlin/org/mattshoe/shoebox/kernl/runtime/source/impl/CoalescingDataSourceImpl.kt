@@ -9,7 +9,7 @@ import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
 import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
 import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 
-class CoalescingDataSourceImpl<T: Any>(private val retryStrategy: RetryStrategy? = null): CoalescingDataSource<T> {
+internal class CoalescingDataSourceImpl<T: Any>(private val retryStrategy: RetryStrategy? = null): CoalescingDataSource<T> {
 
     private val requestMutex = Mutex()
     private var ongoingRequest: Deferred<ValidDataResult<T>>? = null

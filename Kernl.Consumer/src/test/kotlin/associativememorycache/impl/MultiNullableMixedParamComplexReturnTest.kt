@@ -1,13 +1,13 @@
 package associativememorycache.impl
 
-import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeCacheKernl
 import org.mattshoe.shoebox.kernl.models.ServiceRequest
 import org.mattshoe.shoebox.kernl.models.ServiceResponse
 import kernl.org.mattshoe.shoebox.kernl.associativememorycache.MultiNullableMixedParamComplexReturnKernl
 import associativememorycache.AssociativeMemoryCacheScenariosTest
 
 class MultiNullableMixedParamComplexReturnTest : AssociativeMemoryCacheScenariosTest<MultiNullableMixedParamComplexReturnKernl.Params, ServiceResponse>() {
-    override fun repository(): AssociativeMemoryCacheKernl<MultiNullableMixedParamComplexReturnKernl.Params, ServiceResponse> {
+    override fun repository(): AssociativeCacheKernl<MultiNullableMixedParamComplexReturnKernl.Params, ServiceResponse> {
         return MultiNullableMixedParamComplexReturnKernl.Factory { id, bar ->
             onFetch(MultiNullableMixedParamComplexReturnKernl.Params(id, bar))
             ServiceResponse((id?.toInt() ?: 0) + (bar?.data?.toInt() ?: 0))
