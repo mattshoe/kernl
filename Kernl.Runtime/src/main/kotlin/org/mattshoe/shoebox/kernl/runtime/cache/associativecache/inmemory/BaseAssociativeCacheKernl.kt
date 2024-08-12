@@ -16,20 +16,33 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
-import org.mattshoe.shoebox.kernl.runtime.ext.conflatedChannelFlow
+import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import kotlin.reflect.KClass
 
-abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
+/**
+ * An abstract base class that implements an associative memory cache kernel for managing data retrieval operations with
+ * support for caching, refreshing, and invalidation policies. The `BaseAssociativeCacheKernl` class provides a flexible
+ * caching mechanism where data is associated with parameters, and the cache can be refreshed or invalidated based on
+ * specific events or policy configurations.
+ *
+ * @param TParams The type of the parameters that are used to identify and retrieve data.
+ * @param TData The type of data that this kernel manages and retrieves.
+ * @param dispatcher The `CoroutineDispatcher` used to execute data fetch operations. Defaults to `Dispatchers.IO`.
+ * @param kernlPolicy The policy that governs the caching, refreshing, and invalidation behavior of the kernel. Defaults
+ *     to `DefaultKernlPolicy`.
+ */
+abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val kernlPolicy: KernlPolicy = DefaultKernlPolicy
-): AssociativeMemoryCacheKernl<TParams, TData> {
+) : AssociativeMemoryCacheKernl<TParams, TData> {
 
     private val refreshStream = MutableSharedFlow<TParams>(replay = 0, onBufferOverflow = BufferOverflow.SUSPEND)
     private val invalidationStream = MutableSharedFlow<TParams>(replay = 0, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    private data class CacheEntry<TData: Any>(
+    private data class CacheEntry<TData : Any>(
         val dataSource: DataSource<TData>
     )
+
     private val dataCacheMutex = Mutex()
     private val dataCache = mutableMapOf<TParams, CacheEntry<TData>>()
     abstract val dataType: KClass<TData>
@@ -66,7 +79,7 @@ abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
     }
 
     private fun initializeNewStream(params: TParams, forceFetch: Boolean): Flow<DataResult<TData>> {
-        return conflatedChannelFlow {
+        return conflatingChannelFlow {
             withContext(Dispatchers.IO) {
                 loadDataIntoCache(params, forceFetch)
                 launch {
@@ -90,7 +103,7 @@ abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
 
     private suspend fun loadDataIntoCache(params: TParams, forceFetch: Boolean) {
         dataCacheMutex.withLock {
-            with (findDataCacheEntry(params)) {
+            with(findDataCacheEntry(params)) {
                 dataSource.initialize(forceFetch) {
                     fetchData(params)
                 }
@@ -182,7 +195,7 @@ abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
 
     private suspend fun refreshDataSource(params: TParams) {
         withContext(dispatcher) {
-            with (findDataCacheEntry(params)) {
+            with(findDataCacheEntry(params)) {
                 dataSource.initialize(forceFetch = true) {
                     fetchData(params)
                 }
@@ -203,6 +216,7 @@ abstract class BaseAssociativeCacheKernl<TParams: Any, TData: Any>(
                     invalidateDataSource(params)
                 }
             }
+
             is KernlEvent.Refresh -> {
                 if (event.params == null || event.params == params) {
                     refreshDataSource(params)

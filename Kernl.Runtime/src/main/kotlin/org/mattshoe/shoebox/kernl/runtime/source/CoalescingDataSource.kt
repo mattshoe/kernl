@@ -15,6 +15,19 @@ import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
  * @param T The type of data that this data source provides.
  */
 interface CoalescingDataSource<T : Any> {
+
+    /**
+     * Coalesces multiple concurrent requests for data into a single operation and returns the result.
+     *
+     * This method ensures that if multiple requests for data are made concurrently, only one instance of
+     * the `action` is executed. The result of this operation is then shared among all requests. This helps
+     * to prevent redundant data retrieval operations, reducing the load on the underlying system.
+     *
+     * @param action A suspending function that defines the data retrieval operation. This action is only executed
+     * once, even if multiple concurrent requests are made.
+     * @return A `ValidDataResult<T>` containing the result of the data retrieval operation, which is shared among
+     * all coalesced requests.
+     */
     suspend fun coalesce(action: suspend () -> T): ValidDataResult<T>
 }
 

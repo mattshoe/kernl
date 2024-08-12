@@ -16,7 +16,7 @@ import kotlinx.coroutines.*
 import kotlin.reflect.KClass
 
 
-class SingleMemoryCacheProcessor(
+internal class SingleMemoryCacheProcessor(
     logger: KSPLogger,
     private val codeGenerator: MemoryCacheCodeGenerator
 ): KernlFunctionProcessor(

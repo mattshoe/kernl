@@ -16,7 +16,7 @@ import org.mattshoe.shoebox.util.className
 import org.mattshoe.shoebox.util.simpleName
 import kotlin.reflect.KClass
 
-class MemoryCacheCodeGenerator {
+internal class MemoryCacheCodeGenerator {
     suspend fun generate(
         baseInterface: KClass<*>,
         baseClass: KClass<*>,
