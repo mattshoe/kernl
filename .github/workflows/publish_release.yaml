@@ -97,5 +97,11 @@ jobs:
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
-        run: ./gradlew publish
+        run: |
+          env
+          echo "OSSRH_USERNAME:  $OSSRH_USERNAME"
+          echo "OSSRH_PASSWORD:  OSSRH_PASSWORD"
+          echo "GPG_SIGNING_KEY:  GPG_SIGNING_KEY"
+          echo "GPG_SIGNING_PASSPHRASE:  GPG_SIGNING_PASSPHRASE"
+          ./gradlew publish
 
