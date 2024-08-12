@@ -1,5 +1,7 @@
 import org.apache.tools.ant.taskdefs.Java
 
+val NOTHING = "nothing"
+
 plugins {
     kotlin("jvm") version "2.0.10-RC2"
     id("maven-publish")
@@ -72,8 +74,8 @@ subprojects {
                                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
 
                                 credentials {
-                                    username = providers.environmentVariable("OSSRH_USERNAME").get()
-                                    password = providers.environmentVariable("OSSRH_PASSWORD").get()
+                                    username = System.getenv("OSSRH_USERNAME") ?: NOTHING
+                                    password = System.getenv("OSSRH_PASSWORD") ?: NOTHING
                                 }
                             }
                             mavenLocal()

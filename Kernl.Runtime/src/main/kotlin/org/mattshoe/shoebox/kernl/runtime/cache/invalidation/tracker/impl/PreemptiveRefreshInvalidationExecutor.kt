@@ -4,14 +4,14 @@ import kotlinx.coroutines.flow.*
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
-import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationExecutor
 import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
-class PreemptiveRefreshInvalidationTracker(
+class PreemptiveRefreshInvalidationExecutor(
     private val strategy: InvalidationStrategy.PreemptiveRefresh,
     kernlResourceManager: KernlResourceManager
-): BaseInvalidationTracker(kernlResourceManager) {
+): BaseInvalidationExecutor(kernlResourceManager) {
     private val preemptiveCountdown = CountdownFlow("PreemptiveCountdown")
     private val manualRefreshStream = MutableSharedFlow<Unit>()
 

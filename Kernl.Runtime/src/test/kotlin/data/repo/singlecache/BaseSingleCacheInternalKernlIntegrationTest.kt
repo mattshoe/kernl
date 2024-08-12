@@ -6,6 +6,7 @@ import com.google.common.truth.Truth
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.advanceTimeBy
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -15,6 +16,7 @@ import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
 import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
+import util.runKernlTest
 import kotlin.time.Duration
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
@@ -31,9 +33,8 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runRealTimeTest {
+    fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runKernlTest {
         val subject = makeSubject()
-        delay(100)
         subject.data.test {
             println("fetching data")
             subject.fetch(42)
@@ -45,7 +46,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN dataRetrieval fails THEN error is emitted`() = runRealTimeTest {
+    fun `WHEN dataRetrieval fails THEN error is emitted`() = runKernlTest {
         val subject = makeSubject()
         subject.data.test {
             val expectedValue = RuntimeException("oops")
@@ -60,7 +61,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() = runRealTimeTest {
+    fun `WHEN initialize is invoked multiple times sequentially THEN only the first invocation is executed and other dropped`() = runKernlTest {
         val subject = makeSubject()
         subject.data.test {
             subject.fetch(42)
@@ -72,12 +73,12 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() = runRealTimeTest {
+    fun `WHEN initialize is invoked multiple times concurrently THEN only one operation is executed`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test {
             subject.operation = {
-                delay(it.toLong())
+                advanceTimeBy(it.toLong())
                 it.toString()
             }
 
@@ -85,11 +86,11 @@ class BaseSingleCacheInternalKernlIntegrationTest {
                 subject.fetch(500)
             }
             launch {
-                delay(100)
+                advanceTimeBy(100)
                 subject.fetch(1)
             }
             launch {
-                delay(100)
+                advanceTimeBy(100)
                 subject.fetch(1)
             }
 
@@ -98,13 +99,13 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runRealTimeTest {
+    fun `WHEN refresh is invoked concurrently THEN only one operation is performed`() = runKernlTest {
         var counter = 0
         val subject = makeSubject()
 
         subject.data.test {
             subject.operation = {
-                delay(500)
+                advanceTimeBy(500)
                 counter.toString().also {
                     counter++
                 }
@@ -127,7 +128,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN refresh is invoked THEN new item is emitted`() = runRealTimeTest {
+    fun `WHEN refresh is invoked THEN new item is emitted`() = runKernlTest {
         val subject = makeSubject()
         var counter = 0
         subject.data.test {
@@ -145,7 +146,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN multiple listeners THEN all receive updates`() = runRealTimeTest {
+    fun `WHEN multiple listeners THEN all receive updates`() = runKernlTest {
         val subject = makeSubject()
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -171,7 +172,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runRealTimeTest {
+    fun `WHEN subscribing after a previous emission THEN most recent value is replayed`() = runKernlTest {
         val subject = makeSubject()
         turbineScope {
             val turbine1 = subject.data.testIn(backgroundScope)
@@ -189,12 +190,12 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runRealTimeTest {
+    fun `WHEN refresh is invoked before fetch THEN exception is thrown`() = runKernlTest {
         makeSubject().refresh()
     }
 
     @Test
-    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN invalidate is invoked before fetch THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject()
         subject.invalidate()
         subject.data.test {
@@ -204,7 +205,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN invalidate is invoked after fetch THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject()
         subject.data.test {
             subject.fetch(42)
@@ -217,7 +218,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global invalidate is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN global invalidate is invoked after fetch THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test {
@@ -239,7 +240,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global invalidate is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN global invalidate is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
@@ -254,7 +255,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global invalidate is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runRealTimeTest {
+    fun `WHEN global invalidate is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
@@ -268,7 +269,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global refresh is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN global refresh is invoked after fetch THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test {
@@ -283,7 +284,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global refresh is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN global refresh is invoked after fetch AND parameters match request THEN Invalidated emission occurs`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
@@ -298,7 +299,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN global refresh is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runRealTimeTest {
+    fun `WHEN global refresh is invoked after fetch AND parameters do not match request THEN no emission occurs`() = runKernlTest {
         val subject = makeSubject()
 
         subject.data.test(Duration.INFINITE) {
@@ -312,7 +313,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy invalidate is invoked after fetch THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN kernl policy invalidate is invoked after fetch THEN Invalidated emission occurs`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -330,7 +331,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy invalidate is invoked after fetch and params match THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN kernl policy invalidate is invoked after fetch and params match THEN Invalidated emission occurs`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -348,7 +349,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy invalidate is invoked after fetch and params do not match THEN Invalidated emission occurs`() = runRealTimeTest {
+    fun `WHEN kernl policy invalidate is invoked after fetch and params do not match THEN Invalidated emission occurs`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -366,7 +367,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy refresh is invoked after fetch THEN new emission occurs`() = runRealTimeTest {
+    fun `WHEN kernl policy refresh is invoked after fetch THEN new emission occurs`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -384,7 +385,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy refresh is invoked after fetch and parameters match THEN new emission occurs`() = runRealTimeTest {
+    fun `WHEN kernl policy refresh is invoked after fetch and parameters match THEN new emission occurs`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -402,7 +403,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy refresh is invoked after fetch and parameters do not match THEN no emission occurs`() = runRealTimeTest {
+    fun `WHEN kernl policy refresh is invoked after fetch and parameters do not match THEN no emission occurs`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -420,7 +421,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy has no retry strategy THEN no retry is attempted`() = runRealTimeTest {
+    fun `WHEN kernl policy has no retry strategy THEN no retry is attempted`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream
@@ -440,7 +441,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runRealTimeTest {
+    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND first attempt fails THEN one retry is attempted`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream,
@@ -466,7 +467,7 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     @Test
-    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runRealTimeTest {
+    fun `WHEN kernl policy has ExponentialBackoff retry strategy AND all attempts fail THEN 3 attempts are made`() = runKernlTest {
         val eventStream = MutableSharedFlow<KernlEvent>(replay = 1)
         val policy = KernlPolicyDefaults.copy(
             events = eventStream,
@@ -487,9 +488,6 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     }
 
     private fun CoroutineScope.makeSubject(dispatcher: CoroutineDispatcher? = null, kernlPolicy: KernlPolicy = DefaultKernlPolicy): StubSingleCacheKernl {
-        kernl {
-            startSession(coroutineContext[CoroutineDispatcher]!!)
-        }
         return StubSingleCacheKernl(
             dispatcher ?: coroutineContext[CoroutineDispatcher]!!,
             kernlPolicy

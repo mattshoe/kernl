@@ -7,7 +7,7 @@ object DefaultKernlPolicy: KernlPolicy {
     override val retryStrategy: RetryStrategy? = null
     override val events: Flow<KernlEvent> = Kernl.events
     override val cacheStrategy = CacheStrategy.NetworkFirst
-    override val invalidationStrategy = InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE)
+    override val invalidationStrategy = InvalidationStrategy.TimeToLive(timeToLive = Duration.INFINITE)
 }
 ```
 
@@ -30,7 +30,7 @@ object DefaultKernlPolicy: KernlPolicy {
 
 ### `invalidationStrategy`
 - **Type:** [`InvalidationStrategy`](INVALIDATION_STRATEGY.md)
-- **Value:** `InvalidationStrategy.TakeNoAction(timeToLive = Duration.INFINITE),`
+- **Value:** `InvalidationStrategy.TimeToLive(timeToLive = Duration.INFINITE),`
 - **Description:** By default, no invalidation will ever occur unless manually triggered.
 
 ## Summary

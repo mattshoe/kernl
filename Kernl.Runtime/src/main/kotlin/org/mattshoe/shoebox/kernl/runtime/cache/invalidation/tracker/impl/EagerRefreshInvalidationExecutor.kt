@@ -3,14 +3,14 @@ package org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.impl
 import kotlinx.coroutines.flow.*
 import org.mattshoe.shoebox.kernl.InvalidationStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
-import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationTracker
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.BaseInvalidationExecutor
 import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
 import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 
-class EagerRefreshInvalidationTracker(
+class EagerRefreshInvalidationExecutor(
     private val strategy: InvalidationStrategy.EagerRefresh,
     kernlResourceManager: KernlResourceManager
-): BaseInvalidationTracker(kernlResourceManager) {
+): BaseInvalidationExecutor(kernlResourceManager) {
 
     private val manualRefreshStream = MutableSharedFlow<Unit>()
 
