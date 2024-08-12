@@ -68,7 +68,7 @@ subprojects {
                 publishing {
                     publications {
                         repositories {
-                            mavenLocal()
+                            mavenCentral()
                         }
 
                         create<MavenPublication>(publicationName) {
