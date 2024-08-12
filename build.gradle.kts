@@ -23,7 +23,6 @@ dependencies {
 
 allprojects {
     repositories {
-//        mavenLocal()
         mavenCentral()
         google()
     }
@@ -68,7 +67,15 @@ subprojects {
                 publishing {
                     publications {
                         repositories {
-                            mavenCentral()
+                            maven {
+                                name = "Nexus"
+                                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+
+                                credentials {
+                                    username = System.getenv("OSSRH_USERNAME")
+                                    password = System.getenv("OSSRH_PASSWORD")
+                                }
+                            }
                         }
 
                         create<MavenPublication>(publicationName) {
@@ -108,12 +115,8 @@ subprojects {
 
 
                         signing {
-                            val signingKey = providers
-                                .environmentVariable("GPG_SIGNING_KEY")
-                                .forUseAtConfigurationTime()
-                            val signingPassphrase = providers
-                                .environmentVariable("GPG_SIGNING_PASSPHRASE")
-                                .forUseAtConfigurationTime()
+                            val signingKey = providers.environmentVariable("GPG_SIGNING_KEY")
+                            val signingPassphrase = providers.environmentVariable("GPG_SIGNING_PASSPHRASE")
                             if (signingKey.isPresent && signingPassphrase.isPresent) {
                                 useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
                                 sign(publishing.publications[publicationName])
@@ -125,7 +128,7 @@ subprojects {
 
             tasks.register<Zip>("generateZip") {
                 val publishTask = tasks.named(
-                    "publish${publicationName.replaceFirstChar { it.uppercaseChar() }}PublicationToMavenLocalRepository",
+                    "publish${publicationName.replaceFirstChar { it.uppercaseChar() }}PublicationToNexusRepository",
                     PublishToMavenRepository::class.java
                 )
                 from(publishTask.map { it.repository.url })
