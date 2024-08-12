@@ -6,7 +6,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.mattshoe.shoebox.kernl.annotations.Kernl
-import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeMemoryCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeCacheKernl
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.inmemory.BaseAssociativeCacheKernl
 import io.github.mattshoe.shoebox.stratify.model.GeneratedFile
 import kotlinx.coroutines.async
@@ -35,7 +35,7 @@ internal class AssociativeMemoryCacheProcessor(
         listOf(
             async {
                 codeGenerator.generate(
-                    AssociativeMemoryCacheKernl::class,
+                    AssociativeCacheKernl::class,
                     BaseAssociativeCacheKernl::class,
                     declaration,
                     repositoryName,

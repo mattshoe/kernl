@@ -18,7 +18,7 @@ import org.mattshoe.shoebox.kernl.InvalidationStrategy
  * @param TParams The type of the parameters that are used to identify and retrieve data.
  * @param TData The type of data that this kernel manages and retrieves.
  */
-interface AssociativeMemoryCacheKernl<TParams : Any, TData : Any> {
+interface AssociativeCacheKernl<TParams : Any, TData : Any> {
 
     /**
      * Retrieves the latest cached value associated with the given parameters, if available.
