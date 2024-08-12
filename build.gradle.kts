@@ -76,6 +76,7 @@ subprojects {
                                     password = providers.environmentVariable("OSSRH_PASSWORD").get()
                                 }
                             }
+                            mavenLocal()
                         }
 
                         create<MavenPublication>(publicationName) {
@@ -128,7 +129,7 @@ subprojects {
 
             tasks.register<Zip>("generateZip") {
                 val publishTask = tasks.named(
-                    "publish${publicationName.replaceFirstChar { it.uppercaseChar() }}PublicationToNexusRepository",
+                    "publish${publicationName.replaceFirstChar { it.uppercaseChar() }}PublicationToMavenLocalRepository",
                     PublishToMavenRepository::class.java
                 )
                 from(publishTask.map { it.repository.url })
