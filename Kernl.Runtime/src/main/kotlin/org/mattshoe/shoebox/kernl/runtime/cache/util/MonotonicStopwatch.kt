@@ -1,5 +1,6 @@
 package org.mattshoe.shoebox.kernl.runtime.cache.util
 
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
@@ -25,7 +26,7 @@ class MonotonicStopwatch: Stopwatch {
         return startTime?.let {
             now().minus(it)
         } ?: run {
-            println("TimeTracker was not started before elapsed was called!")
+            KernlLogger.debug("TimeTracker was not started before elapsed was called!")
             Duration.ZERO
         }
     }

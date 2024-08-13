@@ -20,13 +20,13 @@ A `Flow` of data of type `T`. <br>
 fun sampleCatchDataResult(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .catchDataResult {
-            println("oh no!")
+            KernlLogger.debug("oh no!")
             // Optionally emit a default value
             emit("Default Value")
         }
         .onEach {
             // Note the emission is NOT wrapped in DataResult
-            println("$it worked!")
+            KernlLogger.debug("$it worked!")
         }
         .launchIn(yourCoroutineScope)
 }

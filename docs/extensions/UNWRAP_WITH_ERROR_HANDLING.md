@@ -15,6 +15,6 @@ The encapsulated data of a successful data retrieval operation, or `null` if an 
 ```kotlin
 fun sampleUnwrapWithErrorHandling(dataResult: DataResult<String>): String? {
     return dataResult.unwrap {
-        println("logging the error: $it")
+        KernlLogger.debug("logging the error: $it")
     }
 }

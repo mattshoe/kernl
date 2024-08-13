@@ -11,6 +11,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.*
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Error
 import org.mattshoe.shoebox.kernl.runtime.DataResult.Success
@@ -36,12 +37,12 @@ class BaseSingleCacheInternalKernlIntegrationTest {
     fun `WHEN dataRetrieval succeeds THEN success is emitted`() = runKernlTest {
         val subject = makeSubject()
         subject.data.test {
-            println("fetching data")
+            KernlLogger.debug("fetching data")
             subject.fetch(42)
 
-            println("awaiting data")
+            KernlLogger.debug("awaiting data")
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
-            println("data received")
+            KernlLogger.debug("data received")
         }
     }
 
@@ -222,19 +223,19 @@ class BaseSingleCacheInternalKernlIntegrationTest {
         val subject = makeSubject()
 
         subject.data.test {
-            println("fetching")
+            KernlLogger.debug("fetching")
             subject.fetch(42)
-            println("awaiting fetch")
+            KernlLogger.debug("awaiting fetch")
             Truth.assertThat(awaitItem()).isEqualTo(Success("42"))
-            println("fetch got")
+            KernlLogger.debug("fetch got")
 
-            println("invalidating")
+            KernlLogger.debug("invalidating")
             kernl { globalInvalidate() }
-            println("invalidated")
+            KernlLogger.debug("invalidated")
 
-            println("awaiting invalidation")
+            KernlLogger.debug("awaiting invalidation")
             Truth.assertThat(awaitItem() is DataResult.Invalidated).isTrue()
-            println("awaited")
+            KernlLogger.debug("awaited")
             cancelAndIgnoreRemainingEvents()
         }
     }

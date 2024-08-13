@@ -76,7 +76,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           release_name: ${{ env.VERSION }}
-          body: |            
+          body: | 
             [Kernl.Runtime Maven Central](https://central.sonatype.com/artifact/org.mattshoe.shoebox/Kernl.Runtime/versions)
             [Kernl.Processor Maven Central](https://central.sonatype.com/artifact/org.mattshoe.shoebox/Kernl.Processor/versions)
             [Kernl.Annotations Maven Central](https://central.sonatype.com/artifact/org.mattshoe.shoebox/Kernl.Annotations/versions)

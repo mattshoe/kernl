@@ -1,5 +1,7 @@
 package org.mattshoe.shoebox
 
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
+
 fun main() {
-    println("Hello World!")
+    KernlLogger.debug("Hello World!")
 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.KernlEvent
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import util.runKernlTest
 import kotlin.time.Duration
@@ -154,31 +155,31 @@ class BaseAssociativeCacheInternalKernlTest {
     fun `WHEN global Kernl refresh all data is invoked, THEN all listeners receive new emission`() = runKernlTest(dispatcher) {
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
-            println("Awaiting first emission")
+            KernlLogger.debug("Awaiting first emission")
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             val turbine2 = subject.stream(43).testIn(backgroundScope)
-            println("Awaiting second emission")
+            KernlLogger.debug("Awaiting second emission")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
-            println("Awaiting third emission")
+            KernlLogger.debug("Awaiting third emission")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
-            println("advancing to ide")
+            KernlLogger.debug("advancing to ide")
             advanceUntilIdle()
 
-            println("asserting emission values")
+            KernlLogger.debug("asserting emission values")
             assertEmissionValues(42, 43, 44)
 
-            println("globalRefresh()")
+            KernlLogger.debug("globalRefresh()")
             kernl { globalRefresh() }
-            println("awaiting first")
+            KernlLogger.debug("awaiting first")
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
-            println("awaiting second")
+            KernlLogger.debug("awaiting second")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
-            println("awaiting third")
+            KernlLogger.debug("awaiting third")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
-            println("asserting fetch invocations")
+            KernlLogger.debug("asserting fetch invocations")
             Truth.assertThat(subject.fetchInvocations.count { it == 42 } == 2).isTrue()
             Truth.assertThat(subject.fetchInvocations.count { it == 43 } == 2).isTrue()
             Truth.assertThat(subject.fetchInvocations.count { it == 44 } == 2).isTrue()
@@ -311,68 +312,68 @@ class BaseAssociativeCacheInternalKernlTest {
 
     @Test
     fun `WHEN global Kernl invalidateAll() is invoked THEN all listeners receive emission`() = runKernlTest(dispatcher) {
-        println("Global Invalidate Test Started")
+        KernlLogger.debug("Global Invalidate Test Started")
         turbineScope {
             val turbine1 = subject.stream(42).testIn(backgroundScope)
-            println("awaiting turbine1 - pre_invalidate")
+            KernlLogger.debug("awaiting turbine1 - pre_invalidate")
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
             val turbine2 = subject.stream(43).testIn(backgroundScope)
-            println("awaiting turbine2 - pre_invalidate")
+            KernlLogger.debug("awaiting turbine2 - pre_invalidate")
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
-            println("awaiting turbine3 - pre_invalidate")
+            KernlLogger.debug("awaiting turbine3 - pre_invalidate")
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
-            println("asserting emission values")
+            KernlLogger.debug("asserting emission values")
             assertEmissionValues(42, 43, 44)
 
-            println("posting Invalidation globally")
+            KernlLogger.debug("posting Invalidation globally")
             kernl { globalInvalidate() }
 
-            println("awaiting Item for turbine1")
+            KernlLogger.debug("awaiting Item for turbine1")
             Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
-            println("awaiting Item for turbine2")
+            KernlLogger.debug("awaiting Item for turbine2")
             Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
-            println("awaiting Item for turbine3")
+            KernlLogger.debug("awaiting Item for turbine3")
             Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
             advanceUntilIdle()
-            println("asserting final emission values")
+            KernlLogger.debug("asserting final emission values")
             assertEmissionValues(42, 43, 44)
         }
-        println("Test Fin")
+        KernlLogger.debug("Test Fin")
     }
 
     @Test
     fun `WHEN global Kernl invalidate(params) is invoked THEN relevant listeners receive emission`() = runKernlTest(dispatcher) {
-        println("Global Parameterized Invalidated Test Started")
+        KernlLogger.debug("Global Parameterized Invalidated Test Started")
         turbineScope {
-            println("awaiting turbine1 - pre_invalidate")
+            KernlLogger.debug("awaiting turbine1 - pre_invalidate")
             val turbine1 = subject.stream(42).testIn(backgroundScope)
             Truth.assertThat(turbine1.awaitItem().unwrap()).isEqualTo("42")
-            println("awaiting turbine2 - pre_invalidate")
+            KernlLogger.debug("awaiting turbine2 - pre_invalidate")
             val turbine2 = subject.stream(43).testIn(backgroundScope)
             Truth.assertThat(turbine2.awaitItem().unwrap()).isEqualTo("43")
-            println("awaiting turbine3 - pre_invalidate")
+            KernlLogger.debug("awaiting turbine3 - pre_invalidate")
             val turbine3 = subject.stream(44).testIn(backgroundScope)
             Truth.assertThat(turbine3.awaitItem().unwrap()).isEqualTo("44")
 
-            println("asserting emission values")
+            KernlLogger.debug("asserting emission values")
             assertEmissionValues(42, 43, 44)
 
-            println("posting Invalidation for: 42")
+            KernlLogger.debug("posting Invalidation for: 42")
             kernl { globalInvalidate(42) }
 
-            println("awaiting Item for turbine1")
+            KernlLogger.debug("awaiting Item for turbine1")
             Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
             advanceUntilIdle()
-            println("expecting on events turbine2")
+            KernlLogger.debug("expecting on events turbine2")
             turbine2.expectNoEvents()
-            println("expecting on events turbine3")
+            KernlLogger.debug("expecting on events turbine3")
             turbine3.expectNoEvents()
-            println("asserting finall emissions")
+            KernlLogger.debug("asserting finall emissions")
             assertEmissionValues(42, 43, 44)
         }
-        println("Test Fin")
+        KernlLogger.debug("Test Fin")
     }
 
     @Test

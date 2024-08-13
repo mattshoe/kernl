@@ -21,7 +21,7 @@ A `Flow` of [`ValidDataResult`](../VALID_DATA_RESULT.md).<br>
 fun sampleOnInvalidation(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
         someFlow
         .onInvalidation {
-            println("invalidated!!")
+            KernlLogger.debug("invalidated!!")
             // Optionally emit a default error value if you like
             emit(
                 DataResult.Error(
@@ -36,11 +36,11 @@ fun sampleOnInvalidation(someFlow: Flow<DataResult<String>>, yourCoroutineScope:
             )
         }
         .onError {
-            println("Error! $it")
+            KernlLogger.debug("Error! $it")
         }
         .onEach {
             // Note the emission is NOT wrapped in DataResult
-            println("$it worked!")
+            KernlLogger.debug("$it worked!")
         }
         .launchIn(yourCoroutineScope)
 }

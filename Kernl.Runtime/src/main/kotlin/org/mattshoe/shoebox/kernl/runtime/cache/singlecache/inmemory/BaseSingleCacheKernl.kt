@@ -8,6 +8,7 @@ import org.mattshoe.shoebox.kernl.DefaultKernlPolicy
 import org.mattshoe.shoebox.kernl.KernlEvent
 import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.internal.*
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactory
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
@@ -67,23 +68,23 @@ abstract class BaseSingleCacheKernl<TParams : Any, TData : Any>(
             if (kernlPolicy.events !is InternalGlobalKernlEventStream) {
                 kernl { globalEventStream() }
                     .onEach {
-                        println("Global KernlEvent received: $it")
+                        KernlLogger.debug("Global KernlEvent received: $it")
                         handleKernlEvent(it)
                     }.launchIn(this)
             }
             kernlPolicy.events
                 .onEach {
-                    println("Policy KernlEvent received: $it")
+                    KernlLogger.debug("Policy KernlEvent received: $it")
                     handleKernlEvent(it)
                 }.launchIn(this)
             invalidationTracker.invalidationStream
                 .onEach {
-                    println("InvalidationStream Event!")
+                    KernlLogger.debug("InvalidationStream Event!")
                     invalidate()
                 }.launchIn(this)
             invalidationTracker.refreshStream
                 .onEach {
-                    println("RefreshStream event!")
+                    KernlLogger.debug("RefreshStream event!")
                     refresh()
                 }.launchIn(this)
             dataSource.data.collect {
@@ -113,7 +114,7 @@ abstract class BaseSingleCacheKernl<TParams : Any, TData : Any>(
 
     override suspend fun refresh() {
         withContext(dispatcher) {
-            println("BaseSingleCacheKernl: Refreshing data")
+            KernlLogger.debug("BaseSingleCacheKernl: Refreshing data")
             dataSource.refresh()
             invalidationTracker.onDataChanged()
         }
@@ -121,7 +122,7 @@ abstract class BaseSingleCacheKernl<TParams : Any, TData : Any>(
 
     override suspend fun invalidate() {
         withContext(dispatcher) {
-            println("BaseSingleCacheKernl: Invalidating data")
+            KernlLogger.debug("BaseSingleCacheKernl: Invalidating data")
             dataSource.invalidate()
             invalidationTracker.onInvalidated()
         }

@@ -3,6 +3,7 @@ package org.mattshoe.shoebox.kernl.internal
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import org.mattshoe.shoebox.kernl.KernlEvent
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 
 private val mutableGlobalEventStream = MutableSharedFlow<KernlEvent>(
     replay = 0,
@@ -33,8 +34,8 @@ object InternalKernl {
     val events: Flow<KernlEvent> = InternalGlobalKernlEventStream
 
     suspend fun globalEvent(event: KernlEvent) {
-        println("emitting kernlevent: $event")
+        KernlLogger.debug("emitting kernlevent: $event")
         mutableGlobalEventStream.emit(event)
-        println("kernlevent emitted! $event")
+        KernlLogger.debug("kernlevent emitted! $event")
     }
 }

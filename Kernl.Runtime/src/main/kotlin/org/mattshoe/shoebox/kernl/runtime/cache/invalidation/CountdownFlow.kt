@@ -2,6 +2,7 @@ package org.mattshoe.shoebox.kernl.runtime.cache.invalidation
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import kotlin.time.Duration
 
 /**
@@ -25,9 +26,9 @@ class CountdownFlow(private val name: String) {
         .flatMapLatest { interval ->
             flow {
                 interval?.let {
-                    println("$name: Delaying ${it.inWholeMilliseconds}ms")
+                    KernlLogger.debug("$name: Delaying ${it.inWholeMilliseconds}ms")
                     delay(it.inWholeMilliseconds)
-                    println("$name: Delay over")
+                    KernlLogger.debug("$name: Delay over")
                     emit(Unit)
                 }
             }
@@ -42,7 +43,7 @@ class CountdownFlow(private val name: String) {
      * @param newInterval The new countdown interval, after which an event will be emitted.
      */
     suspend fun reset(newInterval: Duration) {
-        println("$name: Resetting interval to ${newInterval.inWholeMilliseconds}ms")
+        KernlLogger.debug("$name: Resetting interval to ${newInterval.inWholeMilliseconds}ms")
         intervalFlow.emit(newInterval)
     }
 

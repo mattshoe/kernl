@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
 import javax.xml.crypto.Data
@@ -19,7 +20,7 @@ internal fun sampleValueOrNull() {
     val result = fetchData() // Example function that returns DataResult<String>
 
     val value: String? = result.valueOrNull()
-    println("Retrieved value: $value")
+    KernlLogger.debug("Retrieved value: $value")
 
     // Expected Output:
     // If result is DataResult.Success -> "Retrieved value: <data>"
@@ -31,9 +32,9 @@ internal fun sampleUnwrap() {
 
     try {
         val data = result.unwrap()
-        println("Data: $data")
+        KernlLogger.debug("Data: $data")
     } catch (e: Throwable) {
-        println("Error occurred: ${e.message}")
+        KernlLogger.debug("Error occurred: ${e.message}")
     }
 
     // Expected Output:
@@ -46,10 +47,10 @@ internal fun sampleUnwrapWithErrorHandling() {
     val result = fetchData() // Example function that returns DataResult<String>
 
     val data: String? = result.unwrap { error ->
-        println("Handled error: ${error.message}")
+        KernlLogger.debug("Handled error: ${error.message}")
     }
 
-    println("Unwrapped data: $data")
+    KernlLogger.debug("Unwrapped data: $data")
 
     // Expected Output:
     // If result is DataResult.Success -> "Unwrapped data: <data>"
@@ -68,7 +69,7 @@ internal fun sampleOrElse() {
         "Default value due to error: ${error.message}"
     }
 
-    println("Result data: $data")
+    KernlLogger.debug("Result data: $data")
 
     // Expected Output:
     // If result is DataResult.Success -> "Result data: <data>"
@@ -92,13 +93,13 @@ internal fun sampleObjectAsDataResult() {
 internal fun sampleOnSuccess(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onSuccess {
-            println("$it was successful!")
+            KernlLogger.debug("$it was successful!")
         }
         .onInvalidation {
-            println("invalidated!!")
+            KernlLogger.debug("invalidated!!")
         }
         .onError {
-            println("Error! $it")
+            KernlLogger.debug("Error! $it")
         }
         .launchIn(yourCoroutineScope)
 }
@@ -113,13 +114,13 @@ internal fun sampleCatchDataResult(someFlow: Flow<DataResult<String>>, yourCorou
     }
     someFlow
         .catchDataResult {
-            println("oh no!")
+            KernlLogger.debug("oh no!")
             // Optionally emit a default value
             emit("Default Value")
         }
         .onEach {
             // Note the emission is NOT wrapped in DataResult
-            println("$it worked!")
+            KernlLogger.debug("$it worked!")
         }
         .launchIn(yourCoroutineScope)
 }
@@ -127,16 +128,16 @@ internal fun sampleCatchDataResult(someFlow: Flow<DataResult<String>>, yourCorou
 internal fun sampleOnError(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onInvalidation {
-            println("invalidated!!")
+            KernlLogger.debug("invalidated!!")
         }
         .onError {
-            println("Error! $it")
+            KernlLogger.debug("Error! $it")
             // Optionally emit a default value
             emit("Default Value")
         }
         .onEach {
             // Note the emission is NOT wrapped in DataResult
-            println("$it worked!")
+            KernlLogger.debug("$it worked!")
         }
         .launchIn(yourCoroutineScope)
 }
@@ -148,7 +149,7 @@ private suspend fun foo() {
 internal fun sampleOnInvalidation(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onInvalidation {
-            println("invalidated!!")
+            KernlLogger.debug("invalidated!!")
             // Optionally emit a default error value if you like
             emit(
                 DataResult.Error(
@@ -163,11 +164,11 @@ internal fun sampleOnInvalidation(someFlow: Flow<DataResult<String>>, yourCorout
             )
         }
         .onError {
-            println("Error! $it")
+            KernlLogger.debug("Error! $it")
         }
         .onEach {
             // Note the emission is NOT wrapped in DataResult
-            println("$it worked!")
+            KernlLogger.debug("$it worked!")
         }
         .launchIn(yourCoroutineScope)
 }

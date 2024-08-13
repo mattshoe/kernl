@@ -20,16 +20,16 @@ A `Flow` of data of type `T`. <br> **_Note that this is no longer encapsulated b
 fun sampleOnError(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onInvalidation {
-            println("invalidated!!")
+            KernlLogger.debug("invalidated!!")
         }
         .onError {
-            println("Error! $it")
+            KernlLogger.debug("Error! $it")
             // Optionally emit a default value
             emit("Default Value")
         }
         .onEach {
             // Note the emission is NOT wrapped in DataResult
-            println("$it worked!")
+            KernlLogger.debug("$it worked!")
         }
         .launchIn(yourCoroutineScope)
 }

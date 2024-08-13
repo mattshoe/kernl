@@ -16,13 +16,13 @@ A `Flow` of [`DataResult`](../DATA_RESULT.md).
 fun sampleOnSuccess(someFlow: Flow<DataResult<String>>, yourCoroutineScope: CoroutineScope) {
     someFlow
         .onSuccess {
-            println("$it was successful!")
+            KernlLogger.debug("$it was successful!")
         }
         .onInvalidation {
-            println("invalidated!!")
+            KernlLogger.debug("invalidated!!")
         }
         .onError {
-            println("Error! $it")
+            KernlLogger.debug("Error! $it")
         }
         .launchIn(yourCoroutineScope)
 }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.currentTime
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.*
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import util.runKernlTest
@@ -292,12 +293,12 @@ class BaseSingleMemoryCacheIntegrationTest {
 
         subject.data.test {
             subject.fetch(42, "derp")
-            println("awaiting first emission")
+            KernlLogger.debug("awaiting first emission")
             Truth.assertThat(awaitItem()).isEqualTo(DataResult.Success("42 derp"))
-            println("first emission received")
+            KernlLogger.debug("first emission received")
 
             kernl { globalInvalidate("irrelevant params") }
-            println("awaiting invalidation emissions")
+            KernlLogger.debug("awaiting invalidation emissions")
 
             advanceUntilIdle()
             expectNoEvents()

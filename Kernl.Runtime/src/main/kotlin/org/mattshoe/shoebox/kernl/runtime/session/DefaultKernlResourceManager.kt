@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.mattshoe.shoebox.kernl.NEVER
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.CountdownFlow
 import org.mattshoe.shoebox.kernl.runtime.cache.util.MonotonicStopwatch
 import org.mattshoe.shoebox.kernl.runtime.dsl.DEFAULT_RESOURCE_MONITOR_INTERVAL
@@ -31,17 +32,17 @@ internal object DefaultKernlResourceManager: KernlResourceManager {
         coroutineScope.launch {
             monitorKernlsForDisposal(resourceMonitorInterval)
         }
-        println("session started")
+        KernlLogger.debug("session started")
     }
 
     override fun stopSession() {
-        println("Stopping Previous Session")
+        KernlLogger.debug("Stopping Previous Session")
         currentPollingJob?.cancel()
         if (::coroutineScope.isInitialized) {
-            println("Cancelling previous coroutine scope")
+            KernlLogger.debug("Cancelling previous coroutine scope")
             coroutineScope.cancel()
         }
-        println("clearing active kernels")
+        KernlLogger.debug("clearing active kernels")
         activeKernls.clear()
     }
 
@@ -76,37 +77,39 @@ internal object DefaultKernlResourceManager: KernlResourceManager {
     }
 
     override fun resetTimeToLive(uuid: UUID, duration: Duration) {
-        println("resetTimeToLive(${uuid}, ${duration.inWholeMilliseconds})")
+        KernlLogger.debug("resetTimeToLive(${uuid}, ${duration.inWholeMilliseconds})")
         coroutineScope.launch {
-            println("acquiring mutex lock for reset")
+            KernlLogger.debug("acquiring mutex lock for reset")
             activeKernlsMutex.withLock {
-                println("reset lock acquired.")
+                KernlLogger.debug("reset lock acquired.")
                 activeKernls[uuid]?.apply {
-                    println("resetting countdown flow")
+                    KernlLogger.debug("resetting countdown flow")
                     countdownFlow.reset(duration)
-                    println("resetting stopwatch")
+                    KernlLogger.debug("resetting stopwatch")
                     timeToLiveStopwatch.reset()
-                } ?: println("no reset entry found for $uuid!!!!!!")
+                } ?: KernlLogger.debug("no reset entry found for $uuid!!!!!!")
             }
-            println("reset lock released.")
+            KernlLogger.debug("reset lock released.")
         }
     }
 
     override fun stopTimeToLive(uuid: UUID) {
-        println("stopTimeToLive($uuid)")
+        KernlLogger.debug("stopTimeToLive($uuid)")
         coroutineScope.launch {
-            println("acquiring stop lock")
+            KernlLogger.debug("acquiring stop lock")
             activeKernlsMutex.withLock {
-                println("stop lock acquired")
+                KernlLogger.debug("stop lock acquired")
                 activeKernls[uuid]?.apply {
                     countdownFlow.stop()
                     timeToLiveStopwatch.stop()
-                    println("all stopped")
-                } ?: println("no stop entry found for $uuid!!!!!")
+                    KernlLogger.debug("all stopped")
+                } ?: KernlLogger.debug("no stop entry found for $uuid!!!!!")
             }
-            println("lock released")
+            KernlLogger.debug("lock released")
         }
     }
+
+    internal fun isCoroutineScopeInitialized() = ::coroutineScope.isInitialized
 
     private fun monitorKernlsForDisposal(interval: Duration) {
         currentPollingJob = coroutineScope.launch {
@@ -114,14 +117,14 @@ internal object DefaultKernlResourceManager: KernlResourceManager {
                 while (isActive) {
                     delay(interval.inWholeMilliseconds)
                     activeKernlsMutex.withLock {
-                        println("cleaning up references....")
+                        KernlLogger.debug("cleaning up references....")
                         val garbageCollectedKernls = mutableSetOf<UUID>()
                         activeKernls.keys.forEach {
                             if (activeKernls[it]?.kernlReference?.get() == null) {
                                 garbageCollectedKernls.add(it)
                             }
                         }
-                        println("${garbageCollectedKernls.size} Kernls have been garbage collected.")
+                        KernlLogger.debug("${garbageCollectedKernls.size} Kernls have been garbage collected.")
                         garbageCollectedKernls.forEach {
                             activeKernls[it]?.countdownFlow?.stop()
                             activeKernls[it]?.timeToLiveJob?.cancel()

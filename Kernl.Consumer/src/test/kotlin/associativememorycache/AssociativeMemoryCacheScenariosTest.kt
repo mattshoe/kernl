@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Test
+import org.mattshoe.shoebox.kernl.internal.logger.KernlLogger
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import util.runKernlTest
 
@@ -33,22 +34,22 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
 
     @Test
     fun `multiple streamers all receive updates then all receive invalidated`() = runKernlTest {
-        println("Associative Direct Parameterized Invalidation")
+        KernlLogger.debug("Associative Direct Parameterized Invalidation")
         testData.forEach {(params, response) ->
-            println("params: $params")
+            KernlLogger.debug("params: $params")
             turbineScope {
-                println("streaming")
+                KernlLogger.debug("streaming")
                 val turbine1 = subject.stream(params).testIn(backgroundScope)
                 val turbine2 = subject.stream(params).testIn(backgroundScope)
                 val turbine3 = subject.stream(params).testIn(backgroundScope)
 
                 advanceUntilIdle()
 
-                println("awaiting 1")
+                KernlLogger.debug("awaiting 1")
                 Truth.assertThat((turbine1.awaitItem() as DataResult.Success).data).isEqualTo(response)
-                println("awaiting 2")
+                KernlLogger.debug("awaiting 2")
                 Truth.assertThat((turbine2.awaitItem() as DataResult.Success).data).isEqualTo(response)
-                println("awaiting 3")
+                KernlLogger.debug("awaiting 3")
                 Truth.assertThat((turbine3.awaitItem() as DataResult.Success).data).isEqualTo(response)
 
                 Truth.assertThat(fetchInvocations).hasSize(1)
@@ -60,40 +61,40 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
 
                 advanceUntilIdle()
 
-                println("awaiting 1")
+                KernlLogger.debug("awaiting 1")
                 Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
-                println("awaiting 2")
+                KernlLogger.debug("awaiting 2")
                 Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
-                println("awaiting 3")
+                KernlLogger.debug("awaiting 3")
                 Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
 
                 Truth.assertThat(fetchInvocations).hasSize(1)
                 Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
             }
-            println("params done")
+            KernlLogger.debug("params done")
             fetchInvocations.clear()
         }
-        println("test done")
+        KernlLogger.debug("test done")
     }
 
     @Test
     fun `multiple streamers all receive updates on global invalidation`() = runKernlTest {
-        println("Associative Global Invalidation")
+        KernlLogger.debug("Associative Global Invalidation")
         testData.forEach {(params, response) ->
-            println("Starting params: $params")
+            KernlLogger.debug("Starting params: $params")
             turbineScope {
-                println("streaming")
+                KernlLogger.debug("streaming")
                 val turbine1 = subject.stream(params).testIn(backgroundScope)
                 val turbine2 = subject.stream(params).testIn(backgroundScope)
                 val turbine3 = subject.stream(params).testIn(backgroundScope)
 
                 advanceUntilIdle()
 
-                println("awaiting 1")
+                KernlLogger.debug("awaiting 1")
                 Truth.assertThat((turbine1.awaitItem() as DataResult.Success).data).isEqualTo(response)
-                println("awaiting 2")
+                KernlLogger.debug("awaiting 2")
                 Truth.assertThat((turbine2.awaitItem() as DataResult.Success).data).isEqualTo(response)
-                println("awaiting 3")
+                KernlLogger.debug("awaiting 3")
                 Truth.assertThat((turbine3.awaitItem() as DataResult.Success).data).isEqualTo(response)
 
                 Truth.assertThat(fetchInvocations).hasSize(1)
@@ -101,45 +102,45 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
 
                 advanceUntilIdle()
 
-                println("invalidating")
+                KernlLogger.debug("invalidating")
                 kernl { globalInvalidate() }
 
                 advanceUntilIdle()
 
-                println("awaiting 1")
+                KernlLogger.debug("awaiting 1")
                 Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
-                println("awaiting 2")
+                KernlLogger.debug("awaiting 2")
                 Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
-                println("awaiting 3")
+                KernlLogger.debug("awaiting 3")
                 Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
 
                 Truth.assertThat(fetchInvocations).hasSize(1)
                 Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
             }
-            println("params done")
+            KernlLogger.debug("params done")
             fetchInvocations.clear()
         }
-        println("test done")
+        KernlLogger.debug("test done")
     }
 
     @Test
     fun `multiple streamers all receive updates on global invalidation with specific params`() = runKernlTest {
-        println("Associative Global Parameterized Invalidation")
+        KernlLogger.debug("Associative Global Parameterized Invalidation")
         testData.forEach {(params, response) ->
-            println("Params: $params")
+            KernlLogger.debug("Params: $params")
             turbineScope {
-                println("streaming")
+                KernlLogger.debug("streaming")
                 val turbine1 = subject.stream(params).testIn(backgroundScope)
                 val turbine2 = subject.stream(params).testIn(backgroundScope)
                 val turbine3 = subject.stream(params).testIn(backgroundScope)
 
                 advanceUntilIdle()
 
-                println("awaiting 1")
+                KernlLogger.debug("awaiting 1")
                 Truth.assertThat((turbine1.awaitItem() as DataResult.Success).data).isEqualTo(response)
-                println("awaiting 2")
+                KernlLogger.debug("awaiting 2")
                 Truth.assertThat((turbine2.awaitItem() as DataResult.Success).data).isEqualTo(response)
-                println("awaiting 3")
+                KernlLogger.debug("awaiting 3")
                 Truth.assertThat((turbine3.awaitItem() as DataResult.Success).data).isEqualTo(response)
 
                 Truth.assertThat(fetchInvocations).hasSize(1)
@@ -147,25 +148,25 @@ abstract class AssociativeMemoryCacheScenariosTest<TParams: Any, TResponse: Any>
 
                 advanceUntilIdle()
 
-                println("invalidating")
+                KernlLogger.debug("invalidating")
                 kernl { globalInvalidate(params)}
 
                 advanceUntilIdle()
 
-                println("awaiting 1")
+                KernlLogger.debug("awaiting 1")
                 Truth.assertThat(turbine1.awaitItem() is DataResult.Invalidated).isTrue()
-                println("awaiting 2")
+                KernlLogger.debug("awaiting 2")
                 Truth.assertThat(turbine2.awaitItem() is DataResult.Invalidated).isTrue()
-                println("awaiting 3")
+                KernlLogger.debug("awaiting 3")
                 Truth.assertThat(turbine3.awaitItem() is DataResult.Invalidated).isTrue()
 
-                println("asserting")
+                KernlLogger.debug("asserting")
                 Truth.assertThat(fetchInvocations).hasSize(1)
                 Truth.assertThat(fetchInvocations.first()).isEqualTo(params)
             }
-            println("params done")
+            KernlLogger.debug("params done")
             fetchInvocations.clear()
         }
-        println("test done")
+        KernlLogger.debug("test done")
     }
 }
