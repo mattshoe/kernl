@@ -31,26 +31,25 @@ dependencies {
 }
 ```
 
-### 2. Configure the Scope of your Kernl data
+### 2. (Optional) Configure the Scope of your Kernl data
 
-With Kernl, you define the lifespan of your memory-cached data. Once that lifespan is ended, all memory caches will
-be immediately invalidated, ensuring no data can be used beyond its scope. Disk-cached data will not be invalidated
-upon scope termination, only in-memory caches.
+With Kernl, you can define the lifespan of your memory-cached data. Once that lifespan is ended, all memory
+caches will be immediately invalidated, ensuring that no data can be used outside the defined scope. Disk-cached data
+will not be invalidated upon scope termination, only in-memory caches.
 
-Please note that your application is required to invoke `kernl { startSession() }` at some point before loading your
-Kernls.
-This is typically done in either the Application, in your app's post-login logic, or the main() function in a pure
-kotlin
-library.
+This is useful for situations such as invalidating data when a user logs out, ensuring that no sensitive data is leaked to the next session and all memory is disposed appropriately.
+
+If you opt for no defined scope, then the `Kernl` framework will not automatically invalidate any data unless you
+invoke `kernl { globalInvalidate() }`.
 
 ```kotlin
 // Scope your data to a single login session, invalidating all data on logout
-class MyUserSessionManager : UserSessionManager() {
-    override fun onUserLoggedIn() {
+class MyUserSessionManager : SessionManager {
+    override fun onLoggedIn() {
         kernl { startSession() }
     }
 
-    override fun onUserLoggedOut() {
+    override fun onLoggedOut() {
         kernl { stopSession() }
     }
 }
@@ -231,7 +230,7 @@ class UserRepository(
     suspend fun loadUser(id: String, someParam: Int, otherParam: Boolean) {
         userDataKernl.fetch(id, someParam, otherParam)
     }
-    
+
     suspend fun cleanup() {
         // logic to remove any invalidated data (if necessary)
     }
