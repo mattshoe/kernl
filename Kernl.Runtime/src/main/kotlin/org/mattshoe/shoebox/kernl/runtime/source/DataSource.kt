@@ -35,7 +35,7 @@ interface DataSource<T: Any> {
      * This method will only perform the [dataRetrieval] operation for the FIRST invocation.
      * All subsequent invocations of [initialize] will be ignored.
      *
-     * This method will ensure that only a single `[dataRetrieval] operation is in flight at a
+     * This method will ensure that only a single [dataRetrieval] operation is in flight at a
      * given time, preventing the possibility of duplicate/redundant retrieval operations. Any
      * concurrent invocations of [initialize] will be dropped, NOT queued. Meaning that if this
      * method is invoked while a [dataRetrieval] is already in flight, then it will be ignored.

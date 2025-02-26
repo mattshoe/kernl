@@ -8,16 +8,11 @@ import io.mockk.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
-import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import util.TestKernlResourceManager
 
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
@@ -47,8 +42,8 @@ class BaseSingleCacheInternalKernlUnitTest {
 
         every { DataSource.Builder } returns datasourceBuilderRequest
         every { datasourceBuilderRequest.memoryCache(String::class) } returns memoryCachedDataSourceBuilderRequest
-        every { memoryCachedDataSourceBuilderRequest.dispatcher(any()) } returns memoryCachedDataSourceBuilderRequest
-        every { memoryCachedDataSourceBuilderRequest.retryStrategy(any()) } returns memoryCachedDataSourceBuilderRequest
+        every { memoryCachedDataSourceBuilderRequest.withDispatcher(any()) } returns memoryCachedDataSourceBuilderRequest
+        every { memoryCachedDataSourceBuilderRequest.withRetryStrategy(any()) } returns memoryCachedDataSourceBuilderRequest
         every { memoryCachedDataSourceBuilderRequest.build() } returns mockDataSource
     }
 

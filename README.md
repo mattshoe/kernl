@@ -10,7 +10,7 @@ in-memory network caching to offline backups in poor network conditions to datab
 
 1. **Declarative API:** Define the rules and **Kernl** generates the code to execute it.
 2. **Performance:** **Kernl** uses KSP to generate code rather than relying on reflection to build functionality.
-2. **Flexible Caching:** Use **Kernl**-provided policies or build your own custom policies to define your needs.
+3. **Flexible Caching:** Use **Kernl**-provided policies or build your own custom policies to define your needs.
 4. **Flexible Integration**: Integrates easily with all major dependency injection frameworks.
 5. **Kotlin-First**: Kernl prioritizes Kotlin native functionality like Coroutines and Serialization.
 6. **Real-Time Data Sync:** Ensure your entire application stays in sync with **Kernl**'s managed streams.
@@ -45,6 +45,7 @@ invoke `kernl { globalInvalidate() }`.
 ```kotlin
 // Scope your data to a single login session, invalidating all data on logout
 class MyUserSessionManager : SessionManager {
+    
     override fun onLoggedIn() {
         kernl { startSession() }
     }
@@ -52,15 +53,8 @@ class MyUserSessionManager : SessionManager {
     override fun onLoggedOut() {
         kernl { stopSession() }
     }
+    
 }
-
-// Alternatively, scope your data to the lifetime of an Android application
-class MyApplication : Application() {
-    override fun onCreate() {
-        kernl { startSession() }
-    }
-}
-
 ```
 
 ### 3. Annotate

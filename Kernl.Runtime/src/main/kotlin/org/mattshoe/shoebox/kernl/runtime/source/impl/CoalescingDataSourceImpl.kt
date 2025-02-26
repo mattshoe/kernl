@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.impl
+package org.mattshoe.shoebox.kernl.runtime.source.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -6,10 +6,11 @@ import kotlinx.coroutines.sync.withLock
 import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
+import org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
 import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
 
-internal class CoalescingDataSourceImpl<T: Any>(private val retryStrategy: RetryStrategy? = null): CoalescingDataSource<T> {
+internal class CoalescingDataSourceImpl<T: Any>(private val retryStrategy: RetryStrategy? = null):
+    CoalescingDataSource<T> {
 
     private val requestMutex = Mutex()
     private var ongoingRequest: Deferred<ValidDataResult<T>>? = null

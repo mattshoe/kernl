@@ -1,4 +1,4 @@
-package org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source
+package org.mattshoe.shoebox.kernl.runtime.source
 
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
 

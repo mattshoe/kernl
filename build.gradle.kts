@@ -3,6 +3,8 @@ import org.apache.tools.ant.taskdefs.Java
 val NOTHING = "nothing"
 
 plugins {
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.kotlinAndroid) apply false
     kotlin("jvm") version "2.0.10-RC2"
     id("maven-publish")
     signing

@@ -7,8 +7,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.impl.CoalescingDataSourceImpl
+import org.mattshoe.shoebox.kernl.runtime.source.impl.CoalescingDataSourceImpl
 import kotlin.random.Random
 
 class CoalescingDataSourceTest {

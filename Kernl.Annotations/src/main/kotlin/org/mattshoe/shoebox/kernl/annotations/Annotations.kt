@@ -27,7 +27,7 @@ annotation class Kernl {
 
         @Target(AnnotationTarget.FUNCTION)
         @Retention(AnnotationRetention.SOURCE)
-        annotation class Disk(
+        annotation class Persistent(
             val name: String,
             val policy: KClass<out KernlPolicy> = DefaultKernlPolicy::class
         )
@@ -46,7 +46,7 @@ annotation class Kernl {
 
         @Target(AnnotationTarget.FUNCTION)
         @Retention(AnnotationRetention.SOURCE)
-        annotation class Disk(
+        annotation class Persistent(
             val name: String,
             val policy: KClass<out KernlPolicy> = DefaultKernlPolicy::class
         )

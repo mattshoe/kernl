@@ -11,12 +11,12 @@ abstract class DataSourceBuilder<T: Any>(
     protected var dispatcher: CoroutineDispatcher? = null
     protected var retryStrategy: RetryStrategy? = null
 
-    fun retryStrategy(retryStrategy: RetryStrategy?): DataSourceBuilder<T> {
+    fun withRetryStrategy(retryStrategy: RetryStrategy?): DataSourceBuilder<T> {
         this.retryStrategy = retryStrategy
         return this
     }
 
-    fun dispatcher(dispatcher: CoroutineDispatcher): DataSourceBuilder<T> {
+    fun withDispatcher(dispatcher: CoroutineDispatcher): DataSourceBuilder<T> {
         this.dispatcher = dispatcher
         return this
     }

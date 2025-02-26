@@ -10,8 +10,8 @@ import org.mattshoe.shoebox.kernl.RetryStrategy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.ValidDataResult
 import org.mattshoe.shoebox.kernl.runtime.source.util.fetchWithRetryStrategy
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
-import org.mattshoe.shoebox.org.mattshoe.shoebox.kernl.runtime.source.impl.CoalescingDataSourceImpl
+import org.mattshoe.shoebox.kernl.runtime.source.CoalescingDataSource
+import org.mattshoe.shoebox.kernl.runtime.source.impl.CoalescingDataSourceImpl
 
 /**
  * An abstract base class that provides a framework for implementing a non-caching data kernel with request coalescing.

@@ -14,9 +14,14 @@ import org.mattshoe.shoebox.kernl.KernlEvent
 import org.mattshoe.shoebox.kernl.KernlPolicy
 import org.mattshoe.shoebox.kernl.runtime.DataResult
 import org.mattshoe.shoebox.kernl.runtime.cache.associativecache.AssociativeCacheKernl
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationExecutor
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactory
+import org.mattshoe.shoebox.kernl.runtime.cache.invalidation.tracker.InvalidationTrackerFactoryImpl
 import org.mattshoe.shoebox.kernl.runtime.source.DataSource
 import org.mattshoe.shoebox.kernl.runtime.dsl.kernl
 import org.mattshoe.shoebox.kernl.runtime.ext.conflatingChannelFlow
+import org.mattshoe.shoebox.kernl.runtime.session.DefaultKernlResourceManager
+import org.mattshoe.shoebox.kernl.runtime.session.KernlResourceManager
 import kotlin.reflect.KClass
 
 /**
@@ -33,14 +38,19 @@ import kotlin.reflect.KClass
  */
 abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val kernlPolicy: KernlPolicy = DefaultKernlPolicy
+    private val kernlPolicy: KernlPolicy = DefaultKernlPolicy,
+    private val kernlResourceManager: KernlResourceManager = DefaultKernlResourceManager,
+    private val invalidationTrackerFactory: InvalidationTrackerFactory = InvalidationTrackerFactoryImpl(
+        kernlResourceManager
+    ),
 ) : AssociativeCacheKernl<TParams, TData> {
 
     private val refreshStream = MutableSharedFlow<TParams>(replay = 0, onBufferOverflow = BufferOverflow.SUSPEND)
     private val invalidationStream = MutableSharedFlow<TParams>(replay = 0, onBufferOverflow = BufferOverflow.SUSPEND)
 
     private data class CacheEntry<TData : Any>(
-        val dataSource: DataSource<TData>
+        val dataSource: DataSource<TData>,
+        val invalidationExecutor: InvalidationExecutor
     )
 
     private val dataCacheMutex = Mutex()
@@ -104,8 +114,11 @@ abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
     private suspend fun loadDataIntoCache(params: TParams, forceFetch: Boolean) {
         dataCacheMutex.withLock {
             with(findDataCacheEntry(params)) {
-                dataSource.initialize(forceFetch) {
-                    fetchData(params)
+                val shouldForceFetch = forceFetch || invalidationExecutor.shouldForceFetch(latestValue(params))
+                dataSource.initialize(shouldForceFetch) {
+                    fetchData(params).also {
+                        invalidationExecutor.onDataChanged()
+                    }
                 }
 
                 dataCache[params] = this
@@ -131,14 +144,16 @@ abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
             ?: CacheEntry(
                 DataSource.Builder
                     .memoryCache(dataType)
-                    .dispatcher(dispatcher)
-                    .build()
+                    .withDispatcher(dispatcher)
+                    .build(),
+                invalidationExecutor = invalidationTrackerFactory.getExecutor(kernlPolicy.invalidationStrategy)
             )
     }
 
     private suspend fun invalidateAllDataSources() {
         dataCache.values.forEach {
             it.dataSource.invalidate()
+            it.invalidationExecutor.onInvalidated()
         }
     }
 
@@ -160,6 +175,17 @@ abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
             }
             .flowOn(dispatcher)
             .launchIn(this)
+
+        dataCacheMutex.withLock {
+            dataCache[params]?.apply {
+                invalidationExecutor.refreshStream
+                    .onEach {
+                        refreshDataSource(params)
+                    }
+                    .flowOn(dispatcher)
+                    .launchIn(this@collectRefreshes)
+            }
+        }
     }
 
     private suspend fun ProducerScope<DataResult<TData>>.collectInvalidations(params: TParams) {
@@ -171,6 +197,17 @@ abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
             }
             .flowOn(dispatcher)
             .launchIn(this)
+
+        dataCacheMutex.withLock {
+            dataCache[params]?.apply {
+                invalidationExecutor.invalidationStream
+                    .onEach {
+                        invalidateDataSource(params)
+                    }
+                    .flowOn(dispatcher)
+                    .launchIn(this@collectInvalidations)
+            }
+        }
     }
 
     private suspend fun ProducerScope<DataResult<TData>>.collectGlobalEvents(params: TParams) {
@@ -205,7 +242,10 @@ abstract class BaseAssociativeCacheKernl<TParams : Any, TData : Any>(
 
     private suspend fun invalidateDataSource(params: TParams) {
         withContext(dispatcher) {
-            dataCache[params]?.dataSource?.invalidate()
+            dataCache[params]?.let {
+                it.dataSource.invalidate()
+                it.invalidationExecutor.onInvalidated()
+            }
         }
     }
 
